@@ -2,13 +2,16 @@
 
 [English](./README.md) | 中文
 
-每天早上 08:00 CST 自动运行的 GitHub Actions 工作流。聚合 10 个 AI 生态数据源，以中英双语每日简报的形式发布为 GitHub Issues 并提交为 Markdown 文件。每周和每月自动生成汇总报告。
+> **Roxy 部署版。** 本分支每天北京时间 08:20 运行，通过 GitHub Pages
+> 发布 Markdown、网页和 RSS；模型使用 GitHub Models，仓库跟踪范围压缩为
+> 4 个。默认不发布 Issues、不发送聊天通知，周报和月报仅允许手动运行。
+> 下方详细章节也保留了部分上游可选能力的说明。
 
 ### 数据源
 
 | 来源 | 类型 | 数据内容 |
 |------|------|---------|
-| [GitHub Repos](https://github.com) | API | 17+ 个 AI 工具仓库的 Issues、PR、Releases |
+| [GitHub Repos](https://github.com) | API | 精简 4 个仓库的 Issues、PR、Releases |
 | [Claude Code Skills](https://github.com/anthropics/skills) | API | 按社区活跃度排序的热门 Skills |
 | [GitHub Trending](https://github.com/trending) | HTML + API | 每日热门仓库 + AI 主题搜索（7 天窗口） |
 | [Hacker News](https://news.ycombinator.com) | [Algolia API](https://hn.algolia.com/api) | 过去 24 小时 Top 30 AI 热帖，6 组并行查询 |
@@ -21,7 +24,7 @@
 
 ## Web UI
 
-**[https://duanyytop.github.io/agents-radar](https://duanyytop.github.io/agents-radar)**
+**[https://iiijiashu.github.io/roxy-rss-bot](https://iiijiashu.github.io/roxy-rss-bot)**
 
 在线浏览所有历史简报，深色主题，无需登录。报告直接由本仓库的 Markdown 文件通过 GitHub Pages 渲染。每份报告支持中文 / 英文切换。
 
@@ -44,7 +47,7 @@
 
 ## RSS 订阅
 
-**[https://duanyytop.github.io/agents-radar/feed.xml](https://duanyytop.github.io/agents-radar/feed.xml)**
+**[https://iiijiashu.github.io/roxy-rss-bot/feed.xml](https://iiijiashu.github.io/roxy-rss-bot/feed.xml)**
 
 在任意 RSS 阅读器（Feedly、Reeder、NewsBlur 等）中订阅，每日自动推送新简报。Feed 包含最新 30 条报告（覆盖所有报告类型），与 `manifest.json` 同步更新。
 

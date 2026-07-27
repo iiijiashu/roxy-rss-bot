@@ -3,7 +3,7 @@
  *
  * Env vars:
  *   GITHUB_TOKEN           - GitHub token (PAT or GitHub Actions `GITHUB_TOKEN`)
- *   GITHUB_COPILOT_MODEL   - model name (default: gpt-4o)
+ *   GITHUB_COPILOT_MODEL   - model name (default: openai/gpt-4o-mini)
  */
 
 import { OpenAICompatibleProvider } from "./openai-compatible.ts";
@@ -17,7 +17,7 @@ export class GitHubCopilotProvider extends OpenAICompatibleProvider {
     super({
       apiKey: opts?.apiKey ?? process.env["GITHUB_TOKEN"],
       baseURL: GITHUB_COPILOT_BASE_URL,
-      model: opts?.model ?? process.env["GITHUB_COPILOT_MODEL"] ?? "gpt-4o",
+      model: opts?.model ?? process.env["GITHUB_COPILOT_MODEL"] ?? "openai/gpt-4o-mini",
     });
   }
 }

@@ -255,6 +255,11 @@ describe("GitHubCopilotProvider", () => {
     const p = new GitHubCopilotProvider({ apiKey: "ghp_test" });
     const result = await p.call("prompt", 512);
     expect(result).toBe("Hello from Copilot");
+    expect(mockCreate).toHaveBeenCalledWith({
+      model: "openai/gpt-4o-mini",
+      max_completion_tokens: 512,
+      messages: [{ role: "user", content: "prompt" }],
+    });
   });
 
   it(

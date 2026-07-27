@@ -60,12 +60,26 @@ export function is429(err: unknown): boolean {
   return (err as { status?: number })?.status === 429 || String(err).includes("429");
 }
 
+function configuredMaxTokens(requested: number): number {
+  const rawLimit = process.env["LLM_MAX_TOKENS"]?.trim();
+  if (!rawLimit) return requested;
+  if (!/^[1-9]\d*$/.test(rawLimit)) {
+    throw new Error("LLM_MAX_TOKENS must be a positive integer");
+  }
+  const limit = Number(rawLimit);
+  if (!Number.isSafeInteger(limit)) {
+    throw new Error("LLM_MAX_TOKENS must be a safe integer");
+  }
+  return Math.min(requested, limit);
+}
+
 export async function callLlm(prompt: string, maxTokens = LLM_TOKENS_DEFAULT): Promise<string> {
+  const effectiveMaxTokens = configuredMaxTokens(maxTokens);
   for (let attempt = 0; ; attempt++) {
     await acquireSlot();
     let released = false;
     try {
-      return await provider.call(prompt, maxTokens);
+      return await provider.call(prompt, effectiveMaxTokens);
     } catch (err) {
       if (attempt < MAX_RETRIES && is429(err)) {
         releaseSlot();

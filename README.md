@@ -2,13 +2,17 @@
 
 English | [中文](./README.zh.md)
 
-A GitHub Actions workflow that runs every morning at 08:00 CST. It aggregates AI ecosystem signals from 10 data sources, then publishes bilingual (Chinese + English) daily digests as GitHub Issues and committed Markdown files. Weekly and monthly rollup reports are also generated automatically.
+> **Roxy deployment profile.** This fork runs at 08:20 China Standard Time,
+> publishes Markdown, Web, and RSS through GitHub Pages, and uses GitHub Models
+> with a compact four-repository watchlist. Issue publishing and chat
+> notifications are disabled; weekly and monthly rollups are manual-only. The
+> detailed sections below also document optional upstream capabilities.
 
 ### Data Sources
 
 | Source | Type | Data |
 |--------|------|------|
-| [GitHub Repos](https://github.com) | API | Issues, PRs, releases from 17+ tracked AI tool repos |
+| [GitHub Repos](https://github.com) | API | Issues, PRs, and releases from the compact four-repository watchlist |
 | [Claude Code Skills](https://github.com/anthropics/skills) | API | Trending skills sorted by community engagement |
 | [GitHub Trending](https://github.com/trending) | HTML + API | Daily trending repos + AI topic search (7-day window) |
 | [Hacker News](https://news.ycombinator.com) | [Algolia API](https://hn.algolia.com/api) | Top 30 AI stories from last 24h, 6 parallel queries |
@@ -21,7 +25,7 @@ A GitHub Actions workflow that runs every morning at 08:00 CST. It aggregates AI
 
 ## Web UI
 
-**[https://duanyytop.github.io/agents-radar](https://duanyytop.github.io/agents-radar)**
+**[https://iiijiashu.github.io/roxy-rss-bot](https://iiijiashu.github.io/roxy-rss-bot)**
 
 Browse all historical digests in a clean, dark-themed interface — no login required. Reports are rendered from the Markdown files in this repo via GitHub Pages.
 
@@ -44,7 +48,7 @@ Subscribe to get daily digest notifications pushed directly to your preferred pl
 
 ## RSS Feed
 
-**[https://duanyytop.github.io/agents-radar/feed.xml](https://duanyytop.github.io/agents-radar/feed.xml)**
+**[https://iiijiashu.github.io/roxy-rss-bot/feed.xml](https://iiijiashu.github.io/roxy-rss-bot/feed.xml)**
 
 Subscribe in any RSS reader (Feedly, Reeder, NewsBlur, etc.) to receive new digests automatically. The feed includes the latest 30 reports across all report types, updated daily alongside `manifest.json`.
 

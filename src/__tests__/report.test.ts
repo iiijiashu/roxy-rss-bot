@@ -190,6 +190,8 @@ describe("parseLlmJson", () => {
 // ---------------------------------------------------------------------------
 
 describe("callLlm", () => {
+  const originalMaxTokens = process.env["LLM_MAX_TOKENS"];
+
   beforeEach(() => {
     vi.useFakeTimers();
     mockCall.mockReset();
@@ -197,6 +199,11 @@ describe("callLlm", () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    if (originalMaxTokens === undefined) {
+      delete process.env["LLM_MAX_TOKENS"];
+    } else {
+      process.env["LLM_MAX_TOKENS"] = originalMaxTokens;
+    }
   });
 
   it("passes prompt and maxTokens to provider.call()", async () => {
@@ -215,6 +222,22 @@ describe("callLlm", () => {
     await callLlm("prompt");
 
     expect(mockCall).toHaveBeenCalledWith("prompt", 4096);
+  });
+
+  it("caps requested output tokens using LLM_MAX_TOKENS", async () => {
+    process.env["LLM_MAX_TOKENS"] = "4000";
+    mockCall.mockResolvedValueOnce("ok");
+
+    await callLlm("prompt", 8192);
+
+    expect(mockCall).toHaveBeenCalledWith("prompt", 4000);
+  });
+
+  it("rejects an invalid LLM_MAX_TOKENS value before calling the provider", async () => {
+    process.env["LLM_MAX_TOKENS"] = "0";
+
+    await expect(callLlm("prompt", 8192)).rejects.toThrow("LLM_MAX_TOKENS must be a positive integer");
+    expect(mockCall).not.toHaveBeenCalled();
   });
 
   it("retries on 429 with exponential backoff", async () => {
