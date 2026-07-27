@@ -6,7 +6,7 @@ import { REPORT_LABELS } from "./i18n.ts";
 const DIGESTS_DIR = "digests";
 const MANIFEST_PATH = "manifest.json";
 const FEED_PATH = "feed.xml";
-const SITE_URL = "https://duanyytop.github.io/agents-radar";
+const DEFAULT_SITE_URL = "https://duanyytop.github.io/agents-radar";
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const REPORT_FILES = [
   "ai-cli",
@@ -64,6 +64,18 @@ export function escapeXml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+export function normalizeSiteUrl(raw = DEFAULT_SITE_URL): string {
+  const value = raw.trim();
+  if (!value) throw new Error("PAGES_URL must not be empty");
+
+  const parsed = new URL(value);
+  if (parsed.protocol !== "https:") throw new Error("PAGES_URL must use HTTPS");
+  if (parsed.username || parsed.password) throw new Error("PAGES_URL must not contain credentials");
+  if (parsed.search || parsed.hash) throw new Error("PAGES_URL must not contain a query string or fragment");
+
+  return parsed.href.replace(/\/+$/, "");
+}
+
 async function getReportContent(date: string, report: string): Promise<ReportContent> {
   const filePath = path.join(DIGESTS_DIR, date, `${report}.md`);
 
@@ -97,6 +109,7 @@ async function getReportContent(date: string, report: string): Promise<ReportCon
 }
 
 async function main(): Promise<void> {
+  const siteUrl = normalizeSiteUrl(process.env["PAGES_URL"] ?? DEFAULT_SITE_URL);
   const entries = fs
     .readdirSync(DIGESTS_DIR)
     .filter((name) => DATE_RE.test(name) && fs.statSync(path.join(DIGESTS_DIR, name)).isDirectory())
@@ -132,7 +145,7 @@ async function main(): Promise<void> {
   for (const { date, report } of feedItems) {
     const label = REPORT_LABELS[report] ?? report;
     const title = `${label} ${date}`;
-    const link = `${SITE_URL}/#${date}/${report}`;
+    const link = `${siteUrl}/#${date}/${report}`;
     const parts = date.split("-").map(Number);
     const pubDate = toRfc822(new Date(Date.UTC(parts[0]!, parts[1]! - 1, parts[2]!)));
     const content = await getReportContent(date, report);
@@ -156,10 +169,10 @@ async function main(): Promise<void> {
     `<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">\n` +
     `  <channel>\n` +
     `    <title>agents-radar</title>\n` +
-    `    <link>${SITE_URL}</link>\n` +
+    `    <link>${escapeXml(siteUrl)}</link>\n` +
     `    <description>AI 开源生态每日简报 · Daily AI ecosystem digest</description>\n` +
     `    <language>zh-CN</language>\n` +
-    `    <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml"/>\n` +
+    `    <atom:link href="${escapeXml(`${siteUrl}/feed.xml`)}" rel="self" type="application/rss+xml"/>\n` +
     `    <lastBuildDate>${buildDate}</lastBuildDate>\n` +
     itemsXml +
     `\n  </channel>\n` +

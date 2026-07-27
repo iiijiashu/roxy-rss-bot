@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { toRfc822, escapeXml } from "../generate-manifest.ts";
+import { toRfc822, escapeXml, normalizeSiteUrl } from "../generate-manifest.ts";
 
 // ---------------------------------------------------------------------------
 // toRfc822
@@ -60,5 +60,27 @@ describe("escapeXml", () => {
 
   it("handles empty string", () => {
     expect(escapeXml("")).toBe("");
+  });
+});
+
+describe("normalizeSiteUrl", () => {
+  it("uses the upstream URL by default", () => {
+    expect(normalizeSiteUrl()).toBe("https://duanyytop.github.io/agents-radar");
+  });
+
+  it("accepts a fork-specific GitHub Pages URL and removes trailing slashes", () => {
+    expect(normalizeSiteUrl("https://student.example.github.io/roxy-radar///")).toBe(
+      "https://student.example.github.io/roxy-radar",
+    );
+  });
+
+  it.each([
+    "http://example.com/roxy-radar",
+    "https://user:secret@example.com/roxy-radar",
+    "https://example.com/roxy-radar?token=secret",
+    "https://example.com/roxy-radar#fragment",
+    "   ",
+  ])("rejects unsafe or ambiguous URL %s", (value) => {
+    expect(() => normalizeSiteUrl(value)).toThrow();
   });
 });
