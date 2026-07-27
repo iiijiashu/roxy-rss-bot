@@ -1,0 +1,118 @@
+{
+  "zh": {
+    "ai-cli": [
+      "Claude Code 和 OpenAI Codex 今日均有 10 个 Issues 和 PR。",
+      "OpenAI Codex 发布版本 0.146.0-alpha.13。",
+      "用户对计费与支付问题表现出高度关注。",
+      "多工具间对稳定性与兼容性的问题反映了用户需求。",
+      "Claude Code 专注财务透明度，目标用户为开发者与数据团队。",
+      "OpenAI Codex 强调应用稳定性，瞄准广泛开发者群体。"
+    ],
+    "ai-agents": [
+      "OpenClaw 今日总计61条事件，活跃度明显上升。",
+      "OpenClaw 有50条合并请求，推动功能开发。",
+      "用户对 CLI 性能优化请求激增，影响开发进程。",
+      "讨论最热 Issue 关注会话管理和性能一致性。",
+      "今日报告的主要Bug包括 ‘ERR_INTERNAL_ASSERTION’ 崩溃。",
+      "对受限环境下安全调用的讨论引发广泛关注。"
+    ],
+    "ai-trending": [
+      "CopilotKit 和 Kronos 成为今日 AI 开源领域的热门项目。",
+      "alibaba/open-code-review 今日新增 980 个 Stars。",
+      "Kronos 项目为金融市场提供实时决策支持。",
+      "NousResearch/hermes-agent 的 Stars 已达 221,323。",
+      "Panniantong/Agent-Reach 支持 AI 智能体浏览互联网。",
+      "huggingface/transformers 跨越 163,041 Stars，持续受欢迎。"
+    ],
+    "ai-web": [
+      "Anthropic 扩大与Cognizant的合作，整合Claude。",
+      "OpenAI 发布文章探讨AI对工作职能的扩展。",
+      "Claude被嵌入多个Cognizant平台，提升企业效率。",
+      "文章强调AI与人力资源之间的协同作用。",
+      "Cognizant已培训30,000名员工使用Claude。",
+      "Anthropic重视Claude在企业应用的适应性。"
+    ],
+    "ai-hn": [
+      "Claude Opus 5 的错误率升高引发用户担忧。",
+      "讨论 AI 公司在华盛顿游说支出的创新高。",
+      "Nvidia交易引发行业对AI泡沫的警惕。",
+      "Apple 面临未来AI泡沫化的激烈争论。",
+      "Claude Opus 5 推出后社区积极分享使用体验。",
+      "社区关注如何有效结合AI与商业策略。"
+    ],
+    "ai-hf": [
+      "moonshotai/Kimi-K3 在图像到文本任务表现突出。",
+      "baidu/Unlimited-OCR 成为今日下载量最高模型。",
+      "zai-org/GLM-5.2 适用于对话场景，用户反馈良好。",
+      "DavidAU/Qwen3.6系列模型提供强大生成能力。",
+      "upstage/Solar-Open2-250B 针对生成任务进行了优化。",
+      "社区微调活动显示出开放源模型的强烈需求。"
+    ],
+    "ai-community": [
+      "“AI如何影响新手开发者职业发展”引发热议。",
+      "安全性与技术债务问题在社区引发关注。",
+      "Community对AI工具的反应对技术创新的重要性。",
+      "文章深入探讨了AI在职业发展的新视角。",
+      "开发者分享使用Node.js构建AI助手的经验。",
+      "本地AI求职代理提供实用案例供开发者借鉴。"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Claude Code and OpenAI Codex show robust growth.",
+      "OpenAI Codex has two alpha version releases today.",
+      "OAuth issues highlighted in both tools' bug reports.",
+      "Integration with web browsers is in high demand.",
+      "Collaborative features requested in both tools.",
+      "No new releases for Claude Code today."
+    ],
+    "ai-agents": [
+      "OpenClaw has 11 issues and 50 PRs updated today.",
+      "9 PRs merged focusing on stability and compatibility.",
+      "Key fix for unauthorized image previews in OpenClaw.",
+      "User issues on session stability draw community attention.",
+      "No new releases for OpenClaw today.",
+      "Active engagement reflects a vibrant project environment."
+    ],
+    "ai-trending": [
+      "Growing interest in AI agent frameworks for automation.",
+      "New self-hosted AI assistant moeru-ai/airi launched.",
+      "bradautomates/claude-video integrates video processing.",
+      "amnezia-vpn/amnezia-client gaining traction in AI.",
+      "Trending projects indicate multimedia-aware AI shift.",
+      "Permissionless tech's bitchat signals automation trends."
+    ],
+    "ai-web": [
+      "Anthropic expands partnership with Cognizant today.",
+      "New articles highlight AI's impact on enterprise roles.",
+      "Claude's integration into manufacturing emphasized.",
+      "OpenAI notes AI is changing workplace dynamics.",
+      "Anthropic's article marks a step in industry-specific AI.",
+      "OpenAI's publication lacks detailed content."
+    ],
+    "ai-hn": [
+      "Claude Opus 5 release generates monumental discussion.",
+      "Microsoft's MAI-Cyber 1 raises cybersecurity interest.",
+      "Debate about job market challenges dominates discourse.",
+      "Discussing ethics of AI companies shredding rare books.",
+      "Low-cost AI solutions on microcontrollers discussed.",
+      "Strong community interest in Rust's Bun framework rewrite."
+    ],
+    "ai-hf": [
+      "moonshotai/Kimi-K3 gains 5,269 likes on Hugging Face.",
+      "Baidu's Unlimited-OCR achieves 2.6 million downloads.",
+      "Laguna model variations show ongoing experimentation.",
+      "Robust mix of image-text applications trending today.",
+      "zai-org/GLM-5.2 excels in conversational tasks.",
+      "DavidAU/Qwen3.6-27B showcases creative storytelling."
+    ],
+    "ai-community": [
+      "AI's impact on junior developers is hotly discussed.",
+      "Mixed reactions on AI-driven open-source projects noted.",
+      "Debate about sustainability in tech talent pipelines.",
+      "Critical look at AI altering entry-level opportunities.",
+      "Framework for auditing AI package manager security proposed.",
+      "AI job search agents are emerging in developer discussions."
+    ]
+  }
+}
