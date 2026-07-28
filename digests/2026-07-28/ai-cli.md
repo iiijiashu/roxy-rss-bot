@@ -1,6 +1,6 @@
 # AI CLI 工具社区动态日报 2026-07-28
 
-> 生成时间: 2026-07-27 17:56 UTC | 覆盖工具: 2 个
+> 生成时间: 2026-07-28 03:40 UTC | 覆盖工具: 2 个
 
 - [Claude Code](https://github.com/anthropics/claude-code)
 - [OpenAI Codex](https://github.com/openai/codex)
@@ -10,53 +10,49 @@
 
 ## 横向对比
 
-# AI CLI 工具横向对比分析报告
+# AI CLI 工具生态横向对比分析报告
 
-## 1. 生态全景
-当前 AI CLI 工具生态正处于快速发展阶段，伴随着大型技术团队的持续投入，用户社群活跃度不断提升，反馈机制愈加完善。同时，尽管各工具间在功能上趋向多样化，但对性能、稳定性与用户体验的共同关注促使开发者在优化迭代过程中逐步形成了良性的竞争与合作关系。
+## 生态全景
+当前AI CLI工具发展迅速，社区活跃度显著提升。各工具处于不同的迭代阶段，部分工具专注于性能优化和用户体验的改进，而另一些则集中在稳定性和认证机制的增强上。跨平台兼容性和多设备支持成为用户普遍关注的焦点，反映出开发者对工作流程集成与效率提升的强烈需求。
 
-## 2. 各工具活跃度对比
+## 各工具活跃度对比
 
-| 工具           | 今日 Issues 数 | 今日 PR 数 | Release 情况               |
-|----------------|----------------|------------|-----------------------------|
-| Claude Code    | 10             | 10         | 无新版本发布                |
-| OpenAI Codex   | 10             | 10         | 发布版本 0.146.0-alpha.13、0.146.0-alpha.12 |
+| 工具              | 今日 Issues 数 | 今日 PR 数 | 版本发布情况                 |
+|-------------------|----------------|------------|------------------------------|
+| Claude Code       | 10             | 5          | 无新版本发布                 |
+| OpenAI Codex      | 10             | 10         | 发布 rust-v0.146.0-alpha.12/13 |
 
-## 3. 共同关注的功能方向
-多个工具社区关注的功能需求主要集中在如下几个方面：
+## 共同关注的功能方向
+多个工具社区正在关注的需求包括：
+- **性能优化**：
+  - **Claude Code**：关注设置同步与桌面应用稳定性。
+  - **OpenAI Codex**：关注多任务管理和会话日志性能。
 
-- **计费与支付**：
-  - **Claude Code**: 关注计费错误及支付失败（Issue #55982，#32544）。
+- **用户界面与集成**：
+  - **Claude Code**：请求可定制快捷键、历史管理。
+  - **OpenAI Codex**：希望在VS Code中增强聊天功能的范围。
+
+- **认证机制**：
+  - **Claude Code**：用户对桌面应用程序的登录问题表现出极大的关注。
+  - **OpenAI Codex**：OAuth认证的频繁失效引发大量讨论。
+
+## 差异化定位分析
+- **Claude Code**：主要面向开发者，强调用户体验，尤其是UI的易用性和操作流畅性。它在功能上更倾向于设置同步和多设备支持。
   
-- **稳定性与兼容性**：
-  - **Claude Code**: Windows平台的Cowork选项卡问题（Issue #47327）。
-  - **OpenAI Codex**: 多个关于Windows和macOS输入延迟与崩溃的反馈（Issues #32094, #31573）。
+- **OpenAI Codex**：目标用户涵盖开发者与企业，着重于系统性能和集成能力，尤其在多任务处理和开发环境的集成上有显著优势。其技术路线侧重于优化中间件和深度学习模型的集成使用。
 
-- **集成与用户体验**：
-  - **Claude Code**: 特定Chrome实例的集成需求（Issue #15125）。
-  - **OpenAI Codex**: 线程管理及删除功能的需求（Issue #13018）。
+## 社区热度与成熟度
+- **OpenAI Codex**的社区更为活跃，问题数量和讨论热度较高，显示出用户群体对功能改进和稳定性的高需求。快速迭代的版本发布表明其技术检测与用户反馈机制较为成熟。
+  
+- **Claude Code**在用户体验和功能改进上的讨论热度较高，虽然整体活跃度略低，但关注的方向集中，显示出用户对其产品深入使用后的反馈。
 
-## 4. 差异化定位分析
-- **Claude Code**：
-  - **功能侧重**：强调计费系统的稳定性与功能需求，致力于满足用户对财务透明度的要求。
-  - **目标用户**：面向开发者及数据团队，尤其是在团队协同和财务管理方面有需求的用户。
-  - **技术路线**：聚焦于文档、集成以及平台兼容性的优化。 
+## 值得关注的趋势信号
+1. **跨平台兼容性**：开发者对不同操作系统环境的支持需求不断增加，推动工具朝向多样化发展。
+2. **自动化与集成需求**：用户希望在工作流中实现更高效的工具集成，尤其是IDE中的使用场景。
+3. **认证与安全性关注**：随着对云和远程服务的依赖加深，认证机制的稳定性成为亟待优化的领域。
+4. **用户驱动开发**：社区反馈的直接性和快速响应能力正在推动产品功能的实用性与易用性提升。
 
-- **OpenAI Codex**：
-  - **功能侧重**：更注重开发者体验与应用的稳定性，特别是与主流IDE的兼容性和性能优化。
-  - **目标用户**：广泛针对软件开发者，尤其是经常使用VS Code等开发工具的用户。
-  - **技术路线**：更加关注于性能、数据管理和功能扩展，促进与其他应用的协同工作。
-
-## 5. 社区热度与成熟度
-- **活跃社区**：OpenAI Codex 社区在版本发布和问题反馈上表现更为活跃，活跃度高。Claude Code 社区虽然问题数多，但版本迭代较少，可能偏向长周期的开发与稳定维护。
-- **快速迭代工具**：OpenAI Codex 通过频繁发布版本及改善用户反馈快速迭代，而Claude Code则侧重于功能的稳固与用户体验的提升，迭代速度相对较慢。
-
-## 6. 值得关注的趋势信号
-- **用户体验改进**：开发者对应用的稳定性和性能提升的持续关注表明，未来 AI CLI 工具的开发将更加重视用户反馈的及时响应与功能的灵活适应。
-- **计费系统透明性提升**：随着多个工具对计费问题的关注，预示着一种行业趋势，即制造透明公正的计费体系将成为常态。
-- **集成需求增长**：对不同工具和平台兼容性的请求频繁反映，显示将来对多功能集成的需求将在市场中不断上升。
-
-整体看来，AI CLI 工具生态在迎合用户需求的同时，逐渐向标准化和稳定化发展，为开发者提供更优质的工作体验。
+这些趋势为开发者提供了宝贵的参考，使其在选择和使用AI CLI工具时更加明确需求与期待。
 
 ---
 
@@ -72,198 +68,182 @@
 # Claude Code Skills 社区热点报告
 
 ## 1. 热门 Skills 排行
-以下是评论/关注度最高的 5 个 Skills（PR）：
+1. **[fix(skill-creator): run_eval.py always reports 0% recall](https://github.com/anthropics/skills/pull/1298)**
+   - **功能**: 解决 `run_eval.py` 工具在 Windows 系统下处理技能时出现的 0% 召回率问题。
+   - **社区讨论热点**: 多次复现的召回率问题引发关注，导致整个描述优化循环由于获取错误信息而无法正常优化。
+   - **状态**: OPEN。
 
-1. **[PR #1298](https://github.com/anthropics/skills/pull/1298)** 
-   - **功能**：修复 `run_eval.py` 导致的零召回率问题，改善窗口读取和触发检测功能。
-   - **讨论热点**：社区对于描述优化循环的可靠性和性能表达了强烈关注。
-   - **当前状态**：开放（OPEN）。
+2. **[Add document-typography skill](https://github.com/anthropics/skills/pull/514)**
+   - **功能**: 提供对AI生成文档的排版质量控制，解决常见排版问题。
+   - **社区讨论热点**: 对文档排版的重视，但用户若未主动提出需求，这项功能未必会被优先合并。
+   - **状态**: OPEN。
 
-2. **[PR #514](https://github.com/anthropics/skills/pull/514)**
-   - **功能**：添加文档排版技能，帮助解决 AI 自动生成文档中的常见排版问题。
-   - **讨论热点**：用户对文档可读性和专业性日益重视，建议增加更多排版选项。
-   - **当前状态**：开放（OPEN）。
+3. **[fix(pdf): correct case-sensitive file references in SKILL.md](https://github.com/anthropics/skills/pull/538)**
+   - **功能**: 修复SKILL.md文件中对大小写敏感文件引用的问题。
+   - **社区讨论热点**: 影响跨平台用户的工作流以及文档处理的稳定性。
+   - **状态**: OPEN。
 
-3. **[PR #538](https://github.com/anthropics/skills/pull/538)**
-   - **功能**：修复 SKILL.md 中的大小写不敏感文件引用问题。
-   - **讨论热点**：社区对文档一致性和可维护性的关注, 认为这对使用者非常重要。
-   - **当前状态**：开放（OPEN）。
+4. **[Add ODT skill](https://github.com/anthropics/skills/pull/486)**
+   - **功能**: 支持 OpenDocument 文档的创建、填充和解析。
+   - **社区讨论热点**: 提升用户在使用 LibreOffice 等开源文档处理工具的体验。
+   - **状态**: OPEN。
 
-4. **[PR #486](https://github.com/anthropics/skills/pull/486)**
-   - **功能**：添加 ODT 技能，用于创建和填充 OpenDocument 文件。
-   - **讨论热点**：支持开放标准格式的需求明显，用户希望支持更多文档类型。
-   - **当前状态**：开放（OPEN）。
-
-5. **[PR #210](https://github.com/anthropics/skills/pull/210)**
-   - **功能**：提升前端设计技能的清晰性和可操作性。
-   - **讨论热点**：用户需要更具体的指导以便在交互中更有效地使用技能。
-   - **当前状态**：开放（OPEN）。
+5. **[Improve frontend-design skill clarity and actionability](https://github.com/anthropics/skills/pull/210)**
+   - **功能**: 提高前端设计技能的清晰度和可操作性。
+   - **社区讨论热点**: 旨在使技能指导更具体，增强Claude的能力。
+   - **状态**: OPEN。
 
 ## 2. 社区需求趋势
-从 Issues 中提炼出社区最期待的新 Skill 方向如下：
-- **工作流自动化**：如 [Issue #228](https://github.com/anthropics/skills/issues/228) 期望在组织内部共享技能，简化技能的分享过程。
-- **安全审查**：开发针对社区技能的安全性的审查，防止信任边界滥用 [Issue #492](https://github.com/anthropics/skills/issues/492)。
-- **文档处理与提升**：针对文档的生成、排版和管理提出更多优化技能 [Issue #189](https://github.com/anthropics/skills/issues/189)。
+- **工作流自动化**: 需求集中在希望能够实现文档处理、格式控制和自动化工作流等功能的技能。
+- **代码审查与测试生成**: 社区对于提升代码质量的技能有明显的期待，包括测试模式和质量分析工具。
+- **文档处理能力**: 对于各种文档格式的生成和处理技能的需求日益增加，包括对ODT和PDF的处理。
 
 ## 3. 高潜力待合并 Skills
-评论活跃但尚未合并的 PR，可能近期落地的 Skills：
-- **[PR #1298](https://github.com/anthropics/skills/pull/1298)** - 修复触发检测的功能问题，改善整体性能。
-- **[PR #514](https://github.com/anthropics/skills/pull/514)** - 文档排版技能受到高度关注，符合用户需求。
-- **[PR #538](https://github.com/anthropics/skills/pull/538)** - 修复文档引用问题，关乎使用者的可信度与使用体验。
+1. **[Add pyxel skill for retro game development](https://github.com/anthropics/skills/pull/525)**
+   - **功能**: 支持用户创建复古游戏，增加了开发者的创意空间。
+   - **评论活跃度**: 尽管尚未合并，但在社区中引发了积极的讨论。
+   - **状态**: OPEN。
+
+2. **[feat(skills): add self-audit — mechanical verification + reasoning quality gate](https://github.com/anthropics/skills/pull/1367)**
+   - **功能**: 提供对AI输出的审计功能，确保输出质量。
+   - **评论活跃度**: 受关注的技能，可为未来技能的实施奠定基础。
+   - **状态**: OPEN。
+
+3. **[fix(skill-creator): run_eval trigger detection misses real skill name](https://github.com/anthropics/skills/pull/1323)**
+   - **功能**: 修复技能触发检测问题，以确保优化流程的有效性。
+   - **评论活跃度**: 提议背景广泛，可能引发广泛实用性关注。
+   - **状态**: OPEN。
 
 ## 4. Skills 生态洞察
-社区在 Skills 层面最集中的诉求是优化技能的可靠性与功能性，特别是在文档处理和安全审查方面。
+当前社区在 Skills 层面最集中的诉求是提高技能的稳定性与兼容性，尤其是在多平台和文档处理方面。
 
 ---
 
-# Claude Code 社区动态日报（2026-07-28）
+# Claude Code 社区动态日报 （2026-07-28）
 
 ## 今日速览
-今天，Claude Code社区活跃度较高，共更新了多项关于BUG和功能增强的讨论。其中，关于支付失败和计费错误的Issue引发了较多关注，社区对此反应强烈，急需解决方案。
+今日 Claude Code 社区主要集中在几个重要问题的更新中，包括用户界面的功能请求和一系列新出现的bug报告。同时，版本更新方面暂无新发布。用户对设置同步和桌面应用程序问题的讨论尤为频繁。
 
 ## 版本发布
-无新版本发布。
+本日无新版本发布。
 
 ## 社区热点 Issues
-1. **[Issue #55982](https://github.com/anthropics/claude-code/issues/55982)** - 支付意图在确认之前被立即作废，导致计划升级支付失败。此错误引发76条评论，显然影响了许多用户的体验。
-  
-2. **[Issue #23626](https://github.com/anthropics/claude-code/issues/23626)** - 支持与main分支以外分支的diff比较，获得103个点赞，显示这是一个用户广泛需求的功能请求。
-
-3. **[Issue #47327](https://github.com/anthropics/claude-code/issues/47327)** - Windows 11 Pro上Cowork选项卡受阻，影响多位用户的工作流，引发23条评论。
-
-4. **[Issue #15125](https://github.com/anthropics/claude-code/issues/15125)** - 支持针对特定Chrome实例/配置文件的集成请求，显示出用户对灵活性的期待。
-  
-5. **[Issue #32544](https://github.com/anthropics/claude-code/issues/32544)** - 针对Linux平台的错误，存在费用错误及错误的速率限制，反映用户对计费准确性的高要求。
-
-6. **[Issue #77966](https://github.com/anthropics/claude-code/issues/77966)** - OAuth循环问题，严重影响了用户的登录过程。
-
-7. **[Issue #81204](https://github.com/anthropics/claude-code/issues/81204)** - GPU进程崩溃可能导致桌面应用程序的永久性卡死，需求迫切。
-
-8. **[Issue #79597](https://github.com/anthropics/claude-code/issues/79597)** - Max账户下Fable 5的使用信用被错误限制，反映出计费系统存在漏洞。
-
-9. **[Issue #80750](https://github.com/anthropics/claude-code/issues/80750)** - 使用信用被消耗而计划配额仍然剩余，显示出系统对使用情况的跟踪存在问题。
-
-10. **[Issue #81712](https://github.com/anthropics/claude-code/issues/81712)** - 模型切换无效的问题，引发了对功能完整性的质疑。
+1. **[#5064](https://github.com/anthropics/claude-code/issues/5064)** - 探讨在 Windows 平台上为 Ctrl+Enter 请求可定制快捷键，已收获30条评论，为用户交互体验的重要改进。
+2. **[#22648](https://github.com/anthropics/claude-code/issues/22648)** - 用户请求帐户级设置在不同设备间同步，反映出多设备用户的常见痛点，已有24条评论。
+3. **[#51143](https://github.com/anthropics/claude-code/issues/51143)** - 针对 Windows 上的桌面应用程序出现白屏问题的反馈，使得应用程序无法使用，评论达到18条，说明该问题影响广泛。
+4. **[#79360](https://github.com/anthropics/claude-code/issues/79360)** - 关于 macOS 上 Fable 5 权限问题的讨论缺乏有效性，受到了36个点赞。
+5. **[#54186](https://github.com/anthropics/claude-code/issues/54186)** - macOS 上本地会话历史在 VS Code 重启后丢失，影响开发流程。
+6. **[#80015](https://github.com/anthropics/claude-code/issues/80015)** - 最近更新使任务列表工具无法在模型中使用，引发用户广泛关注。
+7. **[#79366](https://github.com/anthropics/claude-code/issues/79366)** - macOS 上的工作树会话重用不必要的目录，影响用户的会话管理。
+8. **[#78946](https://github.com/anthropics/claude-code/issues/78946)** - 登录时出现的循环问题未能解决，用户反馈急切。
+9. **[#38883](https://github.com/anthropics/claude-code/issues/38883)** - 关于自动生成会话名称与项目文件不匹配的问题，引发多方讨论。
+10. **[#81833](https://github.com/anthropics/claude-code/issues/81833)** - 在 Git 工作树会话中，自动存储加载不一致，影响用户体验。
 
 ## 重要 PR 进展
-1. **[PR #81673](https://github.com/anthropics/claude-code/pull/81673)** - 修复防火墙设置时选项域解析失败不会中止整个脚本的问题，提升了脚本的鲁棒性。
-
-2. **[PR #81672](https://github.com/anthropics/claude-code/pull/81672)** - 使hookify包的导入不再依赖于安装目录名称，增强了包的适用性。
-
-3. **[PR #81576](https://github.com/anthropics/claude-code/pull/81576)** - 修正安全指导插件的README条目，确保文档的一致性及准确性。
-
-4. **[PR #81540](https://github.com/anthropics/claude-code/pull/81540)** - 地址使用泄漏的问题，自动化贡献确保了BUG的快速处理。
-
-5. **[PR #81500](https://github.com/anthropics/claude-code/pull/81500)** - 修正AWS网关示例中的404错误链接，增强开发者文档可用性。
-
-6. **[PR #38167](https://github.com/anthropics/claude-code/pull/38167)** - 使用认证请求访问GitHub API，提高防火墙脚本在受限环境中的稳定性。
-
-7. **[PR #81670](https://github.com/anthropics/claude-code/pull/81670)** - 修复hooks命令路径中的引用问题，确保了插件的顺利运行。
-
-8. **[PR #20448](https://github.com/anthropics/claude-code/pull/20448)** - 添加web4治理插件，推动AI治理的进步。
-
-9. **[PR #38167](https://github.com/anthropics/claude-code/pull/38167)** - 使用身份验证的请求确保在防火墙脚本中能够正常工作。
-
-10. **[PR #75867](https://github.com/anthropics/claude-code/pull/75867)** - 提供对比主分支的功能增强，支持更灵活的开发环境。
+1. **[#81673](https://github.com/anthropics/claude-code/pull/81673)** - 修复防火墙设置在解析可选域名时的 abort 问题，提升了开发环境稳定性。
+2. **[#81672](https://github.com/anthropics/claude-code/pull/81672)** - 使 hookify 包的导入独立于安装目录提升了代码灵活性。
+3. **[#81670](https://github.com/anthropics/claude-code/pull/81670)** - 为 hook 命令加上了引号，修复了路径中空格的问题。
+4. **[#20448](https://github.com/anthropics/claude-code/pull/20448)** - 引入 web4 治理插件来支持 AI 治理增强相关功能。
+5. **[#81576](https://github.com/anthropics/claude-code/pull/81576)** - 修复 README.md 中有关安全引导插件内容的错误，确保文档的准确性。
 
 ## 功能需求趋势
-从当前的问题反馈来看，社区对以下功能有较高关注：
-- **计费和支付问题**：许多用户面临计费准时性和透明度不足的挑战。
-- **集成支持**：对特定工具和配置的集成需求不断上升，特别是IDE和Web工具。
-- **错误修复**：许多用户也在反馈与操作系统及健康运行环境相关的Bug修复需求。
+在各类 Issue 中，社区对设置同步（如多个设备之间的设置推广）、用户界面的功能改进、以及针对不同操作系统的兼容性修复表现出高度关注。
 
 ## 开发者关注点
-开发者们普遍关注以下痛点：
-- **计费透明度和准确性**：对使用信用和额外费用的理解要求加强。
-- **用户体验**：诸如OAuth登录循环和模型切换的错误导致用户体验下降。
-- **文档和支持资源**：开发者需确保快速定位解决方案，整体文档需要更为完善和准确。
+开发者反馈主要集中于： 
+- **界面功能改进**，如可定制快捷键和会话历史管理。
+- **稳定性与兼容性**，例如桌面应用程序在不同平台上的表现以及插件使用的灵活性。
+- **多设备支持**和设置同步的需求，为用户提供了更好的工作体验。
 
-请关注 GitHub 以获取更多信息和更新。
+以上是 Claude Code 社区的最新动态，感谢关注！
 
 </details>
 
 <details>
 <summary><strong>OpenAI Codex</strong> — <a href="https://github.com/openai/codex">openai/codex</a></summary>
 
-# OpenAI Codex 社区动态日报 (2026-07-28)
+# OpenAI Codex 社区动态日报 - 2026年7月28日
 
 ## 今日速览
-今天，OpenAI Codex 发布了版本 0.146.0-alpha.13 和 0.146.0-alpha.12，随着版本更新，社区中的多个重要问题依然在持续发酵，尤其是涉及 Windows 平台的多项 Bugs 引发了开发者的广泛讨论和反馈。
+今天，OpenAI Codex 发布了多个版本更新，并对此前的几个重要问题进行了积极讨论。社区亦在积极关注多种bug修复与功能增强，尤其是与 OAuth 认证和系统性能相关的议题。
 
 ## 版本发布
-- **rust-v0.146.0-alpha.13**: 更新了 Alpha 版本，纯属版本更新。
-- **rust-v0.146.0-alpha.12**: 更新了 Alpha 版本，纯属版本更新。
+- **rust-v0.146.0-alpha.13** 和 **rust-v0.146.0-alpha.12** 发布，具体的更新内容未详细列出。
 
 ## 社区热点 Issues
-1. **[#13018 - Allow to delete threads in the Codex app](https://github.com/openai/codex/issues/13018)**（关闭）
-   - 用户请求在 Codex 应用中允许删除线程，而不只是归档。目前此请求收到104个点赞，显示出该功能的迫切需求。
+1. **#17265** - [Codex does not auto-refresh routed MCP OAuth tokens](https://github.com/openai/codex/issues/17265)
+   - 描述了在存储了 refresh_token 的情况下，未能自动刷新过期的 access token。这一问题影响了用户的认证流程，得到了54个点赞，27条评论，显示出社区对认证机制稳定性的关注。
 
-2. **[#31573 - OAuth authentication fails at issuer validation](https://github.com/openai/codex/issues/31573)**（开放）
-   - 该问题涉及 OAuth 认证失败，引发了25条评论，目前有57个点赞，反映出社区对认证功能稳定性的高度关注。
+2. **#24948** - [Codex session logs grow excessively large](https://github.com/openai/codex/issues/24948)
+   - 指出Codex会话日志由于重复压缩历史和原始工具输出，导致文件达到高达2GB的大小。此问题获得了24条评论和1个点赞，表明了用户对性能和存储管理的关注。
 
-3. **[#35058 - Codex Diff crashes in VS Code on macOS](https://github.com/openai/codex/issues/35058)**（开放）
-   - 此问题报告在 macOS 上使用 Codex Diff 时崩溃，得到41个点赞，强调了与 IDE 集成的兼容性问题。
+3. **#32094** - [Codex app crashes when opening specific pages](https://github.com/openai/codex/issues/32094)
+   - 发现窗口应用程序在特定情况下崩溃，已经吸引了18条评论，开发者希望能够解决这一稳定性问题。
 
-4. **[#32094 - Codex app crashes when embedded browser opens certain pages](https://github.com/openai/codex/issues/32094)**（开放）
-   - 执行特定操作时应用崩溃，遭到用户频繁反馈，显示出对应用稳定性的强烈需求。
+4. **#25319** - [Scope Codex VS Code chats to the current workspace/project](https://github.com/openai/codex/issues/25319)
+   - 用户请求在 VS Code 扩展中仅对当前工作区的聊天进行范围整理，受到了社区广泛关注（48个点赞），显示出对IDE集成的需求。
 
-5. **[#28109 - Brief mouse/input freezes on Windows](https://github.com/openai/codex/issues/28109)**（关闭）
-   - 此问题主要影响 Windows 用户，反映了性能优化的重要性，获得17条评论。
+5. **#13852** - [Supabase MCP repeatedly requires reauthentication](https://github.com/openai/codex/issues/13852)
+   - 该 Issue 警示了在使用 Supabase 时频繁的重新验证问题，当前获得14条评论，表明认证系统的稳定性仍需加强。
 
-6. **[#35352 - Codex Desktop exits when embedded browser GPU process crashes](https://github.com/openai/codex/issues/35352)**（开放）
-   - 提到的崩溃事件引发开发者对 GPU 兼容性及应用稳定性的广泛讨论。
+6. **#11324** - [MCP servers consume memory while multitasking](https://github.com/openai/codex/issues/11324)
+   - 提及多任务处理时MCP服务器会占用大量内存的问题，反映出社区对性能优化的期待。
 
-7. **[#19891 - Regression in "For coding" view](https://github.com/openai/codex/issues/19891)**（开放）
-   - 报告了 UI 变化导致的问题，影响用户体验，用户反馈趋于负面。
+7. **#35352** - [Codex Desktop exits on GPU process crashes](https://github.com/openai/codex/issues/35352)
+   - 报告称Codex Desktop在GPU进程崩溃时会退出，严重影响用户使用体验，问题获得13条评论。
 
-8. **[#32164 - Remote Control enrollment never completes on Windows](https://github.com/openai/codex/issues/32164)**（开放）
-   - 影响 Windows 用户的远程控制功能，显示出远程功能设计的不足与稳定性问题。
+8. **#26736** - [Performance issues on macOS when Codex Desktop is visible](https://github.com/openai/codex/issues/26736)
+   - 讨论了在Codex Desktop可见时GPU使用率异常高的情况，显示出对性能的持续关切。
 
-9. **[#35619 - Rollout JSONL files deleted at app-server process transition](https://github.com/openai/codex/issues/35619)**（开放）
-   - 这个问题反映了重要数据丢失的风险，引起社区对数据一致性和稳定性的关注。
+9. **#26763** - [Codex usage limit dropped unexpectedly after a plan downgrade](https://github.com/openai/codex/issues/26763)
+   - 用户反映在变更订阅计划后，使用限制掉至0，获得5条评论，可见计费体系的透明度亟需改善。
 
-10. **[#35420 - Repeated disconnections when using OneDrive](https://github.com/openai/codex/issues/35420)**（开放）
-    - 明确指出工作流中遇到的网络问题，且频繁断开连接。
+10. **#35669** - [RemoteCompactionV2 repeat-compaction loop](https://github.com/openai/codex/issues/35669)
+   - 描述了一个复杂的状态丢失问题，相关问题的数量与复杂性说明底层架构的稳定性需要进一步提升。
 
 ## 重要 PR 进展
-1. **[#35644 - Preserve thread metadata when rollout files are missing](https://github.com/openai/codex/pull/35644)**（关闭）
-   - 在缺失文件时保留线程元数据，从而提高数据恢复的便利性和完整性。
+1. **#35708** - [Add configurable developer instructions for v2 subagents](https://github.com/openai/codex/pull/35708)
+   - 增加了可配置的开发者指导说明，改善了多代理支持的灵活性。
 
-2. **[#35642 - Make OpenTelemetry provider shutdown idempotent](https://github.com/openai/codex/pull/35642)**（关闭）
-   - 优化 OpenTelemetry 关闭流程，减少资源泄露的风险。
+2. **#35695** - [Honor configured SQLite home in logs client](https://github.com/openai/codex/pull/35695)
+   - 修复了日志客户端不遵循配置的SQLite主目录的问题。
 
-3. **[#35621 - Skip restored token usage replay for exec resumes](https://github.com/openai/codex/pull/35621)**（关闭）
-   - 优化 `exec` 过程，提高执行效率并避免潜在的记录重复。
+3. **#35693** - [Refresh the subagent picker in the background](https://github.com/openai/codex/pull/35693)
+   - 使子代理选择器在后台刷新，以提升用户体验与响应速度。
 
-4. **[#35623 - Parse Claude and Cursor session records separately](https://github.com/openai/codex/pull/35623)**（关闭）
-   - 解析不同类型的会话记录，以解决上下文问题，提高了会话的兼容性。
+4. **#35688** - [Point crossterm patch to the OpenAI OSS fork](https://github.com/openai/codex/pull/35688)
+   - 更新了对特定库的引用，保持与开源项目的兼容性。
 
-5. **[#35537 - Add managed policy for in-app updates](https://github.com/openai/codex/pull/35537)**（关闭）
-   - 进一步规范了应用内更新管理，将管理员设置与用户体验分开。
+5. **#35689** - [Preserve item timestamps in thread history projections](https://github.com/openai/codex/pull/35689)
+   - 增强了线程历史投影中项目时间戳的保留。
 
-6. **[#35530 - Track model and personality in world state](https://github.com/openai/codex/pull/35530)**（关闭）
-   - 增强了世界状态中的模型与个性跟踪，更好地支持个性化体验。
+6. **#35691** - [Include empty-preview threads in relationship listings](https://github.com/openai/codex/pull/35691)
+   - 改进了关系列表以包含没有预览文本的线程，帮助用户更好地了解线程之间的关系。
 
-7. **[#35524 - Preserve terminal turn errors in replayed history](https://github.com/openai/codex/pull/35524)**（关闭）
-   - 在历史回放中保留终端转弯错误，以便更好地调试和分析。
+7. **#35689** - [Preserve paginated thread metadata across resumes](https://github.com/openai/codex/pull/35689)
+   - 保留分段线程元数据，提高了多线程操作中的一致性。
 
-8. **[#35523 - Shut down the in-process outbound router explicitly](https://github.com/openai/codex/pull/35523)**（关闭）
-   - 明确终止进程的发送路由，进一步规范资源管理。
+8. **#35687** - [Enhance metadata management](https://github.com/openai/codex/pull/35687)
+   - 增加了对多代理设置跨配置表示的支持，提高多种配置处理的稳定性。
 
-9. **[#35608 - Support model-owned token budget defaults](https://github.com/openai/codex/pull/35608)**（关闭）
-   - 加强了模型拥有的令牌预算配置，提高资源配置的灵活性。
+9. **#35670** - [Raise the Windows exec yield floor to 10 seconds](https://github.com/openai/codex/pull/35670)
+   - 修改Windows的执行延迟时间设置，提高系统响应效率。
 
-10. **[#35607 - Record metrics for empty skill catalogs](https://github.com/openai/codex/pull/35607)**（关闭）
-    - 记录空技能目录的指标，以便更好地监测资源使用情况。
+10. **#35672** - [Expose network policy callbacks for remote exec](https://github.com/openai/codex/pull/35672)
+    - 增强了远程执行的网络策略回调处理能力。
 
 ## 功能需求趋势
-- **性能优化**：许多问题集中在 Windows 平台的输入延迟、崩溃和 UI 显示问题上。
-- **IDE 集成**：用户对 VS Code 和其他集成环境的需求日益增加，显示更多兼容性需求。
-- **数据管理**：对于线程元数据保存和导入/导出功能的需求逐渐增强。
+当前社区较为关注以下几个功能方向：
+- **性能优化**：关于性能和稳定性的讨论频繁，尤其是在多任务处理和会话日志管理方面。
+- **IDE 集成**：对 VS Code 扩展功能的增强请求显示出开发者希望能够更好地利用 Codex 集成于开发环境。
+- **认证机制**：用户对 OAuth 认证稳定性的关切逐渐增加，展现出需要加固认证流程的趋势。
 
 ## 开发者关注点
-- 大多数反馈集中在应用的稳定性和性能优化上，尤其是在 Windows 系统上的使用体验。
-- 用户对新功能（如线程管理、数据导出等）的响应也表现出强烈的期望。
-- 认证和连接问题的频繁出现促使开发者关注其解决方案的及时性和有效性。
+开发者特别强调了以下几点痛点：
+- **性能与稳定性**：在多任务和资源管理中，Codex的性能表现未能达到预期，用户希望能够在高负载情况下保持稳定运行。
+- **认证问题**：OAuth 认证的频繁失效导致用户反复验证，影响了开发的流畅性与效率。
+- **用户体验**：对更直观、稳定的界面与操作流程的期待，对于提升工作效率至关重要。
+
+请通过 [GitHub](https://github.com/openai/codex) 关注更多动态与更新，期待社区继续为 Codex 贡献更多有价值的反馈与建议。
 
 </details>

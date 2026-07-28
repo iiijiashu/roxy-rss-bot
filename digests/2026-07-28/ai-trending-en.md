@@ -1,66 +1,70 @@
 # AI Open Source Trends 2026-07-28
 
-> Sources: GitHub Trending + GitHub Search API | Generated: 2026-07-27 17:56 UTC
+> Sources: GitHub Trending + GitHub Search API | Generated: 2026-07-28 03:40 UTC
 
 ---
 
-# AI Open Source Trends Report — July 28, 2026
+# AI Open Source Trends Report (July 28, 2026)
 
-## Step 1: Filter
-Selected AI/ML projects from the trending repository data on GitHub. Excluded unrelated projects and general tools.
+## Step 1: Filtered Projects
 
-## Step 2: Categorize
-Filtered projects are categorized as follows:
+From the data provided, the following projects are clearly related to AI and ML:
 
-- **🤖 AI Agents / Workflows**
-- **🧠 LLMs / Training**
-- **🔍 RAG / Knowledge**
+### Trending AI-Related Projects
+1. [moeru-ai/airi](https://github.com/moeru-ai/airi) - A self-hosted, container-based voice chat and gaming companion.
+2. [Kronos](https://github.com/shiyu-coder/Kronos) - Financial markets language model.
+3. [alibaba/open-code-review](https://github.com/alibaba/open-code-review) - A hybrid architecture code review tool utilizing LLM for precise comments.
+4. [bradautomates/claude-video](https://github.com/bradautomates/claude-video) - Enables the Claude LLM to watch and transcribe video content.
+5. [mvanhorn/last30days-skill](https://github.com/mvanhorn/last30days-skill) - AI agent for researching and summarizing information across multiple platforms.
 
-## Step 3: Output Report  
+### AI Topic Search Results
+1. [affaan-m/ECC](https://github.com/affaan-m/ECC) - Agent harness optimization system.
+2. [NousResearch/hermes-agent](https://github.com/NousResearch/hermes-agent) - Personal AI that evolves with the user.
+3. [Significant-Gravitas/AutoGPT](https://github.com/Significant-Gravitas/AutoGPT) - DIY AI that is user-friendly and versatile.
+4. [huggingface/transformers](https://github.com/huggingface/transformers) - A framework for state-of-the-art machine learning models.
+5. [langchain-ai/langchain](https://github.com/langchain-ai/langchain) - An engineering platform for creating AI agents.
+6. [PaddlePaddle/PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) - A robust OCR toolkit for converting documents into structured data.
 
-### Today's Highlights
-Today's trending AI repositories signal a growing interest in AI agent frameworks, particularly those that enable task automation and interaction across various platforms. Projects like [amnezia-vpn/amnezia-client](https://github.com/amnezia-vpn/amnezia-client) and [permissionlesstech/bitchat](https://github.com/permissionlesstech/bitchat) are gaining traction but don't directly relate to AI. Conversely, [bradautomates/claude-video](https://github.com/bradautomates/claude-video) represents innovation in enhancing AI capabilities by integrating video processing and analysis with existing generative AI frameworks, suggesting a shift towards more multimedia-aware AI tools. The launch of [moeru-ai/airi](https://github.com/moeru-ai/airi) introduces a unique self-hosted AI assistant capable of real-time interactions, emphasizing a move towards personalized technology solutions.
+## Step 2: Categorized Projects
 
-### Top Projects by Category 
-
-#### 🤖 AI Agents / Workflows
-
-| Project | Lang | Stars (total / today) | Summary |
-| :--- | :--- | ---: | :--- |
-| [NousResearch/hermes-agent](https://github.com/NousResearch/hermes-agent) | Python | 221,323 | The agent that grows with you, constantly adapting to user needs. With robust features, it’s a leading choice for AI agent implementations. |
-| [santifer/career-ops](https://github.com/santifer/career-ops) | JavaScript | 61,828 | This AI job search tool evaluates listings and tailors CVs, making it easier for users to find job opportunities. Its structured scoring system enhances recruitment strategies. |
-| [Panniantong/Agent-Reach](https://github.com/Panniantong/Agent-Reach) | Python | 61,231 | A CLI tool empowering AI agents to read and search extensively across the internet without API fees. Its versatility is a significant advantage for developers. |
-| [zhayujie/CowAgent](https://github.com/zhayujie/CowAgent) | Python | 46,157 | This super AI assistant is designed for extensibility, allowing rapid deployment and task automation. Its multi-channel support makes it useful for a broad range of applications. |
-| [hugohe3/ppt-master](https://github.com/hugohe3/ppt-master) | Python | 41,404 | This tool uses AI to convert documents into professional PowerPoint presentations, streamlining the presentation creation process. |
-
-#### 🧠 LLMs / Training
+### 🔧 AI Infrastructure
 
 | Project | Lang | Stars (total / today) | Summary |
 | :--- | :--- | ---: | :--- |
-| [huggingface/transformers](https://github.com/huggingface/transformers) | Python | 163,041 | A foundational library for state-of-the-art machine learning, supporting multiple modalities. It continues to be pivotal for LLM developments, facilitating broad adoption in various applications. |
-| [Significant-Gravitas/AutoGPT](https://github.com/Significant-Gravitas/AutoGPT) | Python | 185,717 | Designed for accessible AI, AutoGPT allows users to build AI systems easily and conveniently. Its widespread popularity demonstrates the demand for user-friendly AI tools. |
-| [firecrawl/firecrawl](https://github.com/firecrawl/firecrawl) | TypeScript | 156,919 | This API facilitates web scraping and interaction at scale, which fits well within LLM utilities. Its ability to search efficiently is particularly valuable for training and fine-tuning LLMs. |
-| [affaan-m/ECC](https://github.com/affaan-m/ECC) | JavaScript | 234,013 | A performance optimization system for AI agents, focusing on memory and security. Its advanced features are relevant for developers building competitive LLMs. |
-| [f/prompts.chat](https://github.com/f/prompts.chat) | HTML | 166,430 | A community-driven repository for ChatGPT prompts, this project promotes collaboration and sharing within the AI space, enhancing the user experience of LLMs. |
+| [huggingface/transformers](https://github.com/huggingface/transformers) | Python | 163,050 | A widely recognized framework for AI and ML applications, tailored to state-of-the-art text, vision, and audio models. It is essential for developers looking to implement ML models efficiently. |
+| [alibaba/open-code-review](https://github.com/alibaba/open-code-review) | Go | 979 | This tool enhances code review processes using LLMs, providing precise feedback at the line level. Its hybrid architecture makes it versatile and scalable, having been battle-tested at Alibaba's scale. |
+| [PaddlePaddle/PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) | Python | 86,373 | A lightweight yet powerful OCR toolkit for converting images, PDFs, and documents into structured data. It supports over 100 languages, making it a global tool for document processing. |
 
-#### 🔍 RAG / Knowledge
+### 🤖 AI Agents / Workflows
 
 | Project | Lang | Stars (total / today) | Summary |
 | :--- | :--- | ---: | :--- |
-| [langchain-ai/langchain](https://github.com/langchain-ai/langchain) | Python | 142,703 | This platform is essential for agent engineering and demonstrates the shift towards structured approaches in developing AI applications. Its broad adoption signifies industry confidence. |
-| [Shubhamsaboo/awesome-llm-apps](https://github.com/Shubhamsaboo/awesome-llm-apps) | Python | 128,088 | A curated collection of AI agents and applications, fostering collaboration within the developer community. It is a valuable resource for accelerating AI development. |
-| [PaddlePaddle/PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) | Python | 86,353 | This OCR toolkit transforms documents into structured data, enhancing LLM capabilities. Its support for multiple languages broadens its usability in diverse applications. |
-| [infiniflow/ragflow](https://github.com/infiniflow/ragflow) | Go | 86,153 | An innovative RAG engine combining retrieval-augmented generation with agent capabilities, positioning itself as a critical tool for future developments in this space. |
-| [graphify-labs/graphify](https://github.com/Graphify-Labs/graphify) | Python | 97,005 | This project enables the creation of a queryable knowledge graph from various data sources, enhancing the accessibility of information for AI models, which is critical for RAG systems. |
+| [affaan-m/ECC](https://github.com/affaan-m/ECC) | JavaScript | 234,249 | An agent optimization system that enhances the performance of conversational AI tools through advanced memory and skill features. It represents a significant step forward in creating personalized AI agents. |
+| [NousResearch/hermes-agent](https://github.com/NousResearch/hermes-agent) | Python | 221,497 | This adaptive AI agent grows and learns from user interactions, making it a unique offering in the personalized assistant market. It's designed to continually improve user experience based on individual needs. |
+| [mvanhorn/last30days-skill](https://github.com/mvanhorn/last30days-skill) | Python | 240 | This AI agent skill provides research capabilities across multiple platforms, delivering a synthesized overview for users. Its multi-source approach stands out for its comprehensiveness. |
 
-### Trend Signal Analysis
-Today's GitHub trends reflect a surge in interest towards AI agents and automation tools, as evidenced by the rapid star increases in projects like [hermes-agent](https://github.com/NousResearch/hermes-agent) and [santifer/career-ops](https://github.com/santifer/career-ops). Developers appear eager to explore frameworks that simplify the deployment and interaction of AI agents, responding to the growing need for more personalized interfaces and real-time data processing capabilities. Furthermore, the increased focus on multimedia, particularly with the developments in video processing tools, indicates a significant shift towards integrating diverse data formats into AI workflows. Recent advancements in LLMs, such as those from Hugging Face and AutoGPT, interplay with these emerging trends, suggesting a collaborative movement towards enhancing user experience via more accessible and versatile AI applications.
+### 📦 AI Applications
 
-### Community Hot Spots
-- **[moeru-ai/airi](https://github.com/moeru-ai/airi)**: Highly innovative self-hosted AI assistant capable of real-time interactions, fostering personalized tech implementations.
-- **[Panniantong/Agent-Reach](https://github.com/Panniantong/Agent-Reach)**: Provides comprehensive web search capabilities for AI agents without API fees, a crucial economical solution for developers.
-- **[Shubhamsaboo/awesome-llm-apps](https://github.com/Shubhamsaboo/awesome-llm-apps)**: A rich collection of resources for developers focusing on LLM applications, promoting community engagement and learning.
-- **[huggingface/transformers](https://github.com/huggingface/transformers)**: Continues to be foundational for LLM projects, essential for anyone looking to implement state-of-the-art AI solutions.
-- **[langchain-ai/langchain](https://github.com/langchain-ai/langchain)**: Serves as a pivotal platform for building and integrating AI agents, highly recommended for teams focused on LLM applications.
+| Project | Lang | Stars (total / today) | Summary |
+| :--- | :--- | ---: | :--- |
+| [bradautomates/claude-video](https://github.com/bradautomates/claude-video) | Python | 434 | This tool enables the Claude LLM to analyze and understand video content, offering a new dimension to AI capabilities. As video content grows, tools like this will become essential for interaction and analysis. |
 
-This report provides an insightful snapshot into the evolving landscape of AI in open source, driven by community engagement and rapid technological advancements.
+### 🧠 LLMs / Training
+
+| Project | Lang | Stars (total / today) | Summary |
+| :--- | :--- | ---: | :--- |
+| [moeru-ai/airi](https://github.com/moeru-ai/airi) | TypeScript | 572 | Self-hosted Grok companion that features real-time voice interaction for games, emphasizing the blend of AI and interactive entertainment. It reflects the trend towards personalized AI companions. |
+
+## Step 3: Trend Signal Analysis
+
+Today's analysis of GitHub's trending AI repositories indicates a significant surge in interest in AI agents and automation tools, particularly those that utilize extensive language models (LLMs). Projects like [affaan-m/ECC](https://github.com/affaan-m/ECC) and [NousResearch/hermes-agent](https://github.com/NousResearch/hermes-agent) showcase innovative approaches to making AI more adaptable and responsive to users’ needs. The continual increase in stars for frameworks such as [huggingface/transformers](https://github.com/huggingface/transformers) suggests robust community support and an ever-expanding base for future developments in natural language processing.
+
+Moreover, the emergence of tools that integrate LLMs with video and document analysis, such as [bradautomates/claude-video](https://github.com/bradautomates/claude-video) and [PaddlePaddle/PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR), hint at a shift towards more comprehensive AI applications capable of multi-modal understanding. This trend aligns well with recent advancements in LLMs, reflecting a robust ecosystem where developers are keen to leverage existing models into practical applications across various platforms.
+
+## Step 4: Community Hot Spots
+
+- [Kronos](https://github.com/shiyu-coder/Kronos): Innovative language model focusing on financial markets; a testament to specialized applications of LLMs.
+- [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR): A highly versatile OCR tool that transforms document workflows for enterprises globally.
+- [alibaba/open-code-review](https://github.com/alibaba/open-code-review): Revolutionizes code quality assurance with AI-driven insights, making it vital for software developers.
+- [bradautomates/claude-video](https://github.com/bradautomates/claude-video): Pioneering LLM applications in video analysis, catering to an expansive content type.
+- [mvanhorn/last30days-skill](https://github.com/mvanhorn/last30days-skill): An essential tool for users looking to comprehensively synthesize online information into actionable insights.
