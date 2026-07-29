@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "OpenAI Codex 发布多个重要版本",
+      "Claude Code 用户对会话限制不满",
+      "Codex 用户希望支持多聊天会话",
+      "Claude Code 响应用户反馈缓慢",
+      "用户对共享功能需求增加",
+      "两个工具社区对性能优化高度关注"
+    ],
+    "ai-agents": [
+      "OpenClaw 收到 13 条 Issues 更新",
+      "OpenClaw 发布 50 条 Pull Requests",
+      "OpenClaw 改进了聊天记录功能",
+      "NanoBot 社区参与度显著",
+      "OpenClaw 重点讨论 WebSocket 连接问题",
+      "社区对代码质量的关注持续上升"
+    ],
+    "ai-trending": [
+      "bradautomates/claude-video 今日增加 988 个 Stars",
+      "andrewyng/aisuite 近期新增 62 个 Stars",
+      "huggingface/speech-to-speech 今日增加 227 Stars",
+      "moeru-ai/airi 今日新增 797 Stars",
+      "affaan-m/ECC 获得社区高度关注",
+      "microsoft/agent-governance-toolkit 吸引开发者目光"
+    ],
+    "ai-web": [
+      "Anthropic 发布关于开放权重模型的声明",
+      "Anthropic 发现密码学中的数学脆弱性",
+      "Dario Amodei 强调开放权重模型的重要性",
+      "OpenAI 本日更新未提供详细内容",
+      "开放权重模型会促进企业与开发者合作",
+      "Anthropic 在网络安全方面的技术能力增强"
+    ],
+    "ai-hn": [
+      "Codex Security 引发对 AI 安全的强烈讨论",
+      "Truth is not a direction: 对 LLM 的逻辑探讨",
+      "使用 Claude 发现加密弱点的能力展示",
+      "AI 安全性成为 Hacker News 热议的话题",
+      "芯片股票因 AI 不确定性下滑",
+      "Apple 达成 5 万亿美元市值里程碑"
+    ],
+    "ai-arxiv": [
+      "论文探讨指令调优模型的语法适应性",
+      "VetClaw 系统提供新的兽医疾病筛查方法",
+      "并行解码蒸馏加速图像生成效率",
+      "新算法提升复杂场景下推理能力",
+      "框架研究提升模型通用性",
+      "主张基于价值的内存管理系统展示潜力"
+    ],
+    "ai-hf": [
+      "moonshotai/Kimi-K3 成为热门模型",
+      "baidu/Unlimited-OCR 适用于多语言文本识别",
+      "Qwen/Qwen3.6-35B-A3B 具备强大对话能力",
+      "zai-org/GLM-5.2 成为文本生成首选",
+      "prism-ml/Bonsai-27B-gguf 引发大规模应用关注",
+      "HauhauCS/Qwen3.6-35B-A3B 在创造性任务中表现优异"
+    ],
+    "ai-community": [
+      "Slopsquatting 分析 AI 在供应链攻击中的风险",
+      "AI 代理公共仓库权限需审核",
+      "Kotlin 开发 AI 代理的实用指南",
+      "个性化体验项目启发创意讨论",
+      "云 AI 实现家居自动化的隐私保护案例",
+      "开放权重推动美国 AI 领导地位的潜力"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "OpenAI Codex released rust-v0.146.0",
+      "Both tools emphasize session management",
+      "Claude Code focuses on automation workflows",
+      "Community requests for multi-chat support",
+      "Plugin management enhancements are underway",
+      "10 issues and 10 PRs count for each tool"
+    ],
+    "ai-agents": [
+      "OpenClaw saw 63 updates in 24 hours",
+      "50 pull requests were submitted for OpenClaw",
+      "Critical bug in qqbot WebSocket still open",
+      "Performance enhancements include session reuse",
+      "Refactor to remove duplicate provider code underway",
+      "Active discussions on message handling reliability"
+    ],
+    "ai-trending": [
+      "bradautomates/claude-video enriches AI interactions",
+      "moeru-ai/airi offers self-hosted AI companions",
+      "huggingface/speech-to-speech supports diverse modalities",
+      "tensorflow/tensorflow hit 196,575 stars today",
+      "pytorch/pytorch reached 102,047 total stars",
+      "huggingface/transformers gained 365 stars today"
+    ],
+    "ai-web": [
+      "Anthropic discovers vulnerabilities in cryptography",
+      "OpenAI released metadata-only articles today",
+      "Research on digital security implications released",
+      "Dario Amodei comments on open-weights models",
+      "Article on cryptographic weaknesses published",
+      "Findings do not affect production systems"
+    ],
+    "ai-hn": [
+      "OpenAI's Codex Security platform launched",
+      "Market reactions to chip stocks discussed",
+      "Community debates new AI evaluation frameworks",
+      "Cryptographic weaknesses discovered by Claude",
+      "Split opinions on future tech investments",
+      "Vulnerabilities' implications for cybersecurity explored"
+    ],
+    "ai-arxiv": [
+      "Focus on multimodal models in recent submissions",
+      "New frameworks for reasoning and interaction introduced",
+      "LLMs aid in clinical diagnostics research",
+      "Paper on human syntax reuse by LLMs published",
+      "LLM framework for inventory allocation evaluation",
+      "VetClaw system developed for veterinary screening"
+    ],
+    "ai-hf": [
+      "moonshotai/Kimi-K3 gained 8,000 likes today",
+      "baidu/Unlimited-OCR surpassed 2.7 million downloads",
+      "Qwen/Qwen3.6-35B-A3B excels in conversational tasks",
+      "zai-org/GLM-5.2 focuses on language understanding",
+      "prism-ml/Bonsai-27B-gguf emphasizes generative efficiency",
+      "Trending models reflect interest in image-text integration"
+    ],
+    "ai-community": [
+      "New attack vector slopsquatting threatens security",
+      "Best practices discussed for auditing AI agents",
+      "Recent incident urges audits of public repo access",
+      "Developers misidentify core AI risks highlighted",
+      "Countermeasures for slopsquatting detailed",
+      "Emerging conversation on AI safety and reliability"
+    ]
+  }
+}
