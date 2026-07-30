@@ -1,0 +1,126 @@
+{
+  "zh": {
+    "ai-cli": [
+      "Claude Code 今日无新版本发布，用户需求多样化。",
+      "OpenAI Codex 更新至 v0.147，PR 数高达 10。",
+      "用户呼吁标准化配置文件以提升使用体验。",
+      "跨平台支持被视为未来发展的关键方向。",
+      "OpenAI Codex 社区讨论多语言支持以增加可访问性。",
+      "Claude Code 用户对性能优化的需求愈发明显。"
+    ],
+    "ai-agents": [
+      "OpenClaw 今日增加 5 条 Issues 和 50 条 PR。",
+      "重要 PR 修复 Discord 进度显示问题，提高渲染效果。",
+      "崩溃循环问题成为用户讨论的热点，影响通讯功能。",
+      "新 PR 解决 MacOS 语音唤醒触发设置问题。",
+      "用户关注工具渲染效果和消息传递的准确性。",
+      "未及时处理的安全性相关 Issue 需引起重视。"
+    ],
+    "ai-trending": [
+      "Hugging Face 的 speech-to-speech 项目今日涨幅显著，关注度提升。",
+      "Microsoft 的 VibeVoice 语音互动项目获得广泛注意。",
+      "阿里巴巴的 open-code-review 工具显著提升企业级代码管理。",
+      "ECC 项目动态支持智能体优化，用户增长强劲。",
+      "学习资源项目 learn-claude-code 引起开发者关注。",
+      "Agent-Reach 项目展现了广泛的数据采集能力。"
+    ],
+    "ai-web": [
+      "Anthropic 发布关于 Claude 模型的新研究，探讨密码学漏洞。",
+      "OpenAI 新文章聚焦学术研究支持及技术效率提升。",
+      "OpenAI 发布的文章探讨 GPT-5 和 GPT-6 的智能效率。",
+      "最新研究显示 AI 在自动化发现和利用软件漏洞中的潜力。",
+      "OpenAI 的 ChatGPT 在学术应用中发挥关键作用。",
+      "Anthropic 在安全领域展现其技术应用的战略方向。"
+    ],
+    "ai-arxiv": [
+      "强化学习研究激增，关注大语言模型个性化服务。",
+      "个性化研究论文日益增多，应用领域扩展迅速。",
+      "新方法提升 LLMA 代理在任务中的执行效率。",
+      "探讨智能体在开放式 AI 研究中的能力，具战略价值。",
+      "多智能体团队合作中的能力评估提出新视角。",
+      "新型的 AI 文本分类模型准确率大幅优于旧版本。"
+    ],
+    "ai-hf": [
+      "moonshotai/Kimi-K3 模型点赞数冲破 8,700，热度持续升高。",
+      "baidu/Unlimited-OCR 以超 259 万的下载量显示应用需求。",
+      "Qwen3.6 系列模型在对话生成领域受到广泛关注。",
+      "thinkingmachines/Inkling 提供创新对话能力，用户反馈积极。",
+      "prism-ml/Ternary-Bonsai-27B-gguf 微调与量化方面表现优异。",
+      "unsloth/Laguna-S-2.1-GGUF 在生成效率上大幅提升。"
+    ],
+    "ai-community": [
+      "讨论 AI 模型安全存储引发关注，衍生新思考。",
+      "分享用 AI 提升代码生成效率的最佳实践。",
+      "关于 OpenAI 模型安全事件的深入分析引热议。",
+      "探讨开放模型在确保 AI 安全性中的重要作用。",
+      "分享非编程手段利用 AI 提升生产力的经验。",
+      "多模型路由在生产环境中面临许多实际挑战。"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Claude Code and Codex both have 10 open issues.",
+      "OpenAI Codex announced 3 new alpha releases.",
+      "User demand for improved cross-platform support grows.",
+      "Performance optimization is a key user request for both tools.",
+      "Error messaging improvements are heavily requested.",
+      "Claude Code focuses on user collaboration enhancements."
+    ],
+    "ai-agents": [
+      "OpenClaw sees 50 pull requests updated today.",
+      "Progress includes fixes for macOS voice trigger settings.",
+      "Major active issue involves crash-loop in Discord support.",
+      "Two issues closed today, showing project advancement.",
+      "47 pull requests are still under review.",
+      "Community discussions highlight demand for tool visibility."
+    ],
+    "ai-trending": [
+      "AI agents and RAG frameworks are trending on GitHub.",
+      "opengeos/GeoLibre gained 671 stars today.",
+      "affaan-m/ECC saw an increase of 857 stars today.",
+      "huggingface/speech-to-speech added 827 stars today.",
+      "different-ai/openwork gained 97 stars today.",
+      "microscaling/Prometheus-FileSystem-Radar trending upward."
+    ],
+    "ai-web": [
+      "Claude identifies critical vulnerabilities in cryptography.",
+      "OpenAI released articles enhancing model performance metrics.",
+      "Research on cryptographic weaknesses published by Anthropic.",
+      "New settings for ChatGPT aim to aid academic researchers.",
+      "OpenAI publishes 7 new articles today.",
+      "Cryptographic security practices are evolving in AI."
+    ],
+    "ai-hn": [
+      "AI startups are criticized for publishing minimal research.",
+      "Discussion on AI's impact on recruiting traditional roles.",
+      "Cryptographic weaknesses uncovered by Claude sparks debate.",
+      "AI community is engaged with issues of research transparency.",
+      "Discussion highlights challenges in AI industry ethics.",
+      "Growing concern over knowledge dissemination among startups."
+    ],
+    "ai-arxiv": [
+      "Papers explore AI's understanding of human reasoning.",
+      "Research on linguistic monoculture in LLMs published.",
+      "Study investigates regional bias impacts on AI decision-making.",
+      "New insights on AI agents conducting open-ended research.",
+      "Research highlights the need for bias management in AI.",
+      "Advancements in AI applications span multiple domains."
+    ],
+    "ai-hf": [
+      "moonshotai/Kimi-K3 leads in weekly likes on Hugging Face.",
+      "baidu/Unlimited-OCR shows high demand for OCR solutions.",
+      "DavidAU/Qwen3.6-35B-A3B gains attention for image-text tasks.",
+      "Trending models highlight innovative capabilities in AI.",
+      "Qwen/Qwen3.6-35B-A3B is popular among developers.",
+      "moonshotai/Kimi-K3 has 8,700 likes this week."
+    ],
+    "ai-community": [
+      "Discussions on LLM capabilities dominate the community.",
+      "Carla's absence from coding sparked new productivity ideas.",
+      "Analysis of LLM limitations compares to Einstein's insights.",
+      "Security review reveals LLM autonomy risks.",
+      "OpenAI expands GPT-Live voice features for enterprise.",
+      "Emergence of local-first AI prioritizes user control."
+    ]
+  }
+}
