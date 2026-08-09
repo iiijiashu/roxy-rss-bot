@@ -91,7 +91,7 @@ describe("LlmProvider interface", () => {
   });
 
   it("GitHubCopilotProvider has correct name", () => {
-    const p = new GitHubCopilotProvider({ apiKey: "test" });
+    const p = new GitHubCopilotProvider({ token: "test" });
     expect(p.name).toBe("github-copilot");
   });
 
@@ -104,7 +104,7 @@ describe("LlmProvider interface", () => {
     const providers: LlmProvider[] = [
       new AnthropicProvider(),
       new OpenAIProvider({ apiKey: "k" }),
-      new GitHubCopilotProvider({ apiKey: "k" }),
+      new GitHubCopilotProvider({ token: "k" }),
       new OpenRouterProvider({ apiKey: "k" }),
     ];
     for (const p of providers) {
@@ -242,40 +242,9 @@ describe("OpenAIProvider", () => {
 // ---------------------------------------------------------------------------
 
 describe("GitHubCopilotProvider", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("call returns text", async () => {
-    const mockCreate = await getOpenAIMockCreate();
-    mockCreate.mockResolvedValueOnce({
-      choices: [{ message: { content: "Hello from Copilot" } }],
-    });
-
-    const p = new GitHubCopilotProvider({ apiKey: "ghp_test" });
-    const result = await p.call("prompt", 512);
-    expect(result).toBe("Hello from Copilot");
-    expect(mockCreate).toHaveBeenCalledWith({
-      model: "openai/gpt-4o-mini",
-      max_completion_tokens: 512,
-      messages: [{ role: "user", content: "prompt" }],
-    });
-  });
-
-  it(
-    "uses GITHUB_COPILOT_MODEL env",
-    withEnv({ GITHUB_COPILOT_MODEL: "o3-mini" }, () => {
-      const p = new GitHubCopilotProvider({ apiKey: "ghp_test" });
-      expect(p.name).toBe("github-copilot");
-    }),
-  );
-
-  it("throws on empty response", async () => {
-    const mockCreate = await getOpenAIMockCreate();
-    mockCreate.mockResolvedValueOnce({ choices: [] });
-
-    const p = new GitHubCopilotProvider({ apiKey: "k" });
-    await expect(p.call("prompt", 100)).rejects.toThrow("Unexpected empty response from github-copilot");
+  it("uses the Copilot CLI transport", () => {
+    const p = new GitHubCopilotProvider({ token: "test-token" });
+    expect(p.name).toBe("github-copilot");
   });
 });
 

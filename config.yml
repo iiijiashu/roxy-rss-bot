@@ -3,8 +3,8 @@
 # Changes take effect on the next workflow run.
 
 # ── Roxy's compact AI CLI watchlist ───────────────────────────────────────────
-# Keep this intentionally small so the free GitHub Models workflow stays within
-# predictable request and prompt-size limits.
+# Keep this intentionally small so the Copilot CLI workflow stays within its
+# per-run call budget and predictable prompt-size limits.
 # Each entry requires: id (filename slug), repo (owner/repo), name (display name).
 
 cli_repos:

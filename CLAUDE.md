@@ -31,7 +31,7 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxx
 # OpenAI
 # export OPENAI_API_KEY=sk-xxxxx
 
-# GitHub Copilot — uses GITHUB_TOKEN
+# GitHub Copilot CLI — configured in Actions with its short-lived GITHUB_TOKEN
 
 # OpenRouter
 # export OPENROUTER_API_KEY=sk-or-xxxxx
@@ -45,7 +45,7 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxx
 The pipeline runs in four sequential phases, each implemented as a named async function in `src/index.ts`:
 
 1. **`fetchAllData`** — all network I/O in parallel: GitHub API (issues/PRs/releases) for 17 repos, Claude Code Skills, Anthropic/OpenAI sitemaps, GitHub Trending HTML + Search API, Hacker News Algolia API.
-2. **`generateSummaries`** — per-repo LLM calls, all in parallel, rate-limited to 5 concurrent requests by a queue in `src/report.ts`.
+2. **`generateSummaries`** — per-repo LLM calls, all queued through the configurable concurrency and call-budget controls in `src/report.ts`.
 3. **Comparisons** — two LLM calls: cross-tool CLI comparison and OpenClaw cross-ecosystem comparison.
 4. **Save phase** — `buildCliReportContent` / `buildOpenclawReportContent` (in `src/report-builders.ts`) build Markdown strings; `saveWebReport` / `saveTrendingReport` / `saveHnReport` (in `src/report-savers.ts`) call LLM + write file + create GitHub Issue.
 
@@ -67,7 +67,7 @@ The pipeline runs in four sequential phases, each implemented as a named async f
 | `src/providers/openai-compatible.ts` | `OpenAICompatibleProvider` — shared base class for OpenAI-compatible providers |
 | `src/providers/anthropic.ts` | `AnthropicProvider` — Anthropic SDK wrapper |
 | `src/providers/openai.ts` | `OpenAIProvider` — extends `OpenAICompatibleProvider` |
-| `src/providers/github-copilot.ts` | `GitHubCopilotProvider` — extends `OpenAICompatibleProvider` |
+| `src/providers/github-copilot.ts` | `GitHubCopilotProvider` — isolated, tool-free Copilot CLI transport |
 | `src/providers/openrouter.ts` | `OpenRouterProvider` — extends `OpenAICompatibleProvider` |
 | `src/providers/deepseek.ts` | `DeepSeekProvider` — extends `OpenAICompatibleProvider` |
 | `src/providers/index.ts` | `createProvider` factory + barrel re-exports |
@@ -103,8 +103,8 @@ Files written to `digests/YYYY-MM-DD/`:
 - LLM prompt builders are split across two files: `src/prompts.ts` (repo-level prompts) and `src/prompts-data.ts` (data-source and rollup prompts). Each report type has its own builder function.
 - `callLlm(prompt, maxTokens?)` defaults to 4096 tokens. Web report uses 8192, trending uses 6144. The table-formatted listing reports (HN, PH, ArXiv, HF, Community) use `LLM_TOKENS_LISTING` = 6144 to fit multi-row tables plus 2-sentence summaries.
 - Data-source listing reports (Trending, HN, PH, ArXiv, HF, Community) render their item lists as **Markdown tables** (not bullet lists). Numeric columns are copied verbatim from the fetched data; the summary column is 2 sentences. Tables already have CSS in `index.html` and render natively in GitHub Issues too.
-- On 429 rate-limit errors `callLlm` retries up to 3 times with exponential backoff (5 s / 10 s / 20 s); the concurrency slot is released during the wait.
-- The concurrency limiter (`LLM_CONCURRENCY = 5`) prevents 429s when many parallel LLM calls fire. Do not bypass it by calling SDK clients directly.
+- On 429 rate-limit errors `callLlm` retries up to 3 times with exponential backoff (5 s / 10 s / 20 s); the concurrency slot is released during the wait. Every retry counts against `LLM_CALL_BUDGET`.
+- The concurrency limiter defaults to 5, but Actions explicitly sets `LLM_CONCURRENCY=2` for Copilot CLI and a per-run `LLM_CALL_BUDGET` (40 daily, 6 weekly/monthly). Do not bypass it by calling providers directly.
 - LLM provider is selected via `LLM_PROVIDER` env var (default: `anthropic`). Valid values: `anthropic`, `openai`, `github-copilot`, `openrouter`, `deepseek`.
 - Provider implementations live in `src/providers/`. Each file implements the `LlmProvider` interface. The factory in `src/providers/index.ts` validates the provider name and logs only the provider name — never API keys or endpoint URLs.
 - GitHub issue label colors are defined in `LABEL_COLORS` in `src/github.ts`. Add new labels there.

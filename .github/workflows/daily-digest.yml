@@ -12,12 +12,12 @@ concurrency:
 
 permissions:
   contents: write
-  models: read
+  copilot-requests: write
 
 jobs:
   digest:
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: 75
 
     steps:
       - name: Checkout
@@ -35,12 +35,17 @@ jobs:
       - name: Install dependencies without lifecycle scripts
         run: pnpm install --frozen-lockfile --ignore-scripts
 
+      - name: Install GitHub Copilot CLI
+        run: npm install --global @github/copilot@1.0.78 --ignore-scripts
+
       - name: Generate Chinese-first digest and RSS
         env:
           GITHUB_TOKEN: ${{ github.token }}
           LLM_PROVIDER: github-copilot
-          GITHUB_COPILOT_MODEL: openai/gpt-4o-mini
           LLM_MAX_TOKENS: "4000"
+          LLM_CONCURRENCY: "2"
+          LLM_CALL_BUDGET: "40"
+          COPILOT_CLI_TIMEOUT_MS: "90000"
           PAGES_URL: https://${{ github.repository_owner }}.github.io/roxy-rss-bot
         run: |
           pnpm start

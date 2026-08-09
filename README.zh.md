@@ -3,7 +3,7 @@
 [English](./README.md) | 中文
 
 > **Roxy 部署版。** 本分支每天北京时间 08:20 运行，通过 GitHub Pages
-> 发布 Markdown、网页和 RSS；模型使用 GitHub Models，仓库跟踪范围压缩为
+> 发布 Markdown、网页和 RSS；模型使用 GitHub Copilot CLI，仓库跟踪范围压缩为
 > 4 个。默认不发布 Issues、不发送聊天通知，周报和月报仅允许手动运行。
 > 下方详细章节也保留了部分上游可选能力的说明。
 
@@ -232,7 +232,7 @@ openclaw_peers:
 | `TELEGRAM_CHAT_ID` | 可选 | 接收通知的 Telegram 频道 / 群组 / 用户 ID |
 | `FEISHU_WEBHOOK_URLS` | 可选 | 飞书自定义机器人 Webhook URL，多个用英文逗号分隔。设置后每次 digest 完成自动推送卡片通知到所有群 |
 
-> `GITHUB_TOKEN` 由 GitHub Actions 自动提供，无需手动添加。使用 `github-copilot` 作为 Provider 时，同一 `GITHUB_TOKEN` 也用于 LLM 调用。
+> `GITHUB_TOKEN` 由 GitHub Actions 自动提供。`github-copilot` Provider 会用这个短期令牌和 `copilot-requests: write` 权限调用固定版本的 Copilot CLI；不需要 PAT，也不需要保存 Copilot 密钥。
 
 **配置 Telegram 推送**（可选）：
 1. 向 [@BotFather](https://t.me/BotFather) 创建 bot，复制 token
@@ -254,14 +254,16 @@ openclaw_peers:
 
 通过 `LLM_PROVIDER` 环境变量选择模型后端，默认为 `anthropic`。
 
-| 供应商 | `LLM_PROVIDER` | 所需环境变量 | 默认模型 |
+| 供应商 | `LLM_PROVIDER` | 所需环境变量 | 模型选择 |
 |--------|---------------|------------|----------|
 | Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` |
 | OpenAI | `openai` | `OPENAI_API_KEY` | `gpt-4o` |
-| GitHub Copilot | `github-copilot` | `GITHUB_TOKEN` | `gpt-4o` |
+| GitHub Copilot CLI | `github-copilot` | Actions `GITHUB_TOKEN` | Auto（Copilot Student 要求） |
 | OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4` |
 
-可通过 `ANTHROPIC_MODEL`、`OPENAI_MODEL`、`GITHUB_COPILOT_MODEL` 或 `OPENROUTER_MODEL` 分别覆盖默认模型名称。
+可通过 `ANTHROPIC_MODEL`、`OPENAI_MODEL` 或 `OPENROUTER_MODEL` 覆盖对应模型。Copilot CLI 固定使用自动选模，不接受仓库级模型覆盖。
+
+Actions 工作流固定安装 `@github/copilot@1.0.78`，Copilot CLI 同时最多运行 2 个进程，并设置单次工作流调用预算（日更 40 次，周报/月报 6 次）。按当前精简监控列表，数据齐全时日更约有 30 次初始调用；两个 highlights 都需要修复时最多约 32 次，剩余空间留给限流重试。Feed/报告内容会作为不可信数据传入无工具 CLI 会话，且 CLI 不在仓库工作目录中运行。为保留现有逐报告回退与输出契约，本次不合并双语调用；可在真实输出质量验收后再评估批处理。
 
 Provider 抽象层位于 `src/providers/`，每个供应商对应独立文件并实现 `LlmProvider` 接口。新增供应商只需创建新文件并在工厂函数中注册。
 
@@ -279,8 +281,8 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxxxxx
 # export LLM_PROVIDER=openai
 # export OPENAI_API_KEY=sk-xxxxxxxx
 
-# 方式 C: GitHub Copilot（使用 GITHUB_TOKEN）
-# export LLM_PROVIDER=github-copilot
+# 方式 C: GitHub Copilot CLI 仅在 GitHub Actions 中使用短期
+# GITHUB_TOKEN 配置；本文不提供 PAT 本地配置。
 
 # 方式 D: OpenRouter
 # export LLM_PROVIDER=openrouter
