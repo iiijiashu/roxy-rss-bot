@@ -154,6 +154,41 @@ export function parseLlmJson<T = unknown>(raw: string): T {
 }
 
 /**
+ * Validate the runtime shape and requested language of notification highlights.
+ * A syntactically valid JSON response is not sufficient: batched models can
+ * occasionally copy the English sibling task into the Chinese result. Rejecting
+ * that response lets the existing retry issue a dedicated Chinese-only request.
+ */
+export function assertReportHighlights(
+  value: unknown,
+  lang: Lang,
+): asserts value is Record<string, string[]> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("Highlights response must be a JSON object");
+  }
+
+  const entries = Object.entries(value);
+  if (entries.length === 0) throw new Error("Highlights response was empty");
+
+  const items: string[] = [];
+  for (const [reportId, highlights] of entries) {
+    if (!/^ai-[a-z0-9-]+$/.test(reportId) || !Array.isArray(highlights) || highlights.length === 0) {
+      throw new Error("Highlights response had an invalid report entry");
+    }
+    for (const highlight of highlights) {
+      if (typeof highlight !== "string" || highlight.trim().length === 0) {
+        throw new Error("Highlights response contained an invalid item");
+      }
+      items.push(highlight);
+    }
+  }
+
+  if (lang === "zh" && items.some((highlight) => !/[\u3400-\u9fff]/u.test(highlight))) {
+    throw new Error("Chinese highlights response contained an untranslated item");
+  }
+}
+
+/**
  * Best-effort repair of common LLM JSON defects: narrow to the outermost
  * object/array (dropping surrounding prose) and remove trailing commas before a
  * closing brace or bracket. Returns the input unchanged when nothing applies.

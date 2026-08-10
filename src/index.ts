@@ -28,7 +28,14 @@ import {
   buildSkillsPrompt,
 } from "./prompts.ts";
 import { buildTrendingPrompt, buildHighlightsPrompt, type ReportHighlights } from "./prompts-data.ts";
-import { callLlm, parseLlmJson, saveFile, autoGenFooter, LLM_TOKENS_TRENDING } from "./report.ts";
+import {
+  callLlm,
+  parseLlmJson,
+  assertReportHighlights,
+  saveFile,
+  autoGenFooter,
+  LLM_TOKENS_TRENDING,
+} from "./report.ts";
 import { buildCliReportContent, buildOpenclawReportContent } from "./report-builders.ts";
 import {
   saveWebReport,
@@ -453,7 +460,9 @@ async function main(): Promise<void> {
   const genHighlights = async (reports: Record<string, string>, lang: Lang): Promise<ReportHighlights> => {
     for (let attempt = 1; attempt <= 2; attempt++) {
       try {
-        return parseLlmJson<ReportHighlights>(await callLlm(buildHighlightsPrompt(reports, lang), 2048));
+        const parsed = parseLlmJson<unknown>(await callLlm(buildHighlightsPrompt(reports, lang), 2048));
+        assertReportHighlights(parsed, lang);
+        return parsed;
       } catch (err) {
         const tag = attempt < 2 ? "retrying" : "giving up";
         console.error(`  [highlights] ${lang} attempt ${attempt} failed (${tag}): ${err}`);
@@ -465,16 +474,14 @@ async function main(): Promise<void> {
   highlights.zh = zhRes;
   highlights.en = enRes;
 
-  // If one language failed (generation or parse) but the other succeeded,
-  // backfill the empty one from the other so notifications never render with
-  // zero highlights. Seen 2026-07-13: zh failed intermittently while en was
-  // fine, leaving Telegram/Feishu with only section headers and no bullets.
+  // Chinese is the primary Roxy notification language. Do not silently publish
+  // English text in its place; fail the run after the dedicated retry instead.
   const zhEmpty = Object.keys(highlights.zh).length === 0;
   const enEmpty = Object.keys(highlights.en).length === 0;
-  if (zhEmpty && !enEmpty) {
-    console.warn("  [highlights] zh empty — backfilling from en");
-    highlights.zh = highlights.en;
-  } else if (enEmpty && !zhEmpty) {
+  if (zhEmpty) {
+    throw new Error("Chinese highlights generation failed after 2 attempts");
+  }
+  if (enEmpty) {
     console.warn("  [highlights] en empty — backfilling from zh");
     highlights.en = highlights.zh;
   }
