@@ -5,6 +5,7 @@
 > **Roxy 部署版。** 本分支每天北京时间 08:20 运行，通过 GitHub Pages
 > 发布 Markdown、网页和 RSS；模型使用 Agnes 2.5 Flash，仓库跟踪范围压缩为
 > 4 个。默认不发布 Issues、不发送聊天通知，周报和月报仅允许手动运行。
+> 生成报告保存在 `digest-output` 发布分支，使受保护的 `main` 仍只接受 PR；
 > 下方详细章节也保留了部分上游可选能力的说明。
 
 ### 数据源
@@ -190,7 +191,7 @@ LLM 负责过滤非 AI 项目，将结果按维度分类（AI 基础工具 / AI 
 - 通过 Sitemap 抓取 Anthropic 和 OpenAI 官网内容，增量检测新文章
 - 每日监测 GitHub Trending + 搜索 6 个 AI 主题标签，按维度分类并提炼趋势信号
 - 抓取 Hacker News 过去 24 小时 AI 热门帖子（top 30，按分数排序），生成社区情绪报告
-- 以 GitHub Issues 形式发布报告，同时提交 Markdown 文件至 `digests/YYYY-MM-DD/`
+- 将生成的 Markdown 保存在 `digest-output` 发布分支的 `digests/YYYY-MM-DD/`
 - 每日通过 GitHub Actions 定时运行，支持手动触发
 - 所有追踪仓库均可通过 `config.yml` 配置，无需修改代码
 
@@ -398,17 +399,17 @@ OpenAI 内容精选            (research / release / company / safety / ...)
 值得深读
 ```
 
-历史简报存储在 [`digests/`](./digests/)。已发布的 Issues 按类型打标签：[`digest`](../../issues?label=digest) · [`openclaw`](../../issues?label=openclaw) · [`web`](../../issues?label=web) · [`trending`](../../issues?label=trending) · [`hn`](../../issues?label=hn)。
+历史简报存储在 `digest-output` 发布分支的 [`digests/`](https://github.com/iiijiashu/roxy-rss-bot/tree/digest-output/digests)。已发布的 Issues 按类型打标签：[`digest`](../../issues?label=digest) · [`openclaw`](../../issues?label=openclaw) · [`web`](../../issues?label=web) · [`trending`](../../issues?label=trending) · [`hn`](../../issues?label=hn)。
 
 ## 定时计划
 
-默认 cron 表达式 `"0 0 * * *"` = **00:00 UTC = 08:00 CST**。
+默认 cron 表达式 `"20 0 * * *"` = **00:20 UTC = 08:20 CST**。
 
 修改时间请编辑 `.github/workflows/daily-digest.yml` 中的 cron 表达式：
 
 | CST   | UTC cron      |
 |-------|---------------|
-| 08:00 | `0 0 * * *`  |
+| 08:20 | `20 0 * * *` |
 | 09:00 | `0 1 * * *`  |
 | 10:00 | `0 2 * * *`  |
 

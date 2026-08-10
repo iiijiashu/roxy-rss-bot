@@ -6,7 +6,9 @@ English | [中文](./README.zh.md)
 > publishes Markdown, Web, and RSS through GitHub Pages, and uses Agnes 2.5 Flash
 > with a compact four-repository watchlist. Issue publishing and chat
 > notifications are disabled; weekly and monthly rollups are manual-only. The
-> detailed sections below also document optional upstream capabilities.
+> detailed sections below also document optional upstream capabilities. Generated
+> reports are retained on the `digest-output` branch so the protected `main`
+> branch continues to accept changes only through pull requests.
 
 ### Data Sources
 
@@ -192,7 +194,7 @@ New articles are detected by comparing sitemap `lastmod` timestamps against a pe
 - Scrapes official Anthropic and OpenAI web content via sitemaps; detects new articles incrementally
 - Monitors GitHub Trending daily + searches 6 AI topic tags; classifies repos by dimension and extracts trend signals
 - Fetches top-30 AI stories from Hacker News (last 24h, ranked by points); generates community sentiment report
-- Publishes GitHub Issues for each report type; commits Markdown files to `digests/YYYY-MM-DD/`
+- Retains generated Markdown under `digests/YYYY-MM-DD/` on the `digest-output` publication branch
 - Runs on a daily schedule via GitHub Actions; supports manual triggering
 - All tracked repositories are configurable via `config.yml` — no code changes needed
 
@@ -429,13 +431,13 @@ Top projects & releases
 Looking ahead
 ```
 
-Historical digests are stored in [`digests/`](./digests/). Published issues are tagged by type: [`digest`](../../issues?label=digest) · [`openclaw`](../../issues?label=openclaw) · [`web`](../../issues?label=web) · [`trending`](../../issues?label=trending) · [`hn`](../../issues?label=hn) · [`ph`](../../issues?label=ph) · [`arxiv`](../../issues?label=arxiv) · [`hf`](../../issues?label=hf) · [`community`](../../issues?label=community) · [`weekly`](../../issues?label=weekly) · [`monthly`](../../issues?label=monthly).
+Historical digests are stored in [`digests/`](https://github.com/iiijiashu/roxy-rss-bot/tree/digest-output/digests) on the `digest-output` publication branch. Published issues are tagged by type: [`digest`](../../issues?label=digest) · [`openclaw`](../../issues?label=openclaw) · [`web`](../../issues?label=web) · [`trending`](../../issues?label=trending) · [`hn`](../../issues?label=hn) · [`ph`](../../issues?label=ph) · [`arxiv`](../../issues?label=arxiv) · [`hf`](../../issues?label=hf) · [`community`](../../issues?label=community) · [`weekly`](../../issues?label=weekly) · [`monthly`](../../issues?label=monthly).
 
 ## Schedule
 
 | Workflow | Cron | UTC | CST |
 |----------|------|-----|-----|
-| Daily digest | `0 0 * * *` | 00:00 daily | 08:00 daily |
+| Daily digest | `20 0 * * *` | 00:20 daily | 08:20 daily |
 | Weekly rollup | `0 1 * * 1` | 01:00 Monday | 09:00 Monday |
 | Monthly rollup | `0 2 1 * *` | 02:00 on the 1st | 10:00 on the 1st |
 

@@ -4,7 +4,19 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Branch containing the generated site
+        required: false
+        default: main
+        type: string
   workflow_call:
+    inputs:
+      source_ref:
+        description: Branch containing the generated site
+        required: false
+        default: main
+        type: string
 
 concurrency:
   group: roxy-pages
@@ -23,10 +35,10 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Checkout latest branch content
+      - name: Checkout published content
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.ref_name }}
+          ref: ${{ inputs.source_ref || github.ref_name }}
 
       - name: Prepare minimal static site
         run: |
