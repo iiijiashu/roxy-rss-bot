@@ -64,11 +64,7 @@ export interface AgnesProviderOptions {
   requestBudget?: number;
 }
 
-function configuredPositiveInteger(
-  name: string,
-  provided: number | undefined,
-  fallback: number,
-): number {
+function configuredPositiveInteger(name: string, provided: number | undefined, fallback: number): number {
   if (provided !== undefined) {
     if (!Number.isSafeInteger(provided) || provided <= 0) {
       throw new Error(`${name} must be a positive integer`);

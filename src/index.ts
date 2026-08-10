@@ -378,10 +378,7 @@ async function main(): Promise<void> {
     saveCommunityReport(devtoData, lobstersData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
   ]);
 
-  const [comparisons] = await Promise.all([
-    comparisonPromise,
-    sourceReportsPromise,
-  ]);
+  const [comparisons] = await Promise.all([comparisonPromise, sourceReportsPromise]);
   const [zhComparison, zhPeersComparison, enComparison, enPeersComparison] = comparisons;
 
   const comparisonByLang = { zh: zhComparison, en: enComparison };
