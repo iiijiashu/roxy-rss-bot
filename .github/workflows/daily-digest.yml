@@ -53,7 +53,10 @@ jobs:
             exit 1
           fi
 
-          curl --fail --silent --show-error --location             "https://duanyytop.github.io/agents-radar/digests/${report_date}/ai-agents.md"             | head -c 50000 > representative-report.md
+          curl --fail --silent --show-error --location \
+            "https://duanyytop.github.io/agents-radar/digests/${report_date}/ai-agents.md" \
+            --output representative-report-full.md
+          head -c 50000 representative-report-full.md > representative-report.md
 
           {
             cat <<'TRUSTED'
