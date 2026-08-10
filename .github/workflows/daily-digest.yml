@@ -54,6 +54,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
+          PRODUCTHUNT_TOKEN: ${{ secrets.PRODUCTHUNT_TOKEN }}
           AGNES_MODEL: agnes-2.5-flash
           AGNES_BATCH_WINDOW_MS: "25"
           AGNES_MAX_BATCH_TASKS: "64"
