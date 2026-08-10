@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   AnthropicProvider,
   OpenAIProvider,
-  GitHubCopilotProvider,
+  AgnesProvider,
   OpenRouterProvider,
   createProvider,
   VALID_PROVIDER_NAMES,
@@ -90,9 +90,9 @@ describe("LlmProvider interface", () => {
     expect(p.name).toBe("openai");
   });
 
-  it("GitHubCopilotProvider has correct name", () => {
-    const p = new GitHubCopilotProvider({ apiKey: "test" });
-    expect(p.name).toBe("github-copilot");
+  it("AgnesProvider has correct name", () => {
+    const p = new AgnesProvider({ apiKey: "test" });
+    expect(p.name).toBe("agnes");
   });
 
   it("OpenRouterProvider has correct name", () => {
@@ -104,7 +104,7 @@ describe("LlmProvider interface", () => {
     const providers: LlmProvider[] = [
       new AnthropicProvider(),
       new OpenAIProvider({ apiKey: "k" }),
-      new GitHubCopilotProvider({ apiKey: "k" }),
+      new AgnesProvider({ apiKey: "k" }),
       new OpenRouterProvider({ apiKey: "k" }),
     ];
     for (const p of providers) {
@@ -120,7 +120,7 @@ describe("LlmProvider interface", () => {
 
 describe("VALID_PROVIDER_NAMES", () => {
   it("contains all five supported providers", () => {
-    expect(VALID_PROVIDER_NAMES).toEqual(["anthropic", "openai", "github-copilot", "openrouter", "deepseek"]);
+    expect(VALID_PROVIDER_NAMES).toEqual(["anthropic", "openai", "agnes", "openrouter", "deepseek"]);
   });
 });
 
@@ -238,48 +238,6 @@ describe("OpenAIProvider", () => {
 });
 
 // ---------------------------------------------------------------------------
-// GitHubCopilotProvider
-// ---------------------------------------------------------------------------
-
-describe("GitHubCopilotProvider", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("call returns text", async () => {
-    const mockCreate = await getOpenAIMockCreate();
-    mockCreate.mockResolvedValueOnce({
-      choices: [{ message: { content: "Hello from Copilot" } }],
-    });
-
-    const p = new GitHubCopilotProvider({ apiKey: "ghp_test" });
-    const result = await p.call("prompt", 512);
-    expect(result).toBe("Hello from Copilot");
-    expect(mockCreate).toHaveBeenCalledWith({
-      model: "openai/gpt-4o-mini",
-      max_completion_tokens: 512,
-      messages: [{ role: "user", content: "prompt" }],
-    });
-  });
-
-  it(
-    "uses GITHUB_COPILOT_MODEL env",
-    withEnv({ GITHUB_COPILOT_MODEL: "o3-mini" }, () => {
-      const p = new GitHubCopilotProvider({ apiKey: "ghp_test" });
-      expect(p.name).toBe("github-copilot");
-    }),
-  );
-
-  it("throws on empty response", async () => {
-    const mockCreate = await getOpenAIMockCreate();
-    mockCreate.mockResolvedValueOnce({ choices: [] });
-
-    const p = new GitHubCopilotProvider({ apiKey: "k" });
-    await expect(p.call("prompt", 100)).rejects.toThrow("Unexpected empty response from github-copilot");
-  });
-});
-
-// ---------------------------------------------------------------------------
 // OpenRouterProvider
 // ---------------------------------------------------------------------------
 
@@ -350,10 +308,13 @@ describe("createProvider", () => {
     expect(p).toBeInstanceOf(OpenAIProvider);
   });
 
-  it("creates github-copilot provider", () => {
-    const p = createProvider("github-copilot");
-    expect(p).toBeInstanceOf(GitHubCopilotProvider);
-  });
+  it(
+    "creates Agnes provider",
+    withEnv({ AGNES_API_KEY: "test" }, () => {
+      const p = createProvider("agnes");
+      expect(p).toBeInstanceOf(AgnesProvider);
+    }),
+  );
 
   it("creates openrouter provider", () => {
     const p = createProvider("openrouter");
@@ -370,7 +331,7 @@ describe("createProvider", () => {
 
   it("throws descriptive error for unknown provider", () => {
     expect(() => createProvider("bogus" as never)).toThrow(
-      /Invalid LLM provider: "bogus".*Valid providers are: anthropic, openai, github-copilot, openrouter/,
+      /Invalid LLM provider: "bogus".*Valid providers are: anthropic, openai, agnes, openrouter/,
     );
   });
 

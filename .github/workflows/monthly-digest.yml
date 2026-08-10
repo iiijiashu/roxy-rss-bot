@@ -9,7 +9,6 @@ concurrency:
 
 permissions:
   contents: write
-  models: read
 
 jobs:
   monthly:
@@ -35,9 +34,13 @@ jobs:
       - name: Run monthly rollup
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          LLM_PROVIDER: github-copilot
-          GITHUB_COPILOT_MODEL: openai/gpt-4o-mini
+          AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
+          AGNES_MODEL: agnes-2.5-flash
+          AGNES_BATCH_WINDOW_MS: "25"
+          AGNES_REQUEST_BUDGET: "3"
+          LLM_PROVIDER: agnes
           LLM_MAX_TOKENS: "4000"
+          LLM_CONCURRENCY: "64"
           PAGES_URL: https://${{ github.repository_owner }}.github.io/roxy-rss-bot
         run: |
           pnpm monthly

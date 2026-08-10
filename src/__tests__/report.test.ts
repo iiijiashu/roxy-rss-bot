@@ -18,7 +18,14 @@ vi.mock("../providers/index.ts", async (importOriginal) => {
   };
 });
 
-import { is429, callLlm, saveFile, autoGenFooter, parseLlmJson } from "../report.ts";
+import {
+  is429,
+  callLlm,
+  saveFile,
+  autoGenFooter,
+  parseLlmJson,
+  resetLlmCallBudgetForTests,
+} from "../report.ts";
 
 // ---------------------------------------------------------------------------
 // is429
@@ -191,10 +198,13 @@ describe("parseLlmJson", () => {
 
 describe("callLlm", () => {
   const originalMaxTokens = process.env["LLM_MAX_TOKENS"];
+  const originalCallBudget = process.env["LLM_CALL_BUDGET"];
 
   beforeEach(() => {
     vi.useFakeTimers();
     mockCall.mockReset();
+    resetLlmCallBudgetForTests();
+    delete process.env["LLM_CALL_BUDGET"];
   });
 
   afterEach(() => {
@@ -203,6 +213,11 @@ describe("callLlm", () => {
       delete process.env["LLM_MAX_TOKENS"];
     } else {
       process.env["LLM_MAX_TOKENS"] = originalMaxTokens;
+    }
+    if (originalCallBudget === undefined) {
+      delete process.env["LLM_CALL_BUDGET"];
+    } else {
+      process.env["LLM_CALL_BUDGET"] = originalCallBudget;
     }
   });
 
@@ -238,6 +253,27 @@ describe("callLlm", () => {
 
     await expect(callLlm("prompt", 8192)).rejects.toThrow("LLM_MAX_TOKENS must be a positive integer");
     expect(mockCall).not.toHaveBeenCalled();
+  });
+
+  it("enforces the per-process provider attempt budget", async () => {
+    process.env["LLM_CALL_BUDGET"] = "2";
+    mockCall.mockResolvedValue("ok");
+
+    await callLlm("one");
+    await callLlm("two");
+    await expect(callLlm("three")).rejects.toThrow("LLM_CALL_BUDGET exhausted after 2 provider attempts");
+    expect(mockCall).toHaveBeenCalledTimes(2);
+  });
+
+  it("counts rate-limit retries against the call budget", async () => {
+    process.env["LLM_CALL_BUDGET"] = "1";
+    mockCall.mockRejectedValueOnce(Object.assign(new Error("rate limited"), { status: 429 }));
+
+    const pending = callLlm("prompt");
+    const assertion = expect(pending).rejects.toThrow("LLM_CALL_BUDGET exhausted after 1 provider attempts");
+    await vi.advanceTimersByTimeAsync(5_000);
+    await assertion;
+    expect(mockCall).toHaveBeenCalledOnce();
   });
 
   it("retries on 429 with exponential backoff", async () => {

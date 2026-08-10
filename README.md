@@ -3,7 +3,7 @@
 English | [中文](./README.zh.md)
 
 > **Roxy deployment profile.** This fork runs at 08:20 China Standard Time,
-> publishes Markdown, Web, and RSS through GitHub Pages, and uses GitHub Models
+> publishes Markdown, Web, and RSS through GitHub Pages, and uses Agnes 2.5 Flash
 > with a compact four-repository watchlist. Issue publishing and chat
 > notifications are disabled; weekly and monthly rollups are manual-only. The
 > detailed sections below also document optional upstream capabilities.
@@ -224,17 +224,19 @@ Go to **Settings → Secrets and variables → Actions** and add:
 
 | Secret | Required | Description |
 |--------|----------|-------------|
-| `LLM_PROVIDER` | optional | `anthropic` (default), `openai`, `github-copilot`, or `openrouter` |
+| `LLM_PROVIDER` | optional | `anthropic` (default), `agnes`, `openai`, `openrouter`, or `deepseek` |
+| `AGNES_API_KEY` | if Agnes | Agnes API key. The Roxy deployment workflow reads this repository secret |
 | `ANTHROPIC_API_KEY` | if Anthropic | API key — works with both Anthropic and Kimi Code |
 | `ANTHROPIC_BASE_URL` | optional | API endpoint override. Set to `https://api.kimi.com/coding/` for Kimi Code; leave unset for Anthropic |
 | `OPENAI_API_KEY` | if OpenAI | OpenAI API key |
 | `OPENAI_BASE_URL` | optional | OpenAI endpoint override |
 | `OPENROUTER_API_KEY` | if OpenRouter | OpenRouter API key |
+| `DEEPSEEK_API_KEY` | if DeepSeek | DeepSeek API key |
 | `TELEGRAM_BOT_TOKEN` | optional | Telegram bot token from [@BotFather](https://t.me/BotFather). If set, a message is sent after each digest run |
 | `TELEGRAM_CHAT_ID` | optional | Telegram chat/channel/group ID to send notifications to |
 | `FEISHU_WEBHOOK_URLS` | optional | Comma-separated Feishu custom bot webhook URLs. If set, a card message is sent to each group after each digest run |
 
-> `GITHUB_TOKEN` is provided automatically by GitHub Actions. When using `github-copilot` as the provider, the same `GITHUB_TOKEN` is used for LLM calls.
+> `GITHUB_TOKEN` is provided automatically by GitHub Actions. The Roxy deployment keeps the Agnes key in Actions Secrets and never writes it to generated reports or repository files.
 
 **Setting up Telegram notifications** (optional):
 1. Message [@BotFather](https://t.me/BotFather) on Telegram, create a bot, and copy the token
@@ -256,14 +258,17 @@ To test immediately, go to **Actions → Daily Agents Radar → Run workflow**.
 
 Set `LLM_PROVIDER` to choose which model backend powers the digest generation. Defaults to `anthropic`.
 
-| Provider | `LLM_PROVIDER` | Required env vars | Default model |
+| Provider | `LLM_PROVIDER` | Required env vars | Model selection |
 |----------|---------------|-------------------|---------------|
 | Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` |
+| Agnes | `agnes` | `AGNES_API_KEY` | `agnes-2.5-flash` |
 | OpenAI | `openai` | `OPENAI_API_KEY` | `gpt-4o` |
-| GitHub Copilot | `github-copilot` | `GITHUB_TOKEN` | `gpt-4o` |
 | OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4` |
+| DeepSeek | `deepseek` | `DEEPSEEK_API_KEY` | `deepseek-v4-flash` |
 
-Override the model name with `ANTHROPIC_MODEL`, `OPENAI_MODEL`, `GITHUB_COPILOT_MODEL`, or `OPENROUTER_MODEL` respectively.
+Override the model name with `ANTHROPIC_MODEL`, `AGNES_MODEL`, `OPENAI_MODEL`, `OPENROUTER_MODEL`, or `DEEPSEEK_MODEL` respectively.
+
+The Roxy workflow performs fetching, deduplication, source filtering, and ranking in local TypeScript. Concurrent logical summaries are coalesced into three Agnes phases: source summaries, comparisons plus detailed reports, and final notification highlights. `AGNES_REQUEST_BUDGET=4` is a hard per-process ceiling on real provider requests, leaving room for one rate-limit retry while replacing roughly 30 independent model sessions. Public feed/report content is sent as untrusted source data and the direct chat endpoint has no tools or repository write capability.
 
 The provider abstraction lives in `src/providers/` — each provider is a separate file implementing the `LlmProvider` interface. Adding a new provider only requires creating a new file and registering it in the factory.
 
@@ -281,8 +286,10 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxxxxx
 # export LLM_PROVIDER=openai
 # export OPENAI_API_KEY=sk-xxxxxxxx
 
-# Option C: GitHub Copilot (uses GITHUB_TOKEN)
-# export LLM_PROVIDER=github-copilot
+# Option C: Agnes
+# export LLM_PROVIDER=agnes
+# export AGNES_API_KEY=your-agnes-key
+# export AGNES_MODEL=agnes-2.5-flash
 
 # Option D: OpenRouter
 # export LLM_PROVIDER=openrouter

@@ -3,7 +3,7 @@
 [English](./README.md) | 中文
 
 > **Roxy 部署版。** 本分支每天北京时间 08:20 运行，通过 GitHub Pages
-> 发布 Markdown、网页和 RSS；模型使用 GitHub Models，仓库跟踪范围压缩为
+> 发布 Markdown、网页和 RSS；模型使用 Agnes 2.5 Flash，仓库跟踪范围压缩为
 > 4 个。默认不发布 Issues、不发送聊天通知，周报和月报仅允许手动运行。
 > 下方详细章节也保留了部分上游可选能力的说明。
 
@@ -222,17 +222,19 @@ openclaw_peers:
 
 | Secret | 必填 | 说明 |
 |--------|------|------|
-| `LLM_PROVIDER` | 可选 | `anthropic`（默认）、`openai`、`github-copilot` 或 `openrouter` |
+| `LLM_PROVIDER` | 可选 | `anthropic`（默认）、`agnes`、`openai`、`openrouter` 或 `deepseek` |
+| `AGNES_API_KEY` | Agnes 时 | Agnes API 密钥；Roxy 部署工作流从仓库 Secret 读取 |
 | `ANTHROPIC_API_KEY` | Anthropic 时 | API 密钥，兼容 Anthropic 和 Kimi Code |
 | `ANTHROPIC_BASE_URL` | 可选 | API 地址覆盖。使用 Kimi Code 时设置为 `https://api.kimi.com/coding/`，使用 Anthropic 时留空 |
 | `OPENAI_API_KEY` | OpenAI 时 | OpenAI API 密钥 |
 | `OPENAI_BASE_URL` | 可选 | OpenAI 端点覆盖 |
 | `OPENROUTER_API_KEY` | OpenRouter 时 | OpenRouter API 密钥 |
+| `DEEPSEEK_API_KEY` | DeepSeek 时 | DeepSeek API 密钥 |
 | `TELEGRAM_BOT_TOKEN` | 可选 | Telegram bot token，从 [@BotFather](https://t.me/BotFather) 获取。设置后每次 digest 完成自动推送通知 |
 | `TELEGRAM_CHAT_ID` | 可选 | 接收通知的 Telegram 频道 / 群组 / 用户 ID |
 | `FEISHU_WEBHOOK_URLS` | 可选 | 飞书自定义机器人 Webhook URL，多个用英文逗号分隔。设置后每次 digest 完成自动推送卡片通知到所有群 |
 
-> `GITHUB_TOKEN` 由 GitHub Actions 自动提供，无需手动添加。使用 `github-copilot` 作为 Provider 时，同一 `GITHUB_TOKEN` 也用于 LLM 调用。
+> `GITHUB_TOKEN` 由 GitHub Actions 自动提供。Roxy 部署只从 Actions Secrets 读取 Agnes 密钥，不会把它写入报告或仓库文件。
 
 **配置 Telegram 推送**（可选）：
 1. 向 [@BotFather](https://t.me/BotFather) 创建 bot，复制 token
@@ -254,14 +256,17 @@ openclaw_peers:
 
 通过 `LLM_PROVIDER` 环境变量选择模型后端，默认为 `anthropic`。
 
-| 供应商 | `LLM_PROVIDER` | 所需环境变量 | 默认模型 |
+| 供应商 | `LLM_PROVIDER` | 所需环境变量 | 模型选择 |
 |--------|---------------|------------|----------|
 | Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` |
+| Agnes | `agnes` | `AGNES_API_KEY` | `agnes-2.5-flash` |
 | OpenAI | `openai` | `OPENAI_API_KEY` | `gpt-4o` |
-| GitHub Copilot | `github-copilot` | `GITHUB_TOKEN` | `gpt-4o` |
 | OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4` |
+| DeepSeek | `deepseek` | `DEEPSEEK_API_KEY` | `deepseek-v4-flash` |
 
-可通过 `ANTHROPIC_MODEL`、`OPENAI_MODEL`、`GITHUB_COPILOT_MODEL` 或 `OPENROUTER_MODEL` 分别覆盖默认模型名称。
+可通过 `ANTHROPIC_MODEL`、`AGNES_MODEL`、`OPENAI_MODEL`、`OPENROUTER_MODEL` 或 `DEEPSEEK_MODEL` 覆盖对应模型。
+
+Roxy 工作流先由本地 TypeScript 完成抓取、去重、来源过滤和排序，再把并发的逻辑总结合并为三个 Agnes 阶段：来源摘要、对比分析与详细报告、最终通知重点。`AGNES_REQUEST_BUDGET=4` 是真实 API 请求的进程级硬上限，正常日更约 3 次，并为一次限流重试预留空间；相比原先约 30 个独立模型会话大幅缩减。公开 Feed/报告内容按不可信来源数据处理，直接聊天接口没有工具和仓库写入能力。
 
 Provider 抽象层位于 `src/providers/`，每个供应商对应独立文件并实现 `LlmProvider` 接口。新增供应商只需创建新文件并在工厂函数中注册。
 
@@ -279,8 +284,10 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxxxxx
 # export LLM_PROVIDER=openai
 # export OPENAI_API_KEY=sk-xxxxxxxx
 
-# 方式 C: GitHub Copilot（使用 GITHUB_TOKEN）
-# export LLM_PROVIDER=github-copilot
+# 方式 C: Agnes
+# export LLM_PROVIDER=agnes
+# export AGNES_API_KEY=your-agnes-key
+# export AGNES_MODEL=agnes-2.5-flash
 
 # 方式 D: OpenRouter
 # export LLM_PROVIDER=openrouter

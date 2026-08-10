@@ -1,7 +1,7 @@
 /**
  * Base class for OpenAI-compatible providers.
  *
- * Shared by OpenAI, GitHub Copilot, and OpenRouter providers.
+ * Shared by OpenAI, OpenRouter, and DeepSeek providers.
  */
 
 import OpenAI from "openai";

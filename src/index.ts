@@ -2,7 +2,7 @@
  * agents-radar: daily digest for AI CLI tools and OpenClaw.
  *
  * Env vars:
- *   LLM_PROVIDER        - "anthropic" | "openai" | "github-copilot" | "openrouter" (default: anthropic)
+ *   LLM_PROVIDER        - "anthropic" | "openai" | "agnes" | "openrouter" | "deepseek"
  *   GITHUB_TOKEN        - GitHub token for API access and issue creation
  *   DIGEST_REPO         - owner/repo where digest issues are posted (optional)
  *
@@ -325,8 +325,9 @@ async function main(): Promise<void> {
     generateSummaries(fetchedCli, fetchedOpenclaw, skillsData, fetchedPeers, trendingData, dateStr, "en"),
   ]);
 
-  // 3. Generate cross-repo comparisons in parallel (zh + en)
-  console.log("  Calling LLM for comparative analyses (ZH + EN)...");
+  // 3. Generate comparisons and independent source reports together. Agnes
+  // batches these concurrent logical tasks into one provider request.
+  console.log("  Generating comparative analyses and source reports (ZH + EN)...");
   const summariesByLang = { zh: zhSummaries, en: enSummaries };
 
   const makeOpenclawDigest = (lang: Lang): RepoDigest => ({
@@ -337,17 +338,53 @@ async function main(): Promise<void> {
     summary: summariesByLang[lang].openclawSummary,
   });
 
-  const [zhComparison, zhPeersComparison, enComparison, enPeersComparison] = await Promise.all([
+  const comparisonPromise = Promise.all([
     callLlm(buildComparisonPrompt(zhSummaries.cliDigests, dateStr, "zh")),
     callLlm(buildPeersComparisonPrompt(makeOpenclawDigest("zh"), zhSummaries.peerDigests, dateStr, "zh")),
     callLlm(buildComparisonPrompt(enSummaries.cliDigests, dateStr, "en")),
     callLlm(buildPeersComparisonPrompt(makeOpenclawDigest("en"), enSummaries.peerDigests, dateStr, "en")),
   ]);
 
+  const sourceReportsPromise = Promise.all([
+    saveWebReport(webResults, webState, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
+    saveWebReport(webResults, webState, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
+    saveTrendingReport(
+      trendingData,
+      zhSummaries.trendingSummary,
+      utcStr,
+      dateStr,
+      digestRepo,
+      autoGenFooter("zh"),
+      "zh",
+    ),
+    saveTrendingReport(
+      trendingData,
+      enSummaries.trendingSummary,
+      utcStr,
+      dateStr,
+      digestRepo,
+      autoGenFooter("en"),
+      "en",
+    ),
+    saveHnReport(hnData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
+    saveHnReport(hnData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
+    savePhReport(phData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
+    savePhReport(phData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
+    saveArxivReport(arxivData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
+    saveArxivReport(arxivData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
+    saveHfReport(hfData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
+    saveHfReport(hfData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
+    saveCommunityReport(devtoData, lobstersData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
+    saveCommunityReport(devtoData, lobstersData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
+  ]);
+
+  const [comparisons] = await Promise.all([comparisonPromise, sourceReportsPromise]);
+  const [zhComparison, zhPeersComparison, enComparison, enPeersComparison] = comparisons;
+
   const comparisonByLang = { zh: zhComparison, en: enComparison };
   const peersComparisonByLang = { zh: zhPeersComparison, en: enPeersComparison };
 
-  // 4. Build + save all reports (zh + en)
+  // 4. Build + save the reports that depend on comparison output.
   const cliContent: Record<Lang, string> = {} as Record<Lang, string>;
   const openclawContent: Record<Lang, string> = {} as Record<Lang, string>;
 
@@ -382,42 +419,6 @@ async function main(): Promise<void> {
     console.log(`  Saved ${saveFile(cliContent[lang], dateStr, `ai-cli${suffix}.md`)}`);
     console.log(`  Saved ${saveFile(openclawContent[lang], dateStr, `ai-agents${suffix}.md`)}`);
   }
-
-  // Web report: zh saves state, en skips state save
-  for (const lang of ["zh", "en"] as const) {
-    await saveWebReport(webResults, webState, utcStr, dateStr, digestRepo, autoGenFooter(lang), lang);
-  }
-
-  await Promise.all([
-    saveTrendingReport(
-      trendingData,
-      zhSummaries.trendingSummary,
-      utcStr,
-      dateStr,
-      digestRepo,
-      autoGenFooter("zh"),
-      "zh",
-    ),
-    saveTrendingReport(
-      trendingData,
-      enSummaries.trendingSummary,
-      utcStr,
-      dateStr,
-      digestRepo,
-      autoGenFooter("en"),
-      "en",
-    ),
-    saveHnReport(hnData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
-    saveHnReport(hnData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
-    savePhReport(phData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
-    savePhReport(phData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
-    saveArxivReport(arxivData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
-    saveArxivReport(arxivData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
-    saveHfReport(hfData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
-    saveHfReport(hfData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
-    saveCommunityReport(devtoData, lobstersData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
-    saveCommunityReport(devtoData, lobstersData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
-  ]);
 
   // 5. Generate highlights for Telegram notification
   const readReport = (name: string): string | undefined => {

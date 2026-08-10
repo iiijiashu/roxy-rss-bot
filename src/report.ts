@@ -28,9 +28,19 @@ const provider: LlmProvider = createProvider();
 // any given time; the rest queue and run as slots free up.
 // ---------------------------------------------------------------------------
 
-const LLM_CONCURRENCY = 5;
+function configuredPositiveInteger(name: string, fallback?: number): number | undefined {
+  const raw = process.env[name]?.trim();
+  if (!raw) return fallback;
+  if (!/^[1-9]\d*$/.test(raw)) throw new Error(`${name} must be a positive integer`);
+  const value = Number(raw);
+  if (!Number.isSafeInteger(value)) throw new Error(`${name} must be a safe integer`);
+  return value;
+}
+
+const LLM_CONCURRENCY = configuredPositiveInteger("LLM_CONCURRENCY", 5)!;
 let llmSlots = LLM_CONCURRENCY;
 const llmQueue: Array<() => void> = [];
+let llmCallAttempts = 0;
 
 function acquireSlot(): Promise<void> {
   if (llmSlots > 0) {
@@ -60,6 +70,19 @@ export function is429(err: unknown): boolean {
   return (err as { status?: number })?.status === 429 || String(err).includes("429");
 }
 
+function consumeCallBudget(): void {
+  const budget = configuredPositiveInteger("LLM_CALL_BUDGET");
+  if (budget !== undefined && llmCallAttempts >= budget) {
+    throw new Error(`LLM_CALL_BUDGET exhausted after ${llmCallAttempts} provider attempts`);
+  }
+  llmCallAttempts++;
+}
+
+/** Test-only reset for the module-scoped per-process call budget. */
+export function resetLlmCallBudgetForTests(): void {
+  llmCallAttempts = 0;
+}
+
 function configuredMaxTokens(requested: number): number {
   const rawLimit = process.env["LLM_MAX_TOKENS"]?.trim();
   if (!rawLimit) return requested;
@@ -76,6 +99,7 @@ function configuredMaxTokens(requested: number): number {
 export async function callLlm(prompt: string, maxTokens = LLM_TOKENS_DEFAULT): Promise<string> {
   const effectiveMaxTokens = configuredMaxTokens(maxTokens);
   for (let attempt = 0; ; attempt++) {
+    consumeCallBudget();
     await acquireSlot();
     let released = false;
     try {
