@@ -29,6 +29,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - name: Restore published digest history
+        env:
+          PUBLISH_BRANCH: digest-output
+        run: |
+          if git ls-remote --exit-code --heads origin "refs/heads/${PUBLISH_BRANCH}" >/dev/null 2>&1; then
+            git fetch --no-tags origin "refs/heads/${PUBLISH_BRANCH}:refs/remotes/origin/${PUBLISH_BRANCH}"
+            git checkout "refs/remotes/origin/${PUBLISH_BRANCH}" -- digests manifest.json feed.xml
+          fi
+
       - name: Setup pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
 
@@ -72,19 +81,31 @@ jobs:
           if-no-files-found: error
           retention-days: 3
 
-      - name: Commit generated content
+      - name: Commit generated content to publishing branch
         if: github.event_name == 'schedule' || inputs.publish
+        env:
+          PUBLISH_BRANCH: digest-output
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add digests/ manifest.json feed.xml
-          if git diff --cached --quiet; then
+          generated_tree="$(git write-tree)"
+          if git rev-parse --verify --quiet "refs/remotes/origin/${PUBLISH_BRANCH}" >/dev/null; then
+            previous_commit="$(git rev-parse "refs/remotes/origin/${PUBLISH_BRANCH}")"
+            previous_tree="$(git rev-parse "${previous_commit}^{tree}")"
+            if [ "${generated_tree}" = "${previous_tree}" ]; then
+              echo "No generated changes to commit"
+              exit 0
+            fi
+            published_commit="$(printf '%s\n' "digest: ${DIGEST_DATE} daily RSS" | git commit-tree "${generated_tree}" -p "${previous_commit}" -p "${GITHUB_SHA}")"
+          else
+            published_commit="$(printf '%s\n' "digest: ${DIGEST_DATE} daily RSS" | git commit-tree "${generated_tree}" -p "${GITHUB_SHA}")"
+          fi
+          if [ -z "${published_commit}" ]; then
             echo "No generated changes to commit"
             exit 0
           fi
-          git commit -m "digest: ${DIGEST_DATE} daily RSS"
-          git pull --rebase origin "${GITHUB_REF_NAME}"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git push origin "${published_commit}:refs/heads/${PUBLISH_BRANCH}"
 
   pages:
     if: github.event_name == 'schedule' || inputs.publish
@@ -94,3 +115,5 @@ jobs:
       pages: write
       id-token: write
     uses: ./.github/workflows/pages.yml
+    with:
+      source_ref: digest-output
