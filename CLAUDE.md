@@ -2,7 +2,7 @@
 
 ## Project overview
 
-agents-radar is a daily digest generator for the AI open-source ecosystem. A GitHub Actions cron job runs at 00:00 UTC (08:00 CST) and produces bilingual (Chinese + English) reports, published as GitHub Issues and committed Markdown files.
+agents-radar is a daily digest generator for the AI open-source ecosystem. A GitHub Actions cron job runs at 00:20 UTC (08:20 CST) and produces bilingual (Chinese + English) reports, published through GitHub Pages and RSS.
 
 ## Commands
 
@@ -23,7 +23,7 @@ export GITHUB_TOKEN=ghp_xxxxx
 export DIGEST_REPO=owner/repo   # omit to skip GitHub issue creation
 
 # LLM provider (default: anthropic)
-export LLM_PROVIDER=anthropic   # anthropic | openai | github-copilot | openrouter | deepseek
+export LLM_PROVIDER=anthropic   # anthropic | openai | agnes | openrouter | deepseek
 
 # Anthropic (default)
 export ANTHROPIC_API_KEY=sk-ant-xxxxx
@@ -31,7 +31,8 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxx
 # OpenAI
 # export OPENAI_API_KEY=sk-xxxxx
 
-# GitHub Copilot CLI — configured in Actions with its short-lived GITHUB_TOKEN
+# Agnes
+# export AGNES_API_KEY=your-agnes-key
 
 # OpenRouter
 # export OPENROUTER_API_KEY=sk-or-xxxxx
@@ -67,7 +68,7 @@ The pipeline runs in four sequential phases, each implemented as a named async f
 | `src/providers/openai-compatible.ts` | `OpenAICompatibleProvider` — shared base class for OpenAI-compatible providers |
 | `src/providers/anthropic.ts` | `AnthropicProvider` — Anthropic SDK wrapper |
 | `src/providers/openai.ts` | `OpenAIProvider` — extends `OpenAICompatibleProvider` |
-| `src/providers/github-copilot.ts` | `GitHubCopilotProvider` — isolated, tool-free Copilot CLI transport |
+| `src/providers/agnes.ts` | `AgnesProvider` — OpenAI-compatible batched summarization transport |
 | `src/providers/openrouter.ts` | `OpenRouterProvider` — extends `OpenAICompatibleProvider` |
 | `src/providers/deepseek.ts` | `DeepSeekProvider` — extends `OpenAICompatibleProvider` |
 | `src/providers/index.ts` | `createProvider` factory + barrel re-exports |
@@ -104,8 +105,8 @@ Files written to `digests/YYYY-MM-DD/`:
 - `callLlm(prompt, maxTokens?)` defaults to 4096 tokens. Web report uses 8192, trending uses 6144. The table-formatted listing reports (HN, PH, ArXiv, HF, Community) use `LLM_TOKENS_LISTING` = 6144 to fit multi-row tables plus 2-sentence summaries.
 - Data-source listing reports (Trending, HN, PH, ArXiv, HF, Community) render their item lists as **Markdown tables** (not bullet lists). Numeric columns are copied verbatim from the fetched data; the summary column is 2 sentences. Tables already have CSS in `index.html` and render natively in GitHub Issues too.
 - On 429 rate-limit errors `callLlm` retries up to 3 times with exponential backoff (5 s / 10 s / 20 s); the concurrency slot is released during the wait. Every retry counts against `LLM_CALL_BUDGET`.
-- The concurrency limiter defaults to 5, but Actions explicitly sets `LLM_CONCURRENCY=2` for Copilot CLI and a per-run `LLM_CALL_BUDGET` (40 daily, 6 weekly/monthly). Do not bypass it by calling providers directly.
-- LLM provider is selected via `LLM_PROVIDER` env var (default: `anthropic`). Valid values: `anthropic`, `openai`, `github-copilot`, `openrouter`, `deepseek`.
+- The concurrency limiter defaults to 5. The Roxy Actions profile sets `LLM_CONCURRENCY=64`; the Agnes provider coalesces concurrent logical tasks and enforces `AGNES_REQUEST_BUDGET` on real API requests. Do not bypass it by calling providers directly.
+- LLM provider is selected via `LLM_PROVIDER` env var (default: `anthropic`). Valid values: `anthropic`, `openai`, `agnes`, `openrouter`, `deepseek`.
 - Provider implementations live in `src/providers/`. Each file implements the `LlmProvider` interface. The factory in `src/providers/index.ts` validates the provider name and logs only the provider name — never API keys or endpoint URLs.
 - GitHub issue label colors are defined in `LABEL_COLORS` in `src/github.ts`. Add new labels there.
 - `sampleNote(total, sampled)` in `src/prompts.ts` formats the "(共 N 条，展示前 M 条)" note. Reuse it — do not inline the same string format.

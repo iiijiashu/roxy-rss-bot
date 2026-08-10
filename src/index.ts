@@ -2,7 +2,7 @@
  * agents-radar: daily digest for AI CLI tools and OpenClaw.
  *
  * Env vars:
- *   LLM_PROVIDER        - "anthropic" | "openai" | "agnes" | "github-copilot" | "openrouter"
+ *   LLM_PROVIDER        - "anthropic" | "openai" | "agnes" | "openrouter" | "deepseek"
  *   GITHUB_TOKEN        - GitHub token for API access and issue creation
  *   DIGEST_REPO         - owner/repo where digest issues are posted (optional)
  *

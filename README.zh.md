@@ -222,13 +222,14 @@ openclaw_peers:
 
 | Secret | 必填 | 说明 |
 |--------|------|------|
-| `LLM_PROVIDER` | 可选 | `anthropic`（默认）、`agnes`、`openai`、`github-copilot` 或 `openrouter` |
+| `LLM_PROVIDER` | 可选 | `anthropic`（默认）、`agnes`、`openai`、`openrouter` 或 `deepseek` |
 | `AGNES_API_KEY` | Agnes 时 | Agnes API 密钥；Roxy 部署工作流从仓库 Secret 读取 |
 | `ANTHROPIC_API_KEY` | Anthropic 时 | API 密钥，兼容 Anthropic 和 Kimi Code |
 | `ANTHROPIC_BASE_URL` | 可选 | API 地址覆盖。使用 Kimi Code 时设置为 `https://api.kimi.com/coding/`，使用 Anthropic 时留空 |
 | `OPENAI_API_KEY` | OpenAI 时 | OpenAI API 密钥 |
 | `OPENAI_BASE_URL` | 可选 | OpenAI 端点覆盖 |
 | `OPENROUTER_API_KEY` | OpenRouter 时 | OpenRouter API 密钥 |
+| `DEEPSEEK_API_KEY` | DeepSeek 时 | DeepSeek API 密钥 |
 | `TELEGRAM_BOT_TOKEN` | 可选 | Telegram bot token，从 [@BotFather](https://t.me/BotFather) 获取。设置后每次 digest 完成自动推送通知 |
 | `TELEGRAM_CHAT_ID` | 可选 | 接收通知的 Telegram 频道 / 群组 / 用户 ID |
 | `FEISHU_WEBHOOK_URLS` | 可选 | 飞书自定义机器人 Webhook URL，多个用英文逗号分隔。设置后每次 digest 完成自动推送卡片通知到所有群 |
@@ -260,10 +261,10 @@ openclaw_peers:
 | Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` |
 | Agnes | `agnes` | `AGNES_API_KEY` | `agnes-2.5-flash` |
 | OpenAI | `openai` | `OPENAI_API_KEY` | `gpt-4o` |
-| GitHub Copilot CLI | `github-copilot` | Actions `GITHUB_TOKEN` | Auto（Copilot Student 要求） |
 | OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4` |
+| DeepSeek | `deepseek` | `DEEPSEEK_API_KEY` | `deepseek-v4-flash` |
 
-可通过 `ANTHROPIC_MODEL`、`AGNES_MODEL`、`OPENAI_MODEL` 或 `OPENROUTER_MODEL` 覆盖对应模型。Copilot CLI 固定使用自动选模，不接受仓库级模型覆盖。
+可通过 `ANTHROPIC_MODEL`、`AGNES_MODEL`、`OPENAI_MODEL`、`OPENROUTER_MODEL` 或 `DEEPSEEK_MODEL` 覆盖对应模型。
 
 Roxy 工作流先由本地 TypeScript 完成抓取、去重、来源过滤和排序，再把并发的逻辑总结合并为三个 Agnes 阶段：来源摘要、对比分析与详细报告、最终通知重点。`AGNES_REQUEST_BUDGET=4` 是真实 API 请求的进程级硬上限，正常日更约 3 次，并为一次限流重试预留空间；相比原先约 30 个独立模型会话大幅缩减。公开 Feed/报告内容按不可信来源数据处理，直接聊天接口没有工具和仓库写入能力。
 

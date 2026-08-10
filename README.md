@@ -224,13 +224,14 @@ Go to **Settings → Secrets and variables → Actions** and add:
 
 | Secret | Required | Description |
 |--------|----------|-------------|
-| `LLM_PROVIDER` | optional | `anthropic` (default), `agnes`, `openai`, `github-copilot`, or `openrouter` |
+| `LLM_PROVIDER` | optional | `anthropic` (default), `agnes`, `openai`, `openrouter`, or `deepseek` |
 | `AGNES_API_KEY` | if Agnes | Agnes API key. The Roxy deployment workflow reads this repository secret |
 | `ANTHROPIC_API_KEY` | if Anthropic | API key — works with both Anthropic and Kimi Code |
 | `ANTHROPIC_BASE_URL` | optional | API endpoint override. Set to `https://api.kimi.com/coding/` for Kimi Code; leave unset for Anthropic |
 | `OPENAI_API_KEY` | if OpenAI | OpenAI API key |
 | `OPENAI_BASE_URL` | optional | OpenAI endpoint override |
 | `OPENROUTER_API_KEY` | if OpenRouter | OpenRouter API key |
+| `DEEPSEEK_API_KEY` | if DeepSeek | DeepSeek API key |
 | `TELEGRAM_BOT_TOKEN` | optional | Telegram bot token from [@BotFather](https://t.me/BotFather). If set, a message is sent after each digest run |
 | `TELEGRAM_CHAT_ID` | optional | Telegram chat/channel/group ID to send notifications to |
 | `FEISHU_WEBHOOK_URLS` | optional | Comma-separated Feishu custom bot webhook URLs. If set, a card message is sent to each group after each digest run |
@@ -262,10 +263,10 @@ Set `LLM_PROVIDER` to choose which model backend powers the digest generation. D
 | Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` |
 | Agnes | `agnes` | `AGNES_API_KEY` | `agnes-2.5-flash` |
 | OpenAI | `openai` | `OPENAI_API_KEY` | `gpt-4o` |
-| GitHub Copilot CLI | `github-copilot` | Actions `GITHUB_TOKEN` | Auto (required by Copilot Student) |
 | OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4` |
+| DeepSeek | `deepseek` | `DEEPSEEK_API_KEY` | `deepseek-v4-flash` |
 
-Override the model name with `ANTHROPIC_MODEL`, `AGNES_MODEL`, `OPENAI_MODEL`, or `OPENROUTER_MODEL` respectively. Copilot CLI intentionally uses auto model selection and does not accept a repository model override.
+Override the model name with `ANTHROPIC_MODEL`, `AGNES_MODEL`, `OPENAI_MODEL`, `OPENROUTER_MODEL`, or `DEEPSEEK_MODEL` respectively.
 
 The Roxy workflow performs fetching, deduplication, source filtering, and ranking in local TypeScript. Concurrent logical summaries are coalesced into three Agnes phases: source summaries, comparisons plus detailed reports, and final notification highlights. `AGNES_REQUEST_BUDGET=4` is a hard per-process ceiling on real provider requests, leaving room for one rate-limit retry while replacing roughly 30 independent model sessions. Public feed/report content is sent as untrusted source data and the direct chat endpoint has no tools or repository write capability.
 
