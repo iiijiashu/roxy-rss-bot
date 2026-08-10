@@ -24,6 +24,7 @@ import {
   saveFile,
   autoGenFooter,
   parseLlmJson,
+  assertReportHighlights,
   resetLlmCallBudgetForTests,
 } from "../report.ts";
 
@@ -189,6 +190,26 @@ describe("parseLlmJson", () => {
 
   it("throws on genuinely malformed JSON", () => {
     expect(() => parseLlmJson("{not json")).toThrow();
+  });
+});
+
+describe("assertReportHighlights", () => {
+  it("accepts Chinese highlights containing translated prose", () => {
+    const parsed: unknown = {
+      "ai-cli": ["Claude Code 修复 Windows 稳定性问题", "Codex 今日没有新版本"],
+    };
+    expect(() => assertReportHighlights(parsed, "zh")).not.toThrow();
+  });
+
+  it("rejects an English sibling result copied into Chinese highlights", () => {
+    const parsed: unknown = {
+      "ai-cli": ["Claude Code and Codex remain equally active"],
+    };
+    expect(() => assertReportHighlights(parsed, "zh")).toThrow("untranslated item");
+  });
+
+  it("rejects malformed highlight entries", () => {
+    expect(() => assertReportHighlights({ "ai-cli": "not-an-array" }, "en")).toThrow("invalid report entry");
   });
 });
 
