@@ -86,7 +86,11 @@ function configuredPositiveInteger(
 function validatedApiKey(value: string | undefined): string {
   const key = value?.trim();
   if (!key) throw new Error("AGNES_API_KEY is required for the Agnes provider");
-  if (Buffer.byteLength(key, "utf8") > MAX_API_KEY_BYTES || /[\u0000-\u001f\u007f]/.test(key)) {
+  const hasControlCharacter = Array.from(key).some((character) => {
+    const codePoint = character.codePointAt(0)!;
+    return codePoint <= 0x1f || codePoint === 0x7f;
+  });
+  if (Buffer.byteLength(key, "utf8") > MAX_API_KEY_BYTES || hasControlCharacter) {
     throw new Error("AGNES_API_KEY is invalid");
   }
   return key;

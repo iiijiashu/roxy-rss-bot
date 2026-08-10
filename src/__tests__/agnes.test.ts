@@ -146,4 +146,8 @@ describe("AgnesProvider batching", () => {
       else process.env["AGNES_API_KEY"] = previous;
     }
   });
+
+  it("rejects API keys containing control characters", () => {
+    expect(() => new AgnesProvider({ apiKey: "test\nkey" })).toThrow("AGNES_API_KEY is invalid");
+  });
 });
