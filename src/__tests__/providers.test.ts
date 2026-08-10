@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   AnthropicProvider,
   OpenAIProvider,
+  AgnesProvider,
   GitHubCopilotProvider,
   OpenRouterProvider,
   createProvider,
@@ -90,6 +91,11 @@ describe("LlmProvider interface", () => {
     expect(p.name).toBe("openai");
   });
 
+  it("AgnesProvider has correct name", () => {
+    const p = new AgnesProvider({ apiKey: "test" });
+    expect(p.name).toBe("agnes");
+  });
+
   it("GitHubCopilotProvider has correct name", () => {
     const p = new GitHubCopilotProvider({ token: "test" });
     expect(p.name).toBe("github-copilot");
@@ -104,6 +110,7 @@ describe("LlmProvider interface", () => {
     const providers: LlmProvider[] = [
       new AnthropicProvider(),
       new OpenAIProvider({ apiKey: "k" }),
+      new AgnesProvider({ apiKey: "k" }),
       new GitHubCopilotProvider({ token: "k" }),
       new OpenRouterProvider({ apiKey: "k" }),
     ];
@@ -119,8 +126,15 @@ describe("LlmProvider interface", () => {
 // ---------------------------------------------------------------------------
 
 describe("VALID_PROVIDER_NAMES", () => {
-  it("contains all five supported providers", () => {
-    expect(VALID_PROVIDER_NAMES).toEqual(["anthropic", "openai", "github-copilot", "openrouter", "deepseek"]);
+  it("contains all six supported providers", () => {
+    expect(VALID_PROVIDER_NAMES).toEqual([
+      "anthropic",
+      "openai",
+      "agnes",
+      "github-copilot",
+      "openrouter",
+      "deepseek",
+    ]);
   });
 });
 
@@ -319,6 +333,14 @@ describe("createProvider", () => {
     expect(p).toBeInstanceOf(OpenAIProvider);
   });
 
+  it(
+    "creates Agnes provider",
+    withEnv({ AGNES_API_KEY: "test" }, () => {
+      const p = createProvider("agnes");
+      expect(p).toBeInstanceOf(AgnesProvider);
+    }),
+  );
+
   it("creates github-copilot provider", () => {
     const p = createProvider("github-copilot");
     expect(p).toBeInstanceOf(GitHubCopilotProvider);
@@ -339,7 +361,7 @@ describe("createProvider", () => {
 
   it("throws descriptive error for unknown provider", () => {
     expect(() => createProvider("bogus" as never)).toThrow(
-      /Invalid LLM provider: "bogus".*Valid providers are: anthropic, openai, github-copilot, openrouter/,
+      /Invalid LLM provider: "bogus".*Valid providers are: anthropic, openai, agnes, github-copilot, openrouter/,
     );
   });
 

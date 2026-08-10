@@ -9,7 +9,6 @@ concurrency:
 
 permissions:
   contents: write
-  copilot-requests: write
 
 jobs:
   weekly:
@@ -32,17 +31,16 @@ jobs:
       - name: Install dependencies without lifecycle scripts
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Install GitHub Copilot CLI
-        run: npm install --global @github/copilot@1.0.78 --ignore-scripts
-
       - name: Run weekly rollup
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          LLM_PROVIDER: github-copilot
+          AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
+          AGNES_MODEL: agnes-2.5-flash
+          AGNES_BATCH_WINDOW_MS: "25"
+          AGNES_REQUEST_BUDGET: "3"
+          LLM_PROVIDER: agnes
           LLM_MAX_TOKENS: "4000"
-          LLM_CONCURRENCY: "2"
-          LLM_CALL_BUDGET: "6"
-          COPILOT_CLI_TIMEOUT_MS: "90000"
+          LLM_CONCURRENCY: "64"
           PAGES_URL: https://${{ github.repository_owner }}.github.io/roxy-rss-bot
         run: |
           pnpm weekly

@@ -3,7 +3,7 @@
 English | [中文](./README.zh.md)
 
 > **Roxy deployment profile.** This fork runs at 08:20 China Standard Time,
-> publishes Markdown, Web, and RSS through GitHub Pages, and uses GitHub Copilot CLI
+> publishes Markdown, Web, and RSS through GitHub Pages, and uses Agnes 2.5 Flash
 > with a compact four-repository watchlist. Issue publishing and chat
 > notifications are disabled; weekly and monthly rollups are manual-only. The
 > detailed sections below also document optional upstream capabilities.
@@ -224,7 +224,8 @@ Go to **Settings → Secrets and variables → Actions** and add:
 
 | Secret | Required | Description |
 |--------|----------|-------------|
-| `LLM_PROVIDER` | optional | `anthropic` (default), `openai`, `github-copilot`, or `openrouter` |
+| `LLM_PROVIDER` | optional | `anthropic` (default), `agnes`, `openai`, `github-copilot`, or `openrouter` |
+| `AGNES_API_KEY` | if Agnes | Agnes API key. The Roxy deployment workflow reads this repository secret |
 | `ANTHROPIC_API_KEY` | if Anthropic | API key — works with both Anthropic and Kimi Code |
 | `ANTHROPIC_BASE_URL` | optional | API endpoint override. Set to `https://api.kimi.com/coding/` for Kimi Code; leave unset for Anthropic |
 | `OPENAI_API_KEY` | if OpenAI | OpenAI API key |
@@ -234,7 +235,7 @@ Go to **Settings → Secrets and variables → Actions** and add:
 | `TELEGRAM_CHAT_ID` | optional | Telegram chat/channel/group ID to send notifications to |
 | `FEISHU_WEBHOOK_URLS` | optional | Comma-separated Feishu custom bot webhook URLs. If set, a card message is sent to each group after each digest run |
 
-> `GITHUB_TOKEN` is provided automatically by GitHub Actions. The `github-copilot` provider invokes the pinned Copilot CLI with that short-lived token and `copilot-requests: write`; no PAT or stored Copilot secret is needed.
+> `GITHUB_TOKEN` is provided automatically by GitHub Actions. The Roxy deployment keeps the Agnes key in Actions Secrets and never writes it to generated reports or repository files.
 
 **Setting up Telegram notifications** (optional):
 1. Message [@BotFather](https://t.me/BotFather) on Telegram, create a bot, and copy the token
@@ -259,13 +260,14 @@ Set `LLM_PROVIDER` to choose which model backend powers the digest generation. D
 | Provider | `LLM_PROVIDER` | Required env vars | Model selection |
 |----------|---------------|-------------------|---------------|
 | Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` |
+| Agnes | `agnes` | `AGNES_API_KEY` | `agnes-2.5-flash` |
 | OpenAI | `openai` | `OPENAI_API_KEY` | `gpt-4o` |
 | GitHub Copilot CLI | `github-copilot` | Actions `GITHUB_TOKEN` | Auto (required by Copilot Student) |
 | OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4` |
 
-Override the model name with `ANTHROPIC_MODEL`, `OPENAI_MODEL`, or `OPENROUTER_MODEL` respectively. Copilot CLI intentionally uses auto model selection and does not accept a repository model override.
+Override the model name with `ANTHROPIC_MODEL`, `AGNES_MODEL`, `OPENAI_MODEL`, or `OPENROUTER_MODEL` respectively. Copilot CLI intentionally uses auto model selection and does not accept a repository model override.
 
-The Actions workflows pin `@github/copilot@1.0.78`, limit Copilot CLI generation to two concurrent processes, and enforce a per-run call budget (40 for daily, 6 for weekly/monthly). With the compact Roxy watchlist, a fully active daily run is expected to make about 30 initial calls (up to 32 when both highlight generations need repair); the remaining headroom is reserved for rate-limit retries. Feed/report content is passed as untrusted data to a tool-free CLI session running outside the repository working directory. Calls remain separate to preserve the existing per-report fallbacks and output contracts; bilingual batching can be considered later after live output-quality validation.
+The Roxy workflow performs fetching, deduplication, source filtering, and ranking in local TypeScript. Concurrent logical summaries are coalesced into three Agnes phases: source summaries, comparisons plus detailed reports, and final notification highlights. `AGNES_REQUEST_BUDGET=4` is a hard per-process ceiling on real provider requests, leaving room for one rate-limit retry while replacing roughly 30 independent model sessions. Public feed/report content is sent as untrusted source data and the direct chat endpoint has no tools or repository write capability.
 
 The provider abstraction lives in `src/providers/` — each provider is a separate file implementing the `LlmProvider` interface. Adding a new provider only requires creating a new file and registering it in the factory.
 
@@ -283,8 +285,10 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxxxxx
 # export LLM_PROVIDER=openai
 # export OPENAI_API_KEY=sk-xxxxxxxx
 
-# Option C: GitHub Copilot CLI is configured in GitHub Actions with its
-# short-lived GITHUB_TOKEN; no PAT-based local setup is documented.
+# Option C: Agnes
+# export LLM_PROVIDER=agnes
+# export AGNES_API_KEY=your-agnes-key
+# export AGNES_MODEL=agnes-2.5-flash
 
 # Option D: OpenRouter
 # export LLM_PROVIDER=openrouter

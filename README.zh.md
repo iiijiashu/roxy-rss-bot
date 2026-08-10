@@ -3,7 +3,7 @@
 [English](./README.md) | 中文
 
 > **Roxy 部署版。** 本分支每天北京时间 08:20 运行，通过 GitHub Pages
-> 发布 Markdown、网页和 RSS；模型使用 GitHub Copilot CLI，仓库跟踪范围压缩为
+> 发布 Markdown、网页和 RSS；模型使用 Agnes 2.5 Flash，仓库跟踪范围压缩为
 > 4 个。默认不发布 Issues、不发送聊天通知，周报和月报仅允许手动运行。
 > 下方详细章节也保留了部分上游可选能力的说明。
 
@@ -222,7 +222,8 @@ openclaw_peers:
 
 | Secret | 必填 | 说明 |
 |--------|------|------|
-| `LLM_PROVIDER` | 可选 | `anthropic`（默认）、`openai`、`github-copilot` 或 `openrouter` |
+| `LLM_PROVIDER` | 可选 | `anthropic`（默认）、`agnes`、`openai`、`github-copilot` 或 `openrouter` |
+| `AGNES_API_KEY` | Agnes 时 | Agnes API 密钥；Roxy 部署工作流从仓库 Secret 读取 |
 | `ANTHROPIC_API_KEY` | Anthropic 时 | API 密钥，兼容 Anthropic 和 Kimi Code |
 | `ANTHROPIC_BASE_URL` | 可选 | API 地址覆盖。使用 Kimi Code 时设置为 `https://api.kimi.com/coding/`，使用 Anthropic 时留空 |
 | `OPENAI_API_KEY` | OpenAI 时 | OpenAI API 密钥 |
@@ -232,7 +233,7 @@ openclaw_peers:
 | `TELEGRAM_CHAT_ID` | 可选 | 接收通知的 Telegram 频道 / 群组 / 用户 ID |
 | `FEISHU_WEBHOOK_URLS` | 可选 | 飞书自定义机器人 Webhook URL，多个用英文逗号分隔。设置后每次 digest 完成自动推送卡片通知到所有群 |
 
-> `GITHUB_TOKEN` 由 GitHub Actions 自动提供。`github-copilot` Provider 会用这个短期令牌和 `copilot-requests: write` 权限调用固定版本的 Copilot CLI；不需要 PAT，也不需要保存 Copilot 密钥。
+> `GITHUB_TOKEN` 由 GitHub Actions 自动提供。Roxy 部署只从 Actions Secrets 读取 Agnes 密钥，不会把它写入报告或仓库文件。
 
 **配置 Telegram 推送**（可选）：
 1. 向 [@BotFather](https://t.me/BotFather) 创建 bot，复制 token
@@ -257,13 +258,14 @@ openclaw_peers:
 | 供应商 | `LLM_PROVIDER` | 所需环境变量 | 模型选择 |
 |--------|---------------|------------|----------|
 | Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` |
+| Agnes | `agnes` | `AGNES_API_KEY` | `agnes-2.5-flash` |
 | OpenAI | `openai` | `OPENAI_API_KEY` | `gpt-4o` |
 | GitHub Copilot CLI | `github-copilot` | Actions `GITHUB_TOKEN` | Auto（Copilot Student 要求） |
 | OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4` |
 
-可通过 `ANTHROPIC_MODEL`、`OPENAI_MODEL` 或 `OPENROUTER_MODEL` 覆盖对应模型。Copilot CLI 固定使用自动选模，不接受仓库级模型覆盖。
+可通过 `ANTHROPIC_MODEL`、`AGNES_MODEL`、`OPENAI_MODEL` 或 `OPENROUTER_MODEL` 覆盖对应模型。Copilot CLI 固定使用自动选模，不接受仓库级模型覆盖。
 
-Actions 工作流固定安装 `@github/copilot@1.0.78`，Copilot CLI 同时最多运行 2 个进程，并设置单次工作流调用预算（日更 40 次，周报/月报 6 次）。按当前精简监控列表，数据齐全时日更约有 30 次初始调用；两个 highlights 都需要修复时最多约 32 次，剩余空间留给限流重试。Feed/报告内容会作为不可信数据传入无工具 CLI 会话，且 CLI 不在仓库工作目录中运行。为保留现有逐报告回退与输出契约，本次不合并双语调用；可在真实输出质量验收后再评估批处理。
+Roxy 工作流先由本地 TypeScript 完成抓取、去重、来源过滤和排序，再把并发的逻辑总结合并为三个 Agnes 阶段：来源摘要、对比分析与详细报告、最终通知重点。`AGNES_REQUEST_BUDGET=4` 是真实 API 请求的进程级硬上限，正常日更约 3 次，并为一次限流重试预留空间；相比原先约 30 个独立模型会话大幅缩减。公开 Feed/报告内容按不可信来源数据处理，直接聊天接口没有工具和仓库写入能力。
 
 Provider 抽象层位于 `src/providers/`，每个供应商对应独立文件并实现 `LlmProvider` 接口。新增供应商只需创建新文件并在工厂函数中注册。
 
@@ -281,8 +283,10 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxxxxx
 # export LLM_PROVIDER=openai
 # export OPENAI_API_KEY=sk-xxxxxxxx
 
-# 方式 C: GitHub Copilot CLI 仅在 GitHub Actions 中使用短期
-# GITHUB_TOKEN 配置；本文不提供 PAT 本地配置。
+# 方式 C: Agnes
+# export LLM_PROVIDER=agnes
+# export AGNES_API_KEY=your-agnes-key
+# export AGNES_MODEL=agnes-2.5-flash
 
 # 方式 D: OpenRouter
 # export LLM_PROVIDER=openrouter
