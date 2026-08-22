@@ -1,0 +1,86 @@
+{
+  "zh": {
+    "ai-web": [
+      "Claude蛋白质设计成功率22%-35%",
+      "Anthropic首次公开多智能体安全研究",
+      "Claude文本水印符合欧盟AI法案",
+      "Claude Sonnet 5定位Agent能力最强",
+      "工人再培训项目平均增收1000美元",
+      "蛋白质设计工具化能力取得突破"
+    ],
+    "ai-hn": [
+      "AI提升作业成绩却损害考试表现",
+      "OpenRouter接入Stripe引495评论",
+      "Claude Code获AGENTS.md支持请求",
+      "Codex与Claude对比使用体验",
+      "Liquid AI推理速度声称快3.2倍",
+      "OX Alpha新模型引发性能讨论"
+    ],
+    "ai-arxiv": [
+      "首个LLM上下文敏感不可学习基准",
+      "首次评估LLM记忆认知陷阱方法",
+      "LLM自改进审计对抗测量伪影",
+      "7种缓存驱逐策略系统比较研究",
+      "跨任务技能迁移可能损害接收方",
+      "检索自由文档知识内部化方法"
+    ],
+    "ai-hf": [
+      "Qwen3.8-27B周赞11970领跑全平台",
+      "Kimi-K3获10913点赞登顶语言模型",
+      "MiniMax-H3下载量突破361万次",
+      "DeepSeek-V4-Flash下载283万",
+      "Muse-Glimmer-30B多模态获1739赞",
+      "Qwen3.8系列占据下载榜主导"
+    ],
+    "ai-community": [
+      "157个Agent计划验证发现瓶颈在规划",
+      "Pi Agent与OpenCode百小时实测对比",
+      "用搜索过去替代记忆存储新范式",
+      "验证LLM规划器实验7项检查清单",
+      "Agent guardrail在金融场景存在盲区",
+      "Adam优化器缺陷与梯度压缩分析"
+    ]
+  },
+  "en": {
+    "ai-web": [
+      "Claude蛋白质设计成功率22%-35%",
+      "Anthropic首次公开多智能体安全研究",
+      "Claude文本水印符合欧盟AI法案",
+      "Claude Sonnet 5定位Agent能力最强",
+      "工人再培训项目平均增收1000美元",
+      "蛋白质设计工具化能力取得突破"
+    ],
+    "ai-hn": [
+      "AI提升作业成绩却损害考试表现",
+      "OpenRouter接入Stripe引495评论",
+      "Claude Code获AGENTS.md支持请求",
+      "Codex与Claude对比使用体验",
+      "Liquid AI推理速度声称快3.2倍",
+      "OX Alpha新模型引发性能讨论"
+    ],
+    "ai-arxiv": [
+      "首个LLM上下文敏感不可学习基准",
+      "首次评估LLM记忆认知陷阱方法",
+      "LLM自改进审计对抗测量伪影",
+      "7种缓存驱逐策略系统比较研究",
+      "跨任务技能迁移可能损害接收方",
+      "检索自由文档知识内部化方法"
+    ],
+    "ai-hf": [
+      "Qwen3.8-27B周赞11970领跑全平台",
+      "Kimi-K3获10913点赞登顶语言模型",
+      "MiniMax-H3下载量突破361万次",
+      "DeepSeek-V4-Flash下载283万",
+      "Muse-Glimmer-30B多模态获1739赞",
+      "Qwen3.8系列占据下载榜主导"
+    ],
+    "ai-community": [
+      "157个Agent计划验证发现瓶颈在规划",
+      "Pi Agent与OpenCode百小时实测对比",
+      "用搜索过去替代记忆存储新范式",
+      "验证LLM规划器实验7项检查清单",
+      "Agent guardrail在金融场景存在盲区",
+      "Adam优化器缺陷与梯度压缩分析"
+    ]
+  }
+}
