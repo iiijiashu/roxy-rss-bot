@@ -1,0 +1,30 @@
+{
+  "zh": {
+    "ai-cli": [
+      "Claude Code发布v2.1.246，新增Bash通配符警告",
+      "24小时内涌入50条Issue，关注Windows稳定性",
+      "修复Linux ARM64平台glibc崩溃问题",
+      "CVP企业认证绕过引发安全担忧",
+      "会话上下文管理成为社区关注焦点",
+      "项目级插件共享需求强烈，痛点持续存在"
+    ],
+    "ai-web": [
+      "Anthropic推出Economic Index连接器",
+      "Clio工具现更名为Anthropic Insights",
+      "500万美元启动AI幸福感研究资助计划",
+      "Anthropic设2亿美元经济未来研究基金",
+      "Claude 3.7 Sonnet coding教育应用占比上升",
+      "Claude Code获50条Issue，聚焦多平台稳定"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Claude Code v2.1.246 adds Bash wildcard warnings",
+      "50 new issues flood Claude Code community in 24h",
+      "Fixes Linux ARM64 glibc crash on v2.1.245",
+      "CVP enterprise auth bypass raises security concerns",
+      "Session context management draws community focus",
+      "Project-level plugin sharing remains a pain point"
+    ]
+  }
+}
