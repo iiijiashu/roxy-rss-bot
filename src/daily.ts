@@ -759,6 +759,7 @@ export async function runDaily(): Promise<void> {
   }
 
   if (!synthesis || !quality) {
+    const synthesisFailureCode = classifyFailure(lastSynthesisError);
     const failedQuality: QualityReport = {
       schemaVersion: 1,
       passed: false,
@@ -767,14 +768,14 @@ export async function runDaily(): Promise<void> {
       developmentCount: 0,
       duplicateRatio: 0,
       checks: [{ name: "synthesis", passed: false, detail: "bounded synthesis attempts failed" }],
-      violations: [String(lastSynthesisError ?? "unknown synthesis failure")],
+      violations: [`synthesis failed after bounded attempts (${synthesisFailureCode})`],
     };
     writeJson(path.join(digestDir, "quality-report.json"), failedQuality);
-    status.record("quality", "degraded", "quality_gate_failed");
+    status.record("quality", "degraded", synthesisFailureCode);
     saveLlmDiagnostics(digestDir);
     status.save();
     status.logSummary(getLlmDiagnostics());
-    throw lastSynthesisError ?? new Error("Synthesis failed after bounded attempts");
+    throw new Error(`Synthesis failed after bounded attempts (${synthesisFailureCode})`);
   }
 
   writeJson(path.join(digestDir, "quality-report.json"), quality);

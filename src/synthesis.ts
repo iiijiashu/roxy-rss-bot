@@ -12,6 +12,32 @@ const MAX_SYNTHESIS_PROMPT_BYTES = 160_000;
 const MAX_SYNTHESIS_CORRECTION_BYTES = 24_000;
 const INVALID_JSON_CORRECTION =
   "\n\n上一轮不是合法且可验证的严格 JSON。重新输出完整 JSON，不要解释，不要 Markdown fence。\n";
+const SAFE_REQUEST_FAILURE_CODES = new Set([
+  "auth",
+  "bad_request",
+  "budget_exhausted",
+  "empty_response",
+  "input_limit",
+  "invalid_envelope",
+  "invalid_json",
+  "invalid_result",
+  "omitted_task",
+  "provider_error",
+  "rate_limit",
+  "server_error",
+  "timeout",
+  "transport",
+]);
+
+class SynthesisFailure extends Error {
+  constructor(
+    readonly code: string,
+    message: string,
+  ) {
+    super(message);
+    this.name = "SynthesisFailure";
+  }
+}
 
 export type SynthesisAttemptOutcome =
   | { attempt: number; state: "ok" }
@@ -44,8 +70,19 @@ function safeQualityFailureSummary(quality: QualityReport): string {
 
 function assertByteLimit(value: string, label: string, limit: number): void {
   if (Buffer.byteLength(value, "utf8") > limit) {
-    throw new Error(`${label} exceeds the byte limit`);
+    throw new SynthesisFailure("input_limit", `${label} exceeds the byte limit`);
   }
+}
+
+function safeRequestFailure(error: unknown): SynthesisFailure {
+  const code =
+    error && typeof error === "object" && typeof (error as { code?: unknown }).code === "string"
+      ? (error as { code: string }).code.toLowerCase()
+      : "";
+  return new SynthesisFailure(
+    SAFE_REQUEST_FAILURE_CODES.has(code) ? code : "request_failed",
+    "Synthesis provider request failed",
+  );
 }
 
 function canUseThirdAttempt(attempt: number, quality: QualityReport, hadRequestFailure: boolean): boolean {
@@ -94,7 +131,7 @@ export async function synthesizeWithQualityGate(
       raw = await dependencies.invoke(prompt, SYNTHESIS_MAX_TOKENS);
     } catch (error) {
       hadRequestFailure = true;
-      lastError = error;
+      lastError = safeRequestFailure(error);
       dependencies.onAttempt?.({
         attempt,
         state: "degraded",
@@ -110,7 +147,7 @@ export async function synthesizeWithQualityGate(
     try {
       candidate = dependencies.parse(raw);
     } catch (error) {
-      lastError = error;
+      lastError = new SynthesisFailure("invalid_json", "Synthesis response was not valid JSON");
       dependencies.onAttempt?.({
         attempt,
         state: "degraded",
@@ -129,7 +166,7 @@ export async function synthesizeWithQualityGate(
     }
 
     dependencies.onAttempt?.({ attempt, state: "degraded", reason: "quality_gate_failed" });
-    lastError = new Error(safeQualityFailureSummary(quality));
+    lastError = new SynthesisFailure("quality_gate_failed", safeQualityFailureSummary(quality));
     if (attempt === 1 || canUseThirdAttempt(attempt, quality, hadRequestFailure)) {
       correction = qualityCorrection(quality, events);
       continue;

@@ -33,6 +33,30 @@ function validFixture() {
   return { records, events, development };
 }
 
+function twoEventFixture() {
+  const records: EvidenceRecord[] = [
+    evidence(),
+    {
+      ...evidence(),
+      id: "S2",
+      url: "https://example.com/security-agent",
+      title: "Security Agent Update",
+      content: "Security Agent adds isolated execution and audit logs.",
+      category: "agent",
+    },
+  ];
+  const events = groupEvidence(records);
+  const labels = ["甲", "乙"];
+  const developments: SynthesizedDevelopment[] = events.map((event, index) => ({
+    event_id: event.id,
+    title: `安全智能体更新${labels[index]}`,
+    summary: "安全智能体增加隔离执行和审计日志。",
+    why_it_matters: "这会影响智能体应用的隔离边界和审计能力。",
+    source_ids: [event.primarySourceId],
+  }));
+  return { records, events, developments };
+}
+
 describe("bounded synthesis repair", () => {
   it("uses a third attempt to repair a schema failure after invalid JSON", async () => {
     const { records, events, development: validDevelopment } = validFixture();
@@ -93,12 +117,90 @@ describe("bounded synthesis repair", () => {
     ];
     const invoke = vi.fn(async () => responses.shift()!);
 
+    const failure = await synthesizeWithQualityGate("BASE_PROMPT", events, records, {
+      invoke,
+      parse: (raw) => {
+        if (raw === responses[2]) return JSON.parse(raw) as unknown;
+        throw new Error(`PRIVATE_PARSE_SENTINEL:${raw}`);
+      },
+    }).then(
+      () => undefined,
+      (error: unknown) => error,
+    );
+
+    expect(failure).toMatchObject({ code: "invalid_json" });
+    expect(String(failure)).not.toContain("PRIVATE_PARSE_SENTINEL");
+    expect(invoke).toHaveBeenCalledTimes(2);
+  });
+
+  it("sanitizes an attempt-two request failure and does not make a third request", async () => {
+    const { records, events, development } = validFixture();
+    const invoke = vi
+      .fn<(prompt: string, maxTokens: number) => Promise<string>>()
+      .mockResolvedValueOnce("not valid json")
+      .mockRejectedValueOnce(new Error("PRIVATE_REQUEST_SENTINEL"))
+      .mockResolvedValue(JSON.stringify({ developments: [development] }));
+
+    const failure = await synthesizeWithQualityGate("BASE_PROMPT", events, records, {
+      invoke,
+      parse: (raw) => JSON.parse(raw) as unknown,
+    }).then(
+      () => undefined,
+      (error: unknown) => error,
+    );
+
+    expect(failure).toMatchObject({ code: "request_failed" });
+    expect(String(failure)).not.toContain("PRIVATE_REQUEST_SENTINEL");
+    expect(invoke).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not spend a third attempt on an unsupported inference", async () => {
+    const { records, events, development } = validFixture();
+    const unsupported = {
+      ...development,
+      why_it_matters: "社区普遍认可这一变化会影响智能体应用。",
+    };
+    const invoke = vi.fn(async () => JSON.stringify({ developments: [unsupported] }));
+
     await expect(
       synthesizeWithQualityGate("BASE_PROMPT", events, records, {
         invoke,
         parse: (raw) => JSON.parse(raw) as unknown,
       }),
-    ).rejects.toThrow();
+    ).rejects.toThrow(/unsupported_inference/u);
+
+    expect(invoke).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not spend a third attempt on duplicate developments", async () => {
+    const { records, events, developments } = twoEventFixture();
+    const duplicates = developments.map((development) => ({
+      ...development,
+      title: "安全智能体更新隔离执行",
+    }));
+    const invoke = vi.fn(async () => JSON.stringify({ developments: duplicates }));
+
+    await expect(
+      synthesizeWithQualityGate("BASE_PROMPT", events, records, {
+        invoke,
+        parse: (raw) => JSON.parse(raw) as unknown,
+      }),
+    ).rejects.toThrow(/duplicate_ratio/u);
+
+    expect(invoke).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not spend a third attempt on invalid evidence coverage", async () => {
+    const { records, events, development } = validFixture();
+    const invalidEvidence = { ...development, source_ids: ["UNKNOWN_SOURCE"] };
+    const invoke = vi.fn(async () => JSON.stringify({ developments: [invalidEvidence] }));
+
+    await expect(
+      synthesizeWithQualityGate("BASE_PROMPT", events, records, {
+        invoke,
+        parse: (raw) => JSON.parse(raw) as unknown,
+      }),
+    ).rejects.toThrow(/evidence_coverage/u);
 
     expect(invoke).toHaveBeenCalledTimes(2);
   });
@@ -137,25 +239,13 @@ describe("bounded synthesis repair", () => {
   });
 
   it("requires a schema repair candidate to be near-complete before a third attempt", async () => {
-    const records: EvidenceRecord[] = [
-      evidence(),
-      {
-        ...evidence(),
-        id: "S2",
-        url: "https://example.com/security-agent",
-        title: "Security Agent Update",
-        content: "Security Agent adds isolated execution and audit logs.",
-        category: "agent",
-      },
-    ];
-    const events = groupEvidence(records);
+    const { records, events, developments } = twoEventFixture();
     expect(events).toHaveLength(2);
-    const invalidDevelopments = events.map((event, index) => ({
-      event_id: event.id,
-      title: `安全智能体更新 ${index + 1}`,
-      summary: "安全智能体增加隔离执行和审计日志。",
-      source_ids: [records[index]!.id],
-    }));
+    const invalidDevelopments = developments.map((development) => {
+      const invalid = { ...development } as Partial<SynthesizedDevelopment>;
+      delete invalid.why_it_matters;
+      return invalid;
+    });
     const invoke = vi.fn(async () => JSON.stringify({ developments: invalidDevelopments }));
 
     await expect(
@@ -193,6 +283,21 @@ describe("bounded synthesis repair", () => {
         parse: (raw) => JSON.parse(raw) as unknown,
       }),
     ).rejects.toThrow(/correction exceeds the byte limit/u);
+
+    expect(invoke).toHaveBeenCalledTimes(1);
+  });
+
+  it("rejects a combined prompt that exceeds the cap even when each part is below its own cap", async () => {
+    const { records, events } = validFixture();
+    const paddedEvents = [{ ...events[0]!, id: `event:${"a".repeat(12_000)}` }];
+    const invoke = vi.fn(async () => JSON.stringify({ developments: [] }));
+
+    await expect(
+      synthesizeWithQualityGate("x".repeat(150_000), paddedEvents, records, {
+        invoke,
+        parse: (raw) => JSON.parse(raw) as unknown,
+      }),
+    ).rejects.toThrow(/request prompt exceeds the byte limit/u);
 
     expect(invoke).toHaveBeenCalledTimes(1);
   });
