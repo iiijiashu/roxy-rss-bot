@@ -23,10 +23,25 @@ interface SubmittedTask {
   maxTokens: number;
 }
 
-function submittedTasks(call: unknown[]): SubmittedTask[] {
+function submittedUserContent(call: unknown[]): string {
   const request = call[0] as { messages: Array<{ role: string; content: string }> };
   const user = request.messages.find((message) => message.role === "user");
-  return JSON.parse(user?.content ?? "{}").tasks as SubmittedTask[];
+  return user?.content ?? "";
+}
+
+function maybeSubmittedTasks(call: unknown[]): SubmittedTask[] | undefined {
+  try {
+    const parsed = JSON.parse(submittedUserContent(call)) as { tasks?: unknown };
+    return Array.isArray(parsed.tasks) ? (parsed.tasks as SubmittedTask[]) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function submittedTasks(call: unknown[]): SubmittedTask[] {
+  const tasks = maybeSubmittedTasks(call);
+  if (!tasks) throw new Error("Expected a batch request");
+  return tasks;
 }
 
 describe("AgnesProvider batching", () => {
@@ -72,15 +87,42 @@ describe("AgnesProvider batching", () => {
     ]);
   });
 
+  it("uses the direct OpenAI-compatible response for a single logical task", async () => {
+    const create = await getCreateMock();
+    create.mockResolvedValueOnce({
+      choices: [{ message: { content: '{"developments":[]}' } }],
+    });
+
+    const provider = new AgnesProvider({
+      apiKey: "test",
+      batchWindowMs: 1,
+      maxBatchTasks: 1,
+      requestBudget: 1,
+      maxTaskAttempts: 1,
+    });
+    await expect(provider.call("return strict JSON", 100)).resolves.toBe('{"developments":[]}');
+
+    const request = create.mock.calls[0]?.[0] as {
+      messages: Array<{ role: string; content: string }>;
+    };
+    expect(request.messages[0]?.content).toContain("untrusted public source data");
+    expect(request.messages[1]).toEqual({ role: "user", content: "return strict JSON" });
+  });
+
   it("serializes object content for callers that requested JSON", async () => {
     const create = await getCreateMock();
     create.mockImplementationOnce(async (...args: unknown[]) => {
-      const [task] = submittedTasks(args);
+      const tasks = submittedTasks(args);
       return {
         choices: [
           {
             message: {
-              content: JSON.stringify({ results: [{ id: task?.id, content: { headline: "important" } }] }),
+              content: JSON.stringify({
+                results: tasks.map((task) => ({
+                  id: task.id,
+                  content: { headline: task.prompt },
+                })),
+              }),
             },
           },
         ],
@@ -88,7 +130,9 @@ describe("AgnesProvider batching", () => {
     });
 
     const provider = new AgnesProvider({ apiKey: "test", batchWindowMs: 1, requestBudget: 1 });
-    await expect(provider.call("json task", 100)).resolves.toBe('{"headline":"important"}');
+    await expect(
+      Promise.all([provider.call("important", 100), provider.call("secondary", 100)]),
+    ).resolves.toEqual(['{"headline":"important"}', '{"headline":"secondary"}']);
   });
 
   it("retries only an omitted task while preserving returned task results", async () => {
@@ -105,20 +149,9 @@ describe("AgnesProvider batching", () => {
         ],
       };
     });
-    create.mockImplementationOnce(async (...args: unknown[]) => {
-      const tasks = submittedTasks(args);
-      return {
-        choices: [
-          {
-            message: {
-              content: JSON.stringify({
-                results: tasks.map((task) => ({ id: task.id, content: `retried:${task.prompt}` })),
-              }),
-            },
-          },
-        ],
-      };
-    });
+    create.mockImplementationOnce(async (...args: unknown[]) => ({
+      choices: [{ message: { content: `retried:${submittedUserContent(args)}` } }],
+    }));
 
     const provider = new AgnesProvider({
       apiKey: "test",
@@ -132,9 +165,7 @@ describe("AgnesProvider batching", () => {
 
     expect(results).toEqual(["first result", "retried:second"]);
     expect(create).toHaveBeenCalledTimes(2);
-    expect(submittedTasks(create.mock.calls[1] ?? [])).toEqual([
-      expect.objectContaining({ prompt: "second" }),
-    ]);
+    expect(submittedUserContent(create.mock.calls[1] ?? [])).toBe("second");
     expect(provider.getDiagnostics()).toMatchObject({
       requests: 2,
       retryRequests: 1,
@@ -147,18 +178,7 @@ describe("AgnesProvider batching", () => {
 
   it("enforces the real provider-request budget", async () => {
     const create = await getCreateMock();
-    create.mockImplementation(async (...args: unknown[]) => {
-      const tasks = submittedTasks(args);
-      return {
-        choices: [
-          {
-            message: {
-              content: JSON.stringify({ results: tasks.map((task) => ({ id: task.id, content: "ok" })) }),
-            },
-          },
-        ],
-      };
-    });
+    create.mockResolvedValue({ choices: [{ message: { content: "ok" } }] });
 
     const provider = new AgnesProvider({ apiKey: "test", batchWindowMs: 1, requestBudget: 1 });
     await expect(provider.call("first phase", 100)).resolves.toBe("ok");
@@ -169,14 +189,16 @@ describe("AgnesProvider batching", () => {
   it("partitions by task count and aggregate output budget", async () => {
     const create = await getCreateMock();
     create.mockImplementation(async (...args: unknown[]) => {
-      const tasks = submittedTasks(args);
+      const tasks = maybeSubmittedTasks(args);
       return {
         choices: [
           {
             message: {
-              content: JSON.stringify({
-                results: tasks.map((task) => ({ id: task.id, content: task.prompt })),
-              }),
+              content: tasks
+                ? JSON.stringify({
+                    results: tasks.map((task) => ({ id: task.id, content: task.prompt })),
+                  })
+                : submittedUserContent(args),
             },
           },
         ],
@@ -197,7 +219,7 @@ describe("AgnesProvider batching", () => {
 
     expect(results).toHaveLength(9);
     expect(create).toHaveBeenCalledTimes(3);
-    expect(create.mock.calls.map((call) => submittedTasks(call).length).sort()).toEqual([1, 4, 4]);
+    expect(create.mock.calls.map((call) => maybeSubmittedTasks(call)?.length ?? 1).sort()).toEqual([1, 4, 4]);
     for (const call of create.mock.calls) {
       const request = call[0] as { max_tokens: number };
       expect(request.max_tokens).toBeLessThanOrEqual(16_000);
@@ -290,12 +312,12 @@ describe("AgnesProvider batching", () => {
   it("repairs raw control characters and trailing commas in an otherwise valid envelope", async () => {
     const create = await getCreateMock();
     create.mockImplementationOnce(async (...args: unknown[]) => {
-      const [task] = submittedTasks(args);
+      const [first, second] = submittedTasks(args);
       return {
         choices: [
           {
             message: {
-              content: `{"results":[{"id":"${task?.id}","content":"line one\nline two",}],}`,
+              content: `{"results":[{"id":"${first?.id}","content":"line one\nline two",},{"id":"${second?.id}","content":"other",}],}`,
             },
           },
         ],
@@ -303,28 +325,22 @@ describe("AgnesProvider batching", () => {
     });
 
     const provider = new AgnesProvider({ apiKey: "test", batchWindowMs: 1, requestBudget: 1 });
-    await expect(provider.call("repair", 100)).resolves.toBe("line one\nline two");
+    await expect(Promise.all([provider.call("repair", 100), provider.call("other", 100)])).resolves.toEqual([
+      "line one\nline two",
+      "other",
+    ]);
   });
 
   it("bounds physical concurrency independently from logical concurrency", async () => {
     const create = await getCreateMock();
     let active = 0;
     let maximumActive = 0;
-    create.mockImplementation(async (...args: unknown[]) => {
+    create.mockImplementation(async () => {
       active++;
       maximumActive = Math.max(maximumActive, active);
       await new Promise((resolve) => setTimeout(resolve, 5));
       active--;
-      const tasks = submittedTasks(args);
-      return {
-        choices: [
-          {
-            message: {
-              content: JSON.stringify({ results: tasks.map((task) => ({ id: task.id, content: "ok" })) }),
-            },
-          },
-        ],
-      };
+      return { choices: [{ message: { content: "ok" } }] };
     });
 
     const provider = new AgnesProvider({
