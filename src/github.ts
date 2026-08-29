@@ -43,6 +43,8 @@ export interface GitHubItem {
   labels: GitHubLabel[];
   created_at: string;
   updated_at: string;
+  closed_at?: string | null;
+  merged_at?: string | null;
   comments: number;
   reactions?: GitHubReactions;
   body?: string | null;
@@ -55,6 +57,7 @@ export interface GitHubRelease {
   name: string;
   body?: string | null;
   published_at: string;
+  html_url?: string;
 }
 
 export interface RepoFetch {
@@ -64,6 +67,30 @@ export interface RepoFetch {
   releases: GitHubRelease[];
   /** False when the repository API fetch failed; absent means successful legacy data. */
   fetchSuccess?: boolean;
+  /** True when a configured API traversal limit was reached before the time window ended. */
+  truncated?: boolean;
+}
+
+export type GitHubActivity = "created" | "merged" | "closed" | "engagement_delta";
+
+/** Select the timestamp that actually proves the classified GitHub activity. */
+export function githubActivityTimestamp(item: GitHubItem, activity: GitHubActivity): string {
+  if (activity === "created") return item.created_at;
+  if (activity === "merged") return item.merged_at ?? item.updated_at;
+  if (activity === "closed") return item.closed_at ?? item.updated_at;
+  return item.updated_at;
+}
+
+export interface GitHubItemsResult {
+  items: GitHubItem[];
+  truncated: boolean;
+  pagesFetched: number;
+}
+
+export interface GitHubReleasesResult {
+  releases: GitHubRelease[];
+  truncated: boolean;
+  pagesFetched: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -72,6 +99,7 @@ export interface RepoFetch {
 
 /** Maximum pages to fetch for paginated repos (100 items/page). */
 const MAX_PAGES = 5;
+export const MAX_RECENT_ITEMS = MAX_PAGES * 100;
 
 function headers(): Record<string, string> {
   return {
@@ -123,6 +151,14 @@ export async function fetchRecentItems(
   itemType: "issues" | "pulls",
   since: Date,
 ): Promise<GitHubItem[]> {
+  return (await fetchRecentItemsWithMeta(cfg, itemType, since)).items;
+}
+
+export async function fetchRecentItemsWithMeta(
+  cfg: RepoConfig,
+  itemType: "issues" | "pulls",
+  since: Date,
+): Promise<GitHubItemsResult> {
   if (!cfg.paginated) {
     const params: Record<string, string> = {
       state: "all",
@@ -135,26 +171,59 @@ export async function fetchRecentItems(
       `https://api.github.com/repos/${cfg.repo}/${itemType}`,
       params,
     );
-    return itemType === "pulls" ? items.filter((i) => new Date(i.updated_at) >= since) : items;
+    return {
+      items: itemType === "pulls" ? items.filter((i) => new Date(i.updated_at) >= since) : items,
+      truncated: items.length >= 50,
+      pagesFetched: 1,
+    };
   }
 
   const all: GitHubItem[] = [];
+  let pagesFetched = 0;
+  let truncated = false;
   for (let page = 1; page <= MAX_PAGES; page++) {
     const items = await fetchItemPage(cfg.repo, itemType, since, page);
+    pagesFetched = page;
     if (items.length === 0) break;
     all.push(...items);
     const last = items[items.length - 1];
     if (last && new Date(last.updated_at) < since) break;
     if (items.length < 100) break;
+    if (page === MAX_PAGES) truncated = true;
   }
-  return all;
+  return { items: all, truncated, pagesFetched };
 }
 
 export async function fetchRecentReleases(repo: string, since: Date): Promise<GitHubRelease[]> {
-  const releases = await githubGet<GitHubRelease[]>(`https://api.github.com/repos/${repo}/releases`, {
-    per_page: "10",
-  });
-  return releases.filter((r) => new Date(r.published_at) >= since);
+  return (await fetchRecentReleasesWithMeta(repo, since)).releases;
+}
+
+export async function fetchRecentReleasesWithMeta(repo: string, since: Date): Promise<GitHubReleasesResult> {
+  const releases: GitHubRelease[] = [];
+  let pagesFetched = 0;
+  let truncated = false;
+  for (let page = 1; page <= MAX_PAGES; page++) {
+    const batch = await githubGet<GitHubRelease[]>(`https://api.github.com/repos/${repo}/releases`, {
+      per_page: "100",
+      page: String(page),
+    });
+    pagesFetched = page;
+    if (batch.length === 0) break;
+    releases.push(
+      ...batch.filter(
+        (release) =>
+          typeof release.published_at === "string" &&
+          Number.isFinite(Date.parse(release.published_at)) &&
+          Date.parse(release.published_at) >= since.getTime(),
+      ),
+    );
+    // GitHub's release ordering is not a trustworthy published_at boundary:
+    // a long-lived draft can be published after newer-created releases. Stay
+    // bounded, but do not stop merely because one page contains an old release.
+    if (batch.length < 100) break;
+    if (page === MAX_PAGES) truncated = true;
+  }
+  return { releases, truncated, pagesFetched };
 }
 
 export async function ensureLabel(name: string, color: string): Promise<void> {
@@ -194,6 +263,14 @@ export async function fetchSkillsData(repo: string): Promise<{ prs: GitHubItem[]
 
 const GITHUB_ISSUE_BODY_LIMIT = 65536;
 const TRUNCATION_NOTICE = "\n\n---\n> ⚠️ 内容超过 GitHub Issue 上限，完整报告见提交的 Markdown 文件。";
+const MAX_EXISTING_ISSUE_LOOKUP_PAGES = 20;
+
+interface ExistingIssue {
+  number: number;
+  title: string;
+  html_url: string;
+  pull_request?: unknown;
+}
 
 /** GitHub label colors by label name. Default: "0075ca". */
 const LABEL_COLORS: Record<string, string> = {
@@ -229,6 +306,27 @@ function neutralizeGitHubRefs(text: string): string {
       .replace(/https:\/\/github\.com\//g, "https://github\u200B.com/")
       // Prevent @mention notifications — insert zero-width space after @
       .replace(/@([a-zA-Z\d](?:[a-zA-Z\d]|-(?=[a-zA-Z\d])){0,38})/g, "@\u200B$1")
+  );
+}
+
+async function findExistingIssueByTitle(
+  digestRepo: string,
+  title: string,
+): Promise<ExistingIssue | undefined> {
+  for (let page = 1; page <= MAX_EXISTING_ISSUE_LOOKUP_PAGES; page++) {
+    const issues = await githubGet<ExistingIssue[]>(`https://api.github.com/repos/${digestRepo}/issues`, {
+      state: "all",
+      sort: "created",
+      direction: "desc",
+      per_page: "100",
+      page: String(page),
+    });
+    const existing = issues.find((issue) => issue.title === title && !issue.pull_request);
+    if (existing) return existing;
+    if (issues.length < 100) return undefined;
+  }
+  throw new Error(
+    `Issue idempotency lookup exceeded ${MAX_EXISTING_ISSUE_LOOKUP_PAGES * 100} entries; refusing to create a possible duplicate`,
   );
 }
 
@@ -276,17 +374,9 @@ export async function createGitHubIssue(title: string, body: string, label: stri
   if (body.length > GITHUB_ISSUE_BODY_LIMIT) {
     body = body.slice(0, GITHUB_ISSUE_BODY_LIMIT - TRUNCATION_NOTICE.length) + TRUNCATION_NOTICE;
   }
-  await ensureLabel(label, LABEL_COLORS[label] ?? "0075ca");
 
-  const existingIssues = await githubGet<
-    Array<{ number: number; title: string; html_url: string; pull_request?: unknown }>
-  >(`https://api.github.com/repos/${digestRepo}/issues`, {
-    state: "all",
-    sort: "created",
-    direction: "desc",
-    per_page: "100",
-  });
-  const existing = existingIssues.find((issue) => issue.title === title && !issue.pull_request);
+  const existing = await findExistingIssueByTitle(digestRepo, title);
+  await ensureLabel(label, LABEL_COLORS[label] ?? "0075ca");
   const endpoint = existing
     ? `https://api.github.com/repos/${digestRepo}/issues/${existing.number}`
     : `https://api.github.com/repos/${digestRepo}/issues`;

@@ -9,6 +9,8 @@ const FEED_PATH = "feed.xml";
 const DEFAULT_SITE_URL = "https://duanyytop.github.io/agents-radar";
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const REPORT_FILES = [
+  "digest",
+  "ai-daily",
   "ai-cli",
   "ai-cli-en",
   "ai-agents",
@@ -49,12 +51,23 @@ interface ReportContent {
   fullHtml: string;
 }
 
+function reportLabel(report: string): string {
+  return REPORT_LABELS[report] ?? report;
+}
+
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 export function stableGeneratedAt(entries: DateEntry[]): Date {
   const newestDate = entries[0]?.date;
   return newestDate ? new Date(`${newestDate}T00:00:00.000Z`) : new Date(0);
+}
+
+/** Expose only the canonical daily artifact when a date contains legacy files too. */
+export function selectReportsForDate(available: readonly string[]): string[] {
+  if (available.includes("digest")) return ["digest"];
+  if (available.includes("ai-daily")) return ["ai-daily"];
+  return [...available];
 }
 
 export function toRfc822(date: Date): string {
@@ -104,7 +117,7 @@ async function getReportContent(date: string, report: string): Promise<ReportCon
     };
   } catch {
     // Fallback to title-only content on any error
-    const label = REPORT_LABELS[report] ?? report;
+    const label = reportLabel(report);
     const title = `${label} ${date}`;
     return {
       summary: escapeXml(title),
@@ -121,7 +134,8 @@ async function main(): Promise<void> {
     .sort()
     .reverse()
     .map((date) => {
-      const reports = REPORT_FILES.filter((r) => fs.existsSync(path.join(DIGESTS_DIR, date, `${r}.md`)));
+      const available = REPORT_FILES.filter((r) => fs.existsSync(path.join(DIGESTS_DIR, date, `${r}.md`)));
+      const reports = selectReportsForDate(available);
       return { date, reports };
     })
     .filter((e) => e.reports.length > 0);
@@ -149,7 +163,7 @@ async function main(): Promise<void> {
 
   const itemXmlChunks: string[] = [];
   for (const { date, report } of feedItems) {
-    const label = REPORT_LABELS[report] ?? report;
+    const label = reportLabel(report);
     const title = `${label} ${date}`;
     const link = `${siteUrl}/#${date}/${report}`;
     const parts = date.split("-").map(Number);

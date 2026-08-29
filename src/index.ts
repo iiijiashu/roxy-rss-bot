@@ -358,6 +358,28 @@ function comparisonFallback(lang: Lang, subject: "tools" | "agents"): string {
     : "> ⚠️ Today's agent-ecosystem comparison is unavailable. Individual summaries and source links are preserved.";
 }
 
+function digestHasUsableEvidence(digest: RepoDigest): boolean {
+  const hasActivity = digest.issues.length > 0 || digest.prs.length > 0 || digest.releases.length > 0;
+  if (!hasActivity) return false;
+  return !/摘要生成失败|Summary generation failed|unavailable|无法完成|No activity/i.test(digest.summary);
+}
+
+async function comparisonWithCoverageGate(
+  status: PublicationStatus,
+  component: string,
+  digests: RepoDigest[],
+  promptFactory: () => string,
+  fallback: string,
+): Promise<string> {
+  const covered = digests.filter(digestHasUsableEvidence).length;
+  if (covered < 2) {
+    status.record(component, "skipped", "coverage_insufficient");
+    console.log(`  [${component}] skipped: comparison coverage ${covered}/2`);
+    return "";
+  }
+  return callLlmWithFallback(status, component, promptFactory(), fallback);
+}
+
 function deterministicHighlights(reports: Record<string, string>, lang: Lang): ReportHighlights {
   const result: ReportHighlights = {};
   for (const [reportId, markdown] of Object.entries(reports)) {
@@ -545,28 +567,32 @@ async function main(): Promise<void> {
   });
 
   const comparisonPromise = Promise.all([
-    callLlmWithFallback(
+    comparisonWithCoverageGate(
       publicationStatus,
       "comparison/tools/zh",
-      buildComparisonPrompt(zhSummaries.cliDigests, dateStr, "zh"),
+      zhSummaries.cliDigests,
+      () => buildComparisonPrompt(zhSummaries.cliDigests, dateStr, "zh"),
       comparisonFallback("zh", "tools"),
     ),
-    callLlmWithFallback(
+    comparisonWithCoverageGate(
       publicationStatus,
       "comparison/agents/zh",
-      buildPeersComparisonPrompt(makeOpenclawDigest("zh"), zhSummaries.peerDigests, dateStr, "zh"),
+      [makeOpenclawDigest("zh"), ...zhSummaries.peerDigests],
+      () => buildPeersComparisonPrompt(makeOpenclawDigest("zh"), zhSummaries.peerDigests, dateStr, "zh"),
       comparisonFallback("zh", "agents"),
     ),
-    callLlmWithFallback(
+    comparisonWithCoverageGate(
       publicationStatus,
       "comparison/tools/en",
-      buildComparisonPrompt(enSummaries.cliDigests, dateStr, "en"),
+      enSummaries.cliDigests,
+      () => buildComparisonPrompt(enSummaries.cliDigests, dateStr, "en"),
       comparisonFallback("en", "tools"),
     ),
-    callLlmWithFallback(
+    comparisonWithCoverageGate(
       publicationStatus,
       "comparison/agents/en",
-      buildPeersComparisonPrompt(makeOpenclawDigest("en"), enSummaries.peerDigests, dateStr, "en"),
+      [makeOpenclawDigest("en"), ...enSummaries.peerDigests],
+      () => buildPeersComparisonPrompt(makeOpenclawDigest("en"), enSummaries.peerDigests, dateStr, "en"),
       comparisonFallback("en", "agents"),
     ),
   ]);

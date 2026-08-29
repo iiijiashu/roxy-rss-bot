@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { toRfc822, escapeXml, normalizeSiteUrl, stableGeneratedAt } from "../generate-manifest.ts";
+import {
+  escapeXml,
+  normalizeSiteUrl,
+  selectReportsForDate,
+  stableGeneratedAt,
+  toRfc822,
+} from "../generate-manifest.ts";
 
 // ---------------------------------------------------------------------------
 // toRfc822
@@ -94,5 +100,19 @@ describe("stableGeneratedAt", () => {
 
   it("uses the Unix epoch for an empty archive", () => {
     expect(stableGeneratedAt([]).toISOString()).toBe("1970-01-01T00:00:00.000Z");
+  });
+});
+
+describe("selectReportsForDate", () => {
+  it("exposes only digest when evidence-first and legacy files coexist", () => {
+    expect(selectReportsForDate(["digest", "ai-daily", "ai-cli", "ai-web"])).toEqual(["digest"]);
+  });
+
+  it("prefers the legacy consolidated daily file over per-source files", () => {
+    expect(selectReportsForDate(["ai-daily", "ai-cli", "ai-web"])).toEqual(["ai-daily"]);
+  });
+
+  it("preserves per-source reports for historical dates", () => {
+    expect(selectReportsForDate(["ai-cli", "ai-web"])).toEqual(["ai-cli", "ai-web"]);
   });
 });

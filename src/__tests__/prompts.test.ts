@@ -33,7 +33,7 @@ describe("formatItem", () => {
     expect(result).toContain("#1 [OPEN]");
     expect(result).toContain("Test issue");
     expect(result).toContain("作者: alice");
-    expect(result).toContain("评论: 5");
+    expect(result).toContain("累计评论: 5");
     expect(result).toContain("👍: 3");
     expect(result).toContain("链接: org/repo Issue #1");
     expect(result).toContain("摘要: Some body text");
@@ -42,7 +42,7 @@ describe("formatItem", () => {
   it("formats an item in English", () => {
     const result = formatItem(makeItem(), "en");
     expect(result).toContain("Author: alice");
-    expect(result).toContain("Comments: 5");
+    expect(result).toContain("Lifetime comments: 5");
     expect(result).toContain("URL:");
     expect(result).toContain("Summary: Some body text");
   });
@@ -97,12 +97,12 @@ describe("formatItem", () => {
 // ---------------------------------------------------------------------------
 
 describe("topN", () => {
-  it("returns top N items sorted by comment count desc", () => {
+  it("returns top N items sorted by observable update time", () => {
     const items = [
-      makeItem({ number: 1, comments: 2 }),
-      makeItem({ number: 2, comments: 10 }),
-      makeItem({ number: 3, comments: 5 }),
-      makeItem({ number: 4, comments: 8 }),
+      makeItem({ number: 1, comments: 2, updated_at: "2026-03-09T09:00:00Z" }),
+      makeItem({ number: 2, comments: 10, updated_at: "2026-03-09T12:00:00Z" }),
+      makeItem({ number: 3, comments: 5, updated_at: "2026-03-09T10:00:00Z" }),
+      makeItem({ number: 4, comments: 8, updated_at: "2026-03-09T11:00:00Z" }),
     ];
     const result = topN(items, 2);
     expect(result).toHaveLength(2);
@@ -135,17 +135,19 @@ describe("topN", () => {
 describe("sampleNote", () => {
   it("shows sampled note in Chinese when total > sampled", () => {
     const result = sampleNote(100, 30);
-    expect(result).toBe("（共 100 条，以下展示评论数最多的 30 条）");
+    expect(result).toBe("（API 观测到 100 条，以下展示最近更新的 30 条；总数可能受 API 分页上限影响）");
   });
 
   it("shows total-only note in Chinese when total <= sampled", () => {
-    expect(sampleNote(10, 10)).toBe("（共 10 条）");
-    expect(sampleNote(5, 10)).toBe("（共 5 条）");
+    expect(sampleNote(10, 10)).toBe("（API 观测到 10 条；不把该数值解释为精确的“24 小时新增量”）");
+    expect(sampleNote(5, 10)).toBe("（API 观测到 5 条；不把该数值解释为精确的“24 小时新增量”）");
   });
 
   it("shows sampled note in English when total > sampled", () => {
     const result = sampleNote(50, 20, "en");
-    expect(result).toBe("(Total: 50 items; showing top 20 by comment count)");
+    expect(result).toBe(
+      "(Observed 50 API items; showing 20 most recently updated; totals may be API-capped)",
+    );
   });
 
   it("shows total-only note in English when total <= sampled", () => {

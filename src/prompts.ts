@@ -32,11 +32,18 @@ export function formatItem(item: GitHubItem, lang: Lang = "zh"): string {
           author: "Author",
           created: "Created",
           updated: "Updated",
-          comments: "Comments",
+          comments: "Lifetime comments",
           url: "URL",
           summary: "Summary",
         }
-      : { author: "作者", created: "创建", updated: "更新", comments: "评论", url: "链接", summary: "摘要" };
+      : {
+          author: "作者",
+          created: "创建",
+          updated: "更新",
+          comments: "累计评论",
+          url: "链接",
+          summary: "摘要",
+        };
   // Extract "owner/repo" from html_url to avoid full GitHub URLs that trigger cross-references
   const repoSlug = item.html_url.replace(/^https:\/\/github\.com\//, "").replace(/\/(issues|pull)\/\d+$/, "");
   const itemKind = item.html_url.includes("/pull/") ? "PR" : "Issue";
@@ -56,18 +63,22 @@ export function formatItem(item: GitHubItem, lang: Lang = "zh"): string {
 const CLI_ISSUE_LIMIT = 30;
 const CLI_PR_LIMIT = 20;
 
-/** Sort by comment count desc, take top N. */
+/** Sort by observable recent activity, never by lifetime comment totals. */
 export function topN(items: GitHubItem[], n: number): GitHubItem[] {
-  return [...items].sort((a, b) => b.comments - a.comments).slice(0, n);
+  return [...items]
+    .sort((a, b) => Date.parse(b.updated_at) - Date.parse(a.updated_at) || b.number - a.number)
+    .slice(0, n);
 }
 
 export function sampleNote(total: number, sampled: number, lang: Lang = "zh"): string {
   if (lang === "en") {
     return total > sampled
-      ? `(Total: ${total} items; showing top ${sampled} by comment count)`
+      ? `(Observed ${total} API items; showing ${sampled} most recently updated; totals may be API-capped)`
       : `(Total: ${total} items)`;
   }
-  return total > sampled ? `（共 ${total} 条，以下展示评论数最多的 ${sampled} 条）` : `（共 ${total} 条）`;
+  return total > sampled
+    ? `（API 观测到 ${total} 条，以下展示最近更新的 ${sampled} 条；总数可能受 API 分页上限影响）`
+    : `（API 观测到 ${total} 条；不把该数值解释为精确的“24 小时新增量”）`;
 }
 
 // ---------------------------------------------------------------------------
@@ -117,10 +128,10 @@ Generate a structured English digest with the following sections:
 
 1. **Today's Highlights** - 2-3 sentences summarizing the most important updates
 2. **Releases** - If new versions exist, summarize changes; omit if none
-3. **Hot Issues** - Pick 10 noteworthy Issues, explain why they matter and community reaction
+3. **Noteworthy Issues** - Pick up to 10 Issues and explain why the issue description itself matters. Do not infer community reaction; comment bodies are not provided and comment counts are lifetime totals.
 4. **Key PR Progress** - Pick 10 important PRs, describe features or fixes
-5. **Feature Request Trends** - Distill the most-requested feature directions from all Issues
-6. **Developer Pain Points** - Summarize recurring developer frustrations or high-frequency requests
+5. **Issue Themes** - Group explicit themes visible in issue titles/descriptions only. Do not claim popularity from lifetime comment totals.
+6. **Evidence Limits** - State that comment bodies and 24h comment/reaction deltas are unavailable in this legacy prompt, so sentiment and community consensus cannot be assessed.
 
 Style: concise and professional, suited for technical developers. Include GitHub links for each item.
 `;
@@ -145,10 +156,10 @@ ${prsText}
 
 1. **今日速览** - 用2-3句话概括今天最重要的动态
 2. **版本发布** - 如有新版本，总结更新内容；无则省略
-3. **社区热点 Issues** - 挑选 10 个最值得关注的 Issue，说明为什么重要、社区反应如何
+3. **值得关注的 Issues** - 最多挑选 10 个 Issue，只根据标题和 Issue 正文说明为什么重要。输入没有评论正文，累计评论数也不是 24h 热度，因此不得推断社区反应。
 4. **重要 PR 进展** - 挑选 10 个重要的 PR，说明功能或修复内容
-5. **功能需求趋势** - 从所有 Issues 中提炼出社区最关注的功能方向（如 IDE 集成、性能、新模型支持等）
-6. **开发者关注点** - 总结开发者反馈中的痛点或高频需求
+5. **Issue 主题** - 只归纳标题和 Issue 正文明示的主题，不得用累计评论数声称“最热门/需求最高”
+6. **证据边界** - 明确说明当前输入没有评论正文和 24h 评论/Reaction 增量，不能分析社区情绪、共识或满意度
 
 语言要求：简洁专业，适合技术开发者阅读。每个条目附上 GitHub 链接。
 `;
@@ -183,7 +194,7 @@ export function buildPeerPrompt(
   const openIssues = issues.filter((i) => i.state === "open").length;
   const closedIssues = issues.filter((i) => i.state === "closed").length;
   const openPrs = prs.filter((p) => p.state === "open").length;
-  const mergedPrs = prs.filter((p) => p.state === "closed").length;
+  const closedPrs = prs.filter((p) => p.state === "closed").length;
 
   const issueSampleNote = sampleNote(totalIssues, sampledIssues.length, lang);
   const prSampleNote = sampleNote(totalPrs, sampledPrs.length, lang);
@@ -191,9 +202,9 @@ export function buildPeerPrompt(
   if (lang === "en") {
     return `You are an analyst of AI agent and personal AI assistant open-source projects. Based on the following GitHub data from ${cfg.name} (github.com/${cfg.repo}), generate a project digest for ${dateStr}.
 
-# Data Overview
-- Issues updated in last 24h: ${totalIssues} (open/active: ${openIssues}, closed: ${closedIssues})
-- PRs updated in last 24h: ${totalPrs} (open: ${openPrs}, merged/closed: ${mergedPrs})
+# Data Overview (API-observed sample; do not present these as exact global counts when pagination may be capped)
+- Issues returned from the recent-activity query: ${totalIssues} (open: ${openIssues}, closed: ${closedIssues})
+- PRs returned from the recent-activity query: ${totalPrs} (open: ${openPrs}, closed: ${closedPrs}; closed is NOT equivalent to merged)
 - New releases: ${releases.length}
 
 ## Latest Releases
@@ -209,24 +220,24 @@ ${prsText}
 
 Generate a structured English ${cfg.name} project digest with the following sections:
 
-1. **Today's Overview** - 3-5 sentences summarizing project status, including activity assessment
+1. **Today's Overview** - 3-5 sentences summarizing only concrete releases/PRs/issues in the supplied sample; do not turn sampled counts into a full-project activity ranking
 2. **Releases** - If new versions exist, detail changes, breaking changes, migration notes; omit if none
-3. **Project Progress** - Merged/closed PRs today, what features advanced or were fixed
-4. **Community Hot Topics** - Most active Issues/PRs with most comments/reactions (with links), analyze underlying needs
+3. **Verified Project Changes** - Describe only supplied PR state and body evidence. A closed PR is not merged unless merged_at proves it.
+4. **Recent Issues / PRs** - Select items from the observable recent sample. Lifetime comments/reactions are context only, not 24h heat.
 5. **Bugs & Stability** - Bugs, crashes, regressions reported today, ranked by severity, note if fix PRs exist
-6. **Feature Requests & Roadmap Signals** - User-requested features, predict which might be in next version
-7. **User Feedback Summary** - Real user pain points, use cases, satisfaction/dissatisfaction
-8. **Backlog Watch** - Long-unanswered important Issues or PRs needing maintainer attention
+6. **Feature Requests** - Describe explicit requests visible in issue titles/bodies. Do not predict roadmap inclusion without maintainer/milestone evidence.
+7. **Evidence Limits** - Comment bodies are not provided. Do not claim community sentiment, satisfaction, consensus, or "what users say in comments".
+8. **Evidence Limits** - State sample, pagination, missing-comment-body, and state limitations that constrain interpretation
 
-Style: objective, data-driven, highlighting project health. Include GitHub links for each item.
+Style: objective and data-driven. Include GitHub links for each item; do not score project health or infer maintainer intent.
 `;
   }
 
   return `你是一位 AI 智能体与个人 AI 助手领域开源项目分析师。请根据以下来自 ${cfg.name} (github.com/${cfg.repo}) 的 GitHub 数据，生成 ${dateStr} 的项目动态日报。
 
-# 数据概览
-- 过去24小时 Issues 更新：${totalIssues} 条（新开/活跃: ${openIssues}，已关闭: ${closedIssues}）
-- 过去24小时 PR 更新：${totalPrs} 条（待合并: ${openPrs}，已合并/关闭: ${mergedPrs}）
+# 数据概览（API 观测样本；分页可能截断时不得把这些数字写成全量精确计数）
+- 最近活动查询返回 Issues：${totalIssues} 条（open: ${openIssues}，closed: ${closedIssues}）
+- 最近活动查询返回 PR：${totalPrs} 条（open: ${openPrs}，closed: ${closedPrs}；closed 不等于 merged）
 - 新版本发布：${releases.length} 个
 
 ## 最新 Releases
@@ -242,16 +253,16 @@ ${prsText}
 
 请生成一份结构清晰的 ${cfg.name} 项目日报，包含以下部分：
 
-1. **今日速览** - 用3-5句话概括项目今日整体状态，包括活跃度评估
+1. **今日速览** - 用3-5句话概括输入中明确出现的 release/PR/Issue，不得把采样条数升级成项目整体活跃度排名
 2. **版本发布** - 如有新版本，详细说明更新内容、破坏性变更、迁移注意事项；无则省略
-3. **项目进展** - 今日合并/关闭的重要 PR，说明推进了哪些功能或修复，项目整体向前迈进了多少
-4. **社区热点** - 今日讨论最活跃、评论最多、反应最多的 Issues/PRs（附链接），分析背后的诉求
+3. **已验证项目变化** - 只按 PR 状态和正文证据描述变化；closed 不等于 merged，除非 merged_at 明确证明
+4. **近期 Issues / PRs** - 从可观测的近期样本挑选重要条目。累计评论/Reaction 只能作为历史上下文，不能当 24h 热度。
 5. **Bug 与稳定性** - 今日报告的 Bug、崩溃、回归问题，按严重程度排列，标注是否已有 fix PR
-6. **功能请求与路线图信号** - 用户提出的新功能需求，结合已有 PR 判断哪些可能被纳入下一版本
-7. **用户反馈摘要** - 从 Issues 评论中提炼真实用户痛点、使用场景、满意/不满意的地方
-8. **待处理积压** - 长期未响应的重要 Issue 或 PR，提醒维护者关注
+6. **功能请求** - 只描述 Issue 标题/正文明确提出的需求；没有 maintainer/milestone/roadmap 证据时不得预测下一版本
+7. **证据边界** - 输入没有评论正文，不得声称社区情绪、满意度、共识，或编造“评论里用户怎么说”
+8. **证据边界** - 明确说明采样、分页、缺少评论正文和状态语义对结论的限制
 
-语言要求：客观专业，数据驱动，突出项目健康度。每个条目附上 GitHub 链接。
+语言要求：客观专业，数据驱动，不评估项目健康度、不推断维护者意图。每个条目附上 GitHub 链接。
 `;
 }
 
@@ -261,7 +272,10 @@ export function buildPeersComparisonPrompt(
   dateStr: string,
   lang: Lang = "zh",
 ): string {
-  const noActivityStr = lang === "en" ? "No activity in the last 24 hours." : "过去24小时无活动。";
+  const noActivityStr =
+    lang === "en"
+      ? "No qualifying item was returned by this bounded API sample; this is not evidence of no project activity."
+      : "本次有界 API 样本未返回合格条目；这不等于项目没有活动。";
 
   const openclawSection =
     lang === "en"
@@ -287,17 +301,16 @@ ${peerSections}
 
 ---
 
-Generate a cross-project comparison report in English with these sections:
+Generate an evidence-scoped cross-project comparison in English:
 
-1. **Ecosystem Overview** - 3-5 sentences on the overall personal AI assistant / agent open-source landscape
-2. **Activity Comparison** - Table comparing Issues count, PR count, Release status, and health score for each project
-3. **OpenClaw's Position** - Advantages vs peers, technical approach differences, community size comparison
-4. **Shared Technical Focus Areas** - Requirements emerging across multiple projects (note which projects, specific needs)
-5. **Differentiation Analysis** - Key differences in feature focus, target users, technical architecture
-6. **Community Momentum & Maturity** - Activity tiers, which are rapidly iterating, which are stabilizing
-7. **Trend Signals** - Industry trends extracted from community feedback, value for AI agent developers
+1. **Coverage Matrix** - Which projects have qualifying releases/Issues/PRs in the supplied bounded sample, with explicit gaps and caps
+2. **Verified Changes** - Concrete changes supported by release notes, PR bodies/states, or Issue bodies; closed is not merged
+3. **Repeated Explicit Themes** - Themes present in at least two supplied project records, naming those records
+4. **Documented Technical Differences** - Only differences explicitly supported by supplied descriptions; omit unsupported dimensions
+5. **Evidence Limits** - Missing comment bodies, cumulative counters, sampling, and pagination limits
 
-Style: concise and professional, data-backed, suited for technical decision-makers and developers.
+Do not rank activity, community size, momentum, maturity, project health, leadership, or strategy. Do not infer sentiment or trends from counters or missing data.
+Style: concise, professional, and traceable to supplied records.
 `;
   }
 
@@ -311,17 +324,16 @@ ${peerSections}
 
 ---
 
-请基于上述各项目的动态，生成一份横向对比分析报告，包含以下部分：
+请生成一份受证据约束的横向对比：
 
-1. **生态全景** - 用3-5句话概括个人 AI 助手/自主智能体开源生态整体态势
-2. **各项目活跃度对比** - 以表格形式汇总各项目今日的 Issues 数、PR 数、Release 情况及健康度评估
-3. **OpenClaw 在生态中的定位** - 与同类相比的优势、技术路线差异、社区规模对比
-4. **共同关注的技术方向** - 多项目共同涌现的需求（注明涉及哪些项目、具体诉求）
-5. **差异化定位分析** - 功能侧重、目标用户、技术架构的关键差异
-6. **社区热度与成熟度** - 活跃度分层，哪些处于快速迭代阶段，哪些在质量巩固阶段
-7. **值得关注的趋势信号** - 从社区反馈中提炼行业趋势，对 AI 智能体开发者的参考价值
+1. **覆盖矩阵** - 列出各项目在有界样本中是否存在合格 release/Issue/PR，并标明缺口与分页上限
+2. **已验证变化** - 只写 release notes、PR 正文/状态或 Issue 正文明示的变化；closed 不等于 merged
+3. **重复出现的明确主题** - 至少两个项目记录明确出现时才归纳，并注明对应记录
+4. **有文档依据的技术差异** - 只比较输入明确支持的维度，不足则省略
+5. **证据边界** - 说明缺少评论正文、累计计数、采样和分页限制
 
-语言要求：简洁专业，有数据支撑，适合技术决策者和开发者阅读。
+不得比较活跃度、社区规模、热度、成熟度、项目健康度、领先地位或战略；不得用计数或缺失数据推断情绪与趋势。
+语言要求：简洁专业，每项结论可追溯到输入记录。
 `;
 }
 
@@ -339,56 +351,59 @@ export function buildSkillsPrompt(
   const issuesText = topIssues.map((i) => formatItem(i, lang)).join("\n") || noneStr;
 
   if (lang === "en") {
-    return `You are a technical analyst focused on the Claude Code ecosystem. The following data is from github.com/anthropics/skills (official Claude Code Skills repository). Analyze the community's most-watched Skills activity (data as of ${dateStr}).
+    return `You are a technical analyst focused on the Claude Code ecosystem. The following data is a bounded, recently updated sample from github.com/anthropics/skills (official Claude Code Skills repository), observed as of ${dateStr}.
 
 ## Repository Context
 anthropics/skills is the official Claude Code Skills collection. Each PR typically represents a new or improved Skill. The community proposes new Skills and reports issues via Issues; PRs represent actual Skill submissions.
 
-## Popular Pull Requests (sorted by comments, ${prs.length} total, showing top ${topPrs.length})
+## Recently Updated Pull Request Sample (${prs.length} returned, showing ${topPrs.length})
 ${prsText}
 
-## Community Issues (sorted by comments, ${issues.length} total, showing top ${topIssues.length})
+## Recently Updated Issue Sample (${issues.length} returned, showing ${topIssues.length})
 ${issuesText}
 
 ---
 
-Generate a Claude Code Skills community highlights report in English with these sections:
+Generate a Claude Code Skills evidence digest in English:
 
-1. **Top Skills Ranking** - List the 5-8 most-discussed Skills (PRs) by comments/attention, describe each Skill's functionality, discussion highlights, and current status (open/merged/draft)
-2. **Community Demand Trends** - From Issues, distill the most-anticipated new Skill directions (e.g. workflow automation, code review, test generation, documentation)
-3. **High-Potential Pending Skills** - Active-comment PRs not yet merged; these Skills may land soon
-4. **Skills Ecosystem Insight** - One-sentence summary: what is the community's most concentrated demand at the Skills level?
+1. **Verified Skill Submissions** - Describe functionality and current state from PR title/body/state only
+2. **Explicit Issue Requests** - Group only requests directly stated in Issue titles/bodies, citing the records
+3. **Pending Submissions** - List open PRs without predicting merge likelihood or timing
+4. **Evidence Limits** - Comment bodies are absent and comment totals are cumulative; do not infer popularity, attention, consensus, or demand rankings
 
-Style: concise and professional, include GitHub links for each item.
+Style: concise and professional; include GitHub links for each item and omit unsupported claims.
 `;
   }
 
-  return `你是一位专注于 Claude Code 生态的技术分析师。以下是来自 github.com/anthropics/skills（Claude Code Skills 官方仓库）的数据，请分析社区最关注的 Skills 动态（数据截止 ${dateStr}）。
+  return `你是一位专注于 Claude Code 生态的技术分析师。以下是 github.com/anthropics/skills（Claude Code Skills 官方仓库）最近更新条目的有界样本，观测截止 ${dateStr}。
 
 ## 仓库说明
 anthropics/skills 是 Claude Code 官方 Skills 集合仓库，每个 PR 通常对应一个新增或改进的 Skill。社区通过 Issues 提出新 Skill 需求或反馈问题，PR 则代表实际提交的 Skill。
 
-## 热门 Pull Requests（按评论数排序，共 ${prs.length} 条，展示前 ${topPrs.length} 条）
+## 最近更新的 Pull Request 样本（返回 ${prs.length} 条，展示 ${topPrs.length} 条）
 ${prsText}
 
-## 社区 Issues（按评论数排序，共 ${issues.length} 条，展示前 ${topIssues.length} 条）
+## 最近更新的 Issue 样本（返回 ${issues.length} 条，展示 ${topIssues.length} 条）
 ${issuesText}
 
 ---
 
-请生成一份 Claude Code Skills 社区热点报告，包含以下部分：
+请生成一份受证据约束的 Claude Code Skills 摘要：
 
-1. **热门 Skills 排行** - 列出评论/关注度最高的 5~8 个 Skills（PR），说明每个 Skill 的功能、社区讨论热点及当前状态（open/merged/draft）
-2. **社区需求趋势** - 从 Issues 中提炼社区最期待的新 Skill 方向（如工作流自动化、代码审查、测试生成、文档等）
-3. **高潜力待合并 Skills** - 评论活跃但尚未合并的 PR，这些 Skills 可能近期落地
-4. **Skills 生态洞察** - 一句话总结：当前社区在 Skills 层面最集中的诉求是什么
+1. **已验证 Skill 提交** - 只按 PR 标题、正文和状态描述功能与当前状态
+2. **Issue 明示需求** - 只归纳 Issue 标题/正文直接提出的请求，并标明对应记录
+3. **待处理提交** - 列出 open PR，不预测合并概率或时间
+4. **证据边界** - 输入没有评论正文，评论数是累计值；不得推断受欢迎程度、关注度、共识或需求排名
 
-语言要求：简洁专业，每个条目附上 GitHub 链接。
+语言要求：简洁专业，每个条目附上 GitHub 链接，省略证据不足的结论。
 `;
 }
 
 export function buildComparisonPrompt(digests: RepoDigest[], dateStr: string, lang: Lang = "zh"): string {
-  const noActivityStr = lang === "en" ? "No activity in the last 24 hours." : "过去24小时无活动。";
+  const noActivityStr =
+    lang === "en"
+      ? "No qualifying item was returned by this bounded API sample; this is not evidence of no tool activity."
+      : "本次有界 API 样本未返回合格条目；这不等于工具没有活动。";
 
   const sections = digests
     .map((d) => {
@@ -405,16 +420,16 @@ ${sections}
 
 ---
 
-Generate a cross-tool comparison report in English with these sections:
+Generate an evidence-scoped cross-tool comparison in English:
 
-1. **Ecosystem Overview** - 3-5 sentences on the overall AI CLI tools development landscape
-2. **Activity Comparison** - Table comparing Issues count, PR count, Release status for each tool today
-3. **Shared Feature Directions** - Requirements appearing across multiple tool communities (note which tools, specific needs)
-4. **Differentiation Analysis** - Differences in feature focus, target users, and technical approach
-5. **Community Momentum & Maturity** - Which tools have more active communities, which are rapidly iterating
-6. **Trend Signals** - Industry trends from community feedback, reference value for developers
+1. **Coverage Matrix** - Which tools have qualifying releases/Issues/PRs in the supplied bounded sample, with gaps and API caps
+2. **Verified Changes** - Concrete release, PR, and Issue changes supported by supplied records
+3. **Repeated Explicit Themes** - Themes directly present in at least two tool records, naming those records
+4. **Documented Technical Differences** - Compare only dimensions explicitly supported by the supplied summaries
+5. **Evidence Limits** - Missing comment bodies, cumulative counters, sampling, and pagination limits
 
-Style: concise and professional, data-backed, suited for technical decision-makers and developers.
+Do not rank activity, community size, momentum, maturity, health, leadership, or strategy. Do not infer sentiment or trends from counters or missing data.
+Style: concise, professional, and traceable to supplied records.
 `;
   }
 
@@ -424,15 +439,15 @@ ${sections}
 
 ---
 
-请基于上述各工具的动态，生成一份横向对比分析报告，包含以下部分：
+请生成一份受证据约束的横向对比：
 
-1. **生态全景** - 用3-5句话概括当前 AI CLI 工具整体发展态势
-2. **各工具活跃度对比** - 以表格形式汇总各工具今日的 Issues 数、PR 数、Release 情况
-3. **共同关注的功能方向** - 多个工具社区都在关注的需求（说明哪些工具、具体诉求）
-4. **差异化定位分析** - 各工具在功能侧重、目标用户、技术路线上的差异
-5. **社区热度与成熟度** - 哪些工具社区更活跃，哪些处于快速迭代阶段
-6. **值得关注的趋势信号** - 从社区反馈中提炼出的行业趋势，对开发者有何参考价值
+1. **覆盖矩阵** - 列出各工具在有界样本中是否存在合格 release/Issue/PR，并标明缺口与 API 上限
+2. **已验证变化** - 只写输入记录明确支持的 release、PR 和 Issue 变化
+3. **重复出现的明确主题** - 至少两个工具记录直接出现时才归纳，并注明对应记录
+4. **有文档依据的技术差异** - 只比较输入摘要明确支持的维度
+5. **证据边界** - 说明缺少评论正文、累计计数、采样和分页限制
 
-语言要求：简洁专业，有数据支撑，适合技术决策者和开发者阅读。
+不得比较活跃度、社区规模、热度、成熟度、健康度、领先地位或战略；不得用计数或缺失数据推断情绪与趋势。
+语言要求：简洁专业，每项结论可追溯到输入记录。
 `;
 }

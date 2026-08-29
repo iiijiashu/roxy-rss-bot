@@ -145,6 +145,8 @@ export const FOOTER = {
 // ---------------------------------------------------------------------------
 
 export const REPORT_LABELS: Record<string, string> = {
+  digest: "Roxy AI 每日高价值进展",
+  "ai-daily": "Roxy AI Daily",
   "ai-cli": "AI CLI 工具社区动态日报",
   "ai-cli-en": "AI CLI Tools Digest",
   "ai-agents": "AI Agents 生态日报",
@@ -170,6 +172,7 @@ export const REPORT_LABELS: Record<string, string> = {
 };
 
 export const NOTIFY_LABELS: Record<string, Record<Lang, string>> = {
+  digest: t("每日高价值进展", "Daily Highlights"),
   "ai-cli": t("AI CLI 工具", "AI CLI Tools"),
   "ai-agents": t("AI Agents 生态", "AI Agents Ecosystem"),
   "ai-web": t("官网动态", "Official Updates"),

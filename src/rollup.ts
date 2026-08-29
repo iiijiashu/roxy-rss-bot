@@ -18,6 +18,7 @@ import { type Lang, WEEKLY_REPORT, MONTHLY_REPORT } from "./i18n.ts";
 
 const DIGESTS_DIR = "digests";
 const MAX_CHARS_PER_REPORT = 2500;
+const MAX_CHARS_EVIDENCE_DIGEST = 10_000;
 
 // Source report types to read for rollups (in priority order)
 const ROLLUP_SOURCES = ["ai-cli", "ai-agents", "ai-trending", "ai-hn", "ai-web"];
@@ -37,6 +38,14 @@ function getDateDirs(): string[] {
 
 /** Read and truncate all daily digest files for a date. Returns null if none found. */
 function readDailyDigest(date: string): string | null {
+  const evidenceFirstPath = path.join(DIGESTS_DIR, date, "digest.md");
+  if (fs.existsSync(evidenceFirstPath)) {
+    const content = fs.readFileSync(evidenceFirstPath, "utf-8");
+    return (
+      content.slice(0, MAX_CHARS_EVIDENCE_DIGEST) +
+      (content.length > MAX_CHARS_EVIDENCE_DIGEST ? "\n...[摘要截断]" : "")
+    );
+  }
   const parts: string[] = [];
   for (const type of ROLLUP_SOURCES) {
     const p = path.join(DIGESTS_DIR, date, `${type}.md`);

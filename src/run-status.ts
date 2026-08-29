@@ -81,7 +81,9 @@ export class PublicationStatus {
   save(): string {
     const filePath = path.posix.join("digests", this.date, "run-status.json");
     fs.mkdirSync(path.posix.dirname(filePath), { recursive: true });
-    fs.writeFileSync(filePath, `${JSON.stringify(this.toJSON(), null, 2)}\n`, "utf-8");
+    const tempPath = `${filePath}.${process.pid}.tmp`;
+    fs.writeFileSync(tempPath, `${JSON.stringify(this.toJSON(), null, 2)}\n`, "utf-8");
+    fs.renameSync(tempPath, filePath);
     return filePath;
   }
 

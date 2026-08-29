@@ -62,7 +62,7 @@ jobs:
       - name: Install dependencies without lifecycle scripts
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Generate resilient Agnes digest
+      - name: Generate evidence-first Chinese digest
         id: generate
         continue-on-error: true
         env:
@@ -70,20 +70,23 @@ jobs:
           AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
           AGNES_MODEL: agnes-2.5-flash
           AGNES_BATCH_WINDOW_MS: "25"
-          AGNES_MAX_BATCH_TASKS: "4"
+          AGNES_MAX_BATCH_TASKS: "2"
           AGNES_MAX_BATCH_INPUT_BYTES: "180000"
-          AGNES_MAX_BATCH_OUTPUT_TOKENS: "18000"
-          AGNES_REQUEST_BUDGET: "18"
-          AGNES_RETRY_BUDGET: "6"
+          AGNES_MAX_BATCH_OUTPUT_TOKENS: "12000"
+          # The evidence-first pipeline performs at most two logical synthesis
+          # calls; keep bounded physical headroom for split/retry recovery.
+          AGNES_REQUEST_BUDGET: "8"
+          AGNES_RETRY_BUDGET: "5"
           AGNES_MAX_TASK_ATTEMPTS: "3"
-          AGNES_MAX_IN_FLIGHT: "2"
+          AGNES_MAX_IN_FLIGHT: "1"
           AGNES_TIMEOUT_MS: "180000"
           AGNES_RETRY_BASE_MS: "1000"
           LLM_PROVIDER: agnes
-          LLM_MAX_TOKENS: "5000"
-          LLM_CONCURRENCY: "12"
-          # Logical guardrail only; physical Agnes requests remain capped at 18.
-          LLM_CALL_BUDGET: "80"
+          LLM_MAX_TOKENS: "6000"
+          LLM_CONCURRENCY: "2"
+          # One synthesis + one bounded correction attempt. Provider-level
+          # split/retry remains separately bounded by AGNES_REQUEST_BUDGET.
+          LLM_CALL_BUDGET: "2"
           HTTP_TIMEOUT_MS: "20000"
           PAGES_URL: https://${{ github.repository_owner }}.github.io/roxy-rss-bot
         run: pnpm start
@@ -128,6 +131,11 @@ jobs:
               echo "### Degraded components"
               jq -r '.components[] | select(.state == "degraded") | "- `" + .component + "`: `" + (.code // "unknown") + "`"' \
                 "digests/${DIGEST_DATE}/run-status.json"
+            fi
+            if [ -f "digests/${DIGEST_DATE}/llm-diagnostics.json" ]; then
+              echo ""
+              echo "### LLM diagnostics"
+              jq -c '.' "digests/${DIGEST_DATE}/llm-diagnostics.json"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
 
