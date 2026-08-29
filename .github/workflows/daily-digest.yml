@@ -74,9 +74,10 @@ jobs:
           AGNES_MAX_BATCH_INPUT_BYTES: "180000"
           AGNES_MAX_BATCH_OUTPUT_TOKENS: "12000"
           # The evidence-first pipeline performs at most three logical synthesis
-          # calls; keep bounded physical headroom for split/retry recovery.
-          AGNES_REQUEST_BUDGET: "8"
-          AGNES_RETRY_BUDGET: "5"
+          # calls. Each task may make three physical attempts: one initial
+          # request plus two retries.
+          AGNES_REQUEST_BUDGET: "9"
+          AGNES_RETRY_BUDGET: "6"
           AGNES_MAX_TASK_ATTEMPTS: "3"
           AGNES_MAX_IN_FLIGHT: "1"
           AGNES_TIMEOUT_MS: "180000"

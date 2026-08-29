@@ -8,6 +8,7 @@ import {
 } from "../github.ts";
 
 const originalRepo = process.env["DIGEST_REPO"];
+const originalToken = process.env["GITHUB_TOKEN"];
 
 beforeEach(() => {
   process.env["DIGEST_REPO"] = "owner/digest";
@@ -17,6 +18,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
   if (originalRepo === undefined) delete process.env["DIGEST_REPO"];
   else process.env["DIGEST_REPO"] = originalRepo;
+  if (originalToken === undefined) delete process.env["GITHUB_TOKEN"];
+  else process.env["GITHUB_TOKEN"] = originalToken;
 });
 
 describe("createGitHubIssue", () => {
@@ -131,6 +134,23 @@ function githubItem(number: number, updatedAt = "2026-08-29T02:00:00.000Z"): Git
 }
 
 describe("bounded GitHub pagination", () => {
+  it("omits the Authorization header when no GitHub token is configured", async () => {
+    delete process.env["GITHUB_TOKEN"];
+    const fetchMock = vi.fn().mockResolvedValue(new Response("[]", { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await fetchRecentItemsWithMeta(
+      { id: "repo", repo: "owner/repo", name: "Repo", paginated: false },
+      "pulls",
+      new Date("2026-08-28T00:00:00.000Z"),
+    );
+
+    const requestHeaders = (fetchMock.mock.calls[0]?.[1] as RequestInit | undefined)?.headers as
+      | Record<string, string>
+      | undefined;
+    expect(requestHeaders?.Authorization).toBeUndefined();
+  });
+
   it("uses updated_at for a new engagement delta instead of an old merge/close timestamp", () => {
     const item = githubItem(1, "2026-08-29T02:00:00.000Z");
     item.merged_at = "2026-08-01T00:00:00.000Z";

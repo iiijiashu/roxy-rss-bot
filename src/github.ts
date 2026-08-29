@@ -102,11 +102,13 @@ const MAX_PAGES = 5;
 export const MAX_RECENT_ITEMS = MAX_PAGES * 100;
 
 function headers(): Record<string, string> {
-  return {
-    Authorization: `Bearer ${process.env["GITHUB_TOKEN"] ?? ""}`,
+  const requestHeaders: Record<string, string> = {
     Accept: "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28",
   };
+  const token = process.env["GITHUB_TOKEN"]?.trim();
+  if (token) requestHeaders.Authorization = `Bearer ${token}`;
+  return requestHeaders;
 }
 
 async function githubGet<T>(url: string, params: Record<string, string> = {}): Promise<T> {

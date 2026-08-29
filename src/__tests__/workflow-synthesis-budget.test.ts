@@ -78,7 +78,12 @@ describe("daily workflow synthesis budget", () => {
       (step) => step.name === "Generate evidence-first Chinese digest",
     );
     const configuredBudget = Number(generateStep?.env?.["LLM_CALL_BUDGET"]);
+    const maxTaskAttempts = Number(generateStep?.env?.["AGNES_MAX_TASK_ATTEMPTS"]);
+    const providerRequestBudget = Number(generateStep?.env?.["AGNES_REQUEST_BUDGET"]);
+    const providerRetryBudget = Number(generateStep?.env?.["AGNES_RETRY_BUDGET"]);
 
     expect(configuredBudget).toBe(invoke.mock.calls.length);
+    expect(providerRequestBudget).toBeGreaterThanOrEqual(configuredBudget * maxTaskAttempts);
+    expect(providerRetryBudget).toBeGreaterThanOrEqual(configuredBudget * (maxTaskAttempts - 1));
   });
 });
