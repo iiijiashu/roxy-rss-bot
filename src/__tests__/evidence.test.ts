@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildSynthesisPrompt,
   canonicalUrl,
   groupEvidence,
   MAX_DAILY_DEVELOPMENTS,
@@ -181,6 +182,82 @@ describe("evidence grouping and selection", () => {
     expect(events).toHaveLength(2);
   });
 
+  it("does not merge unrelated same-repository feature requests", () => {
+    const events = groupEvidence([
+      evidence({
+        id: "AUTH",
+        sourceType: "github_issue",
+        sourceName: "Claude Code GitHub",
+        authority: "primary-community",
+        url: "https://github.com/anthropics/claude-code/issues/1",
+        title: "Claude Code: [FEATURE] Add TOTP-based per-session authentication",
+        publishedAt: undefined,
+        updatedAt: "2026-08-29T00:30:00.000Z",
+        freshness: "new_activity",
+        category: "agent",
+      }),
+      evidence({
+        id: "SKILLS",
+        sourceType: "github_issue",
+        sourceName: "Claude Code GitHub",
+        authority: "primary-community",
+        url: "https://github.com/anthropics/claude-code/issues/2",
+        title: "Claude Code: [FEATURE] Add event-triggered skills",
+        publishedAt: undefined,
+        updatedAt: "2026-08-29T00:31:00.000Z",
+        freshness: "new_activity",
+        category: "agent",
+      }),
+    ]);
+    expect(events).toHaveLength(2);
+  });
+
+  it("does not chain an unrelated issue through a release-linked bridge", () => {
+    const releaseUrl = "https://github.com/anthropics/claude-code/releases/tag/v2.1.251";
+    const records = [
+      evidence({
+        id: "RELEASE",
+        sourceType: "github_release",
+        sourceName: "Claude Code Release",
+        url: releaseUrl,
+        title: "Claude Code v2.1.251: v2.1.251",
+        category: "tool",
+      }),
+      evidence({
+        id: "BRIDGE",
+        sourceType: "github_issue",
+        sourceName: "Claude Code GitHub",
+        authority: "primary-community",
+        url: "https://github.com/anthropics/claude-code/issues/3",
+        title: "Claude Code: [BUG] Claude Code v2.1.251 crashes on startup",
+        content: `Release context: ${releaseUrl}`,
+        publishedAt: undefined,
+        updatedAt: "2026-08-29T00:30:00.000Z",
+        freshness: "new_activity",
+        category: "tool",
+      }),
+      evidence({
+        id: "UNRELATED",
+        sourceType: "github_issue",
+        sourceName: "Claude Code GitHub",
+        authority: "primary-community",
+        url: "https://github.com/anthropics/claude-code/issues/4",
+        title: "Claude Code: [BUG] Claude Code crashes on startup",
+        publishedAt: undefined,
+        updatedAt: "2026-08-29T00:31:00.000Z",
+        freshness: "new_activity",
+        category: "tool",
+      }),
+    ];
+    const events = groupEvidence(records);
+    expect(events).toHaveLength(2);
+    expect(events.find((event) => event.primarySourceId === "RELEASE")?.sourceIds).toEqual([
+      "RELEASE",
+      "BRIDGE",
+    ]);
+    expect(groupEvidence([...records].reverse())).toEqual(events);
+  });
+
   it("merges title variants only when they share a product and version identity", () => {
     const events = groupEvidence([
       evidence({ id: "A", url: "https://example.com/gpt-release", title: "OpenAI launches GPT-5.6" }),
@@ -202,6 +279,41 @@ describe("evidence grouping and selection", () => {
     expect(selectTopEvents(groupEvidence(records), { minimumScore: 0, maxEvents: 100 })).toHaveLength(
       MAX_DAILY_DEVELOPMENTS,
     );
+  });
+
+  it("keeps a twenty-event synthesis request within the Agnes input limit", () => {
+    const records = Array.from({ length: 20 }, (_, eventIndex) =>
+      Array.from({ length: 11 }, (_, sourceIndex) =>
+        evidence({
+          id: `${sourceIndex === 0 ? "P" : "C"}${eventIndex}-${sourceIndex}`,
+          sourceType: sourceIndex === 0 ? "github_release" : "github_issue",
+          sourceName: sourceIndex === 0 ? "Official Release" : "Project GitHub",
+          authority: sourceIndex === 0 ? "primary" : "primary-community",
+          url: `https://example.com/project-${eventIndex}/release`,
+          title: `Project-${eventIndex} ships agent runtime ${eventIndex}.2`,
+          content: `Project-${eventIndex} agent runtime evidence ${"x".repeat(2_000)}`,
+          category: "tool",
+        }),
+      ),
+    ).flat();
+    const events = groupEvidence(records);
+    expect(events).toHaveLength(20);
+
+    const prompt = buildSynthesisPrompt(events, records);
+    const requestBody = JSON.stringify({ tasks: [{ id: "T000001", maxTokens: 6_000, prompt }] });
+    expect(Buffer.byteLength(requestBody, "utf8")).toBeLessThanOrEqual(180_000);
+
+    const payload = JSON.parse(prompt.slice(prompt.indexOf("EVENTS:\n") + "EVENTS:\n".length)) as Array<{
+      event_id: string;
+      source_ids: string[];
+      evidence: Array<{ source_id: string }>;
+    }>;
+    expect(payload.map((event) => event.event_id)).toEqual(events.map((event) => event.id));
+    for (const [index, event] of payload.entries()) {
+      expect(event.source_ids).toContain(events[index]!.primarySourceId);
+      expect(event.source_ids).toEqual(event.evidence.map((source) => source.source_id));
+      expect(event.source_ids.length).toBeLessThanOrEqual(2);
+    }
   });
 
   it("does not let a pile of secondary/community records outrank a strong official event", () => {

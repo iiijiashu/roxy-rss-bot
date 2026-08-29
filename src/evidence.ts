@@ -374,6 +374,14 @@ function authorityScore(authority: EvidenceAuthority): number {
   return 5;
 }
 
+function compareEvidencePriority(left: EvidenceRecord, right: EvidenceRecord): number {
+  return (
+    authorityScore(right.authority) - authorityScore(left.authority) ||
+    right.confidence - left.confidence ||
+    left.id.localeCompare(right.id)
+  );
+}
+
 function freshnessScore(freshness: EvidenceFreshness): number {
   if (freshness === "newly_published") return 20;
   if (freshness === "materially_updated") return 18;
@@ -417,12 +425,7 @@ function scoreEvent(records: EvidenceRecord[]): { score: number; breakdown: Even
   const authoritative = records.filter(
     (record) => record.authority === "primary" || record.authority === "primary-community",
   );
-  const primary = [...authoritative].sort(
-    (a, b) =>
-      authorityScore(b.authority) - authorityScore(a.authority) ||
-      b.confidence - a.confidence ||
-      a.id.localeCompare(b.id),
-  )[0]!;
+  const primary = [...authoritative].sort(compareEvidencePriority)[0]!;
   const freshness = Math.max(...authoritative.map((record) => freshnessScore(record.freshness)));
   const authority = Math.max(...authoritative.map((record) => authorityScore(record.authority)));
   const significance = Math.max(...authoritative.map(significanceScore));
@@ -498,7 +501,10 @@ function hasValidCurrentEvidence(record: EvidenceRecord): boolean {
 }
 
 function findMatchingGroup(groups: EvidenceRecord[][], record: EvidenceRecord): EvidenceRecord[] | undefined {
-  return groups.find((group) => group.some((existing) => likelySameEvent(existing, record)));
+  return groups.find((group) => {
+    const anchor = [...group].sort(compareEvidencePriority)[0]!;
+    return likelySameEvent(anchor, record);
+  });
 }
 
 function noveltyMarker(record: EvidenceRecord): string {
@@ -516,7 +522,7 @@ function noveltyMarker(record: EvidenceRecord): string {
 /** Group multiple sources that describe the same development into one candidate event. */
 export function groupEvidence(records: EvidenceRecord[]): EventCandidate[] {
   const groups: EvidenceRecord[][] = [];
-  for (const record of records.filter(isEligibleStandalone)) {
+  for (const record of records.filter(isEligibleStandalone).sort(compareEvidencePriority)) {
     const group = findMatchingGroup(groups, record);
     if (group) group.push(record);
     else groups.push([record]);
@@ -524,21 +530,18 @@ export function groupEvidence(records: EvidenceRecord[]): EventCandidate[] {
 
   // Secondary/community indexes are corroboration only. Bare engagement counters
   // can enrich a primary event but can never become a standalone fact event.
-  for (const record of records.filter(
-    (item) =>
-      !isEligibleStandalone(item) && hasValidCurrentEvidence(item) && item.visibility !== "metadata_only",
-  )) {
+  for (const record of records
+    .filter(
+      (item) =>
+        !isEligibleStandalone(item) && hasValidCurrentEvidence(item) && item.visibility !== "metadata_only",
+    )
+    .sort(compareEvidencePriority)) {
     const group = findMatchingGroup(groups, record);
     if (group) group.push(record);
   }
 
   return groups.map((group) => {
-    const primary = [...group].sort(
-      (a, b) =>
-        authorityScore(b.authority) - authorityScore(a.authority) ||
-        b.confidence - a.confidence ||
-        a.id.localeCompare(b.id),
-    )[0]!;
+    const primary = [...group].sort(compareEvidencePriority)[0]!;
     const { score, breakdown } = scoreEvent(group);
     const key = `${primary.category}:${canonicalUrl(primary.url)}:${normalizedTitle(primary.title)}`;
     const noveltyEvidence = group.filter(
@@ -609,37 +612,70 @@ export function selectTopEvents(
   return selected;
 }
 
-function evidenceExcerpt(record: EvidenceRecord): string {
-  return record.content.replace(/\s+/g, " ").trim().slice(0, 1_200);
+const MAX_PROMPT_SOURCES_PER_EVENT = 2;
+const MAX_SYNTHESIS_REQUEST_BYTES = 150_000;
+
+function boundedText(value: string, maxChars: number): string {
+  return value.replace(/\s+/g, " ").trim().slice(0, maxChars);
+}
+
+function boundedPromptMetadata(
+  metadata: EvidenceRecord["metadata"],
+): Record<string, string | number | boolean | null> {
+  if (!metadata) return {};
+  return Object.fromEntries(
+    Object.entries(metadata)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .slice(0, 6)
+      .map(([key, value]) => [
+        boundedText(key, 80),
+        typeof value === "string" ? boundedText(value, 120) : value,
+      ]),
+  );
+}
+
+function promptSourceIds(event: EventCandidate, byId: Map<string, EvidenceRecord>): string[] {
+  return [...new Set([event.primarySourceId, ...event.sourceIds])]
+    .filter((sourceId) => byId.has(sourceId))
+    .slice(0, MAX_PROMPT_SOURCES_PER_EVENT);
+}
+
+function synthesisRequestBytes(prompt: string): number {
+  return Buffer.byteLength(JSON.stringify({ tasks: [{ id: "T000001", maxTokens: 6_000, prompt }] }), "utf8");
 }
 
 export function buildSynthesisPrompt(events: EventCandidate[], records: EvidenceRecord[]): string {
   const byId = new Map(records.map((record) => [record.id, record]));
-  const payload = events.map((event) => ({
-    event_id: event.id,
-    category: event.category,
-    source_ids: event.sourceIds,
-    evidence: event.sourceIds.map((sourceId) => {
-      const source = byId.get(sourceId)!;
+  const makePayload = (sourcesPerEvent: number, contentChars: number, includeMetadata: boolean) =>
+    events.map((event) => {
+      const sourceIds = promptSourceIds(event, byId).slice(0, sourcesPerEvent);
       return {
-        source_id: source.id,
-        source_type: source.sourceType,
-        source_name: source.sourceName,
-        authority: source.authority,
-        title: source.title,
-        url: source.url,
-        published_at: source.publishedAt ?? null,
-        updated_at: source.updatedAt ?? null,
-        observed_at: source.observedAt,
-        freshness: source.freshness,
-        visibility: source.visibility,
-        content: evidenceExcerpt(source),
-        metadata: source.metadata ?? {},
+        event_id: event.id,
+        category: event.category,
+        source_ids: sourceIds,
+        evidence: sourceIds.map((sourceId) => {
+          const source = byId.get(sourceId)!;
+          return {
+            source_id: source.id,
+            source_type: boundedText(source.sourceType, 80),
+            source_name: boundedText(source.sourceName, 120),
+            authority: source.authority,
+            title: boundedText(source.title, 320),
+            url: boundedText(source.url, 800),
+            published_at: source.publishedAt ?? null,
+            updated_at: source.updatedAt ?? null,
+            observed_at: source.observedAt,
+            freshness: source.freshness,
+            visibility: source.visibility,
+            content: boundedText(source.content, contentChars),
+            metadata: includeMetadata ? boundedPromptMetadata(source.metadata) : {},
+          };
+        }),
       };
-    }),
-  }));
+    });
 
-  return `你是一个严格受证据约束的 AI 资讯编辑。下面已经完成机械 freshness 验证、事件聚合和排序。
+  const renderPrompt = (payload: ReturnType<typeof makePayload>): string =>
+    `你是一个严格受证据约束的 AI 资讯编辑。下面已经完成机械 freshness 验证、事件聚合和排序。
 
 你的任务只有一个：把每个 event 改写成高密度中文，不添加输入里没有的事实。
 
@@ -660,6 +696,15 @@ export function buildSynthesisPrompt(events: EventCandidate[], records: Evidence
 
 EVENTS:
 ${JSON.stringify(payload)}`;
+
+  let prompt = renderPrompt(makePayload(MAX_PROMPT_SOURCES_PER_EVENT, 900, true));
+  if (synthesisRequestBytes(prompt) > MAX_SYNTHESIS_REQUEST_BYTES) {
+    prompt = renderPrompt(makePayload(1, 400, false));
+  }
+  if (synthesisRequestBytes(prompt) > MAX_SYNTHESIS_REQUEST_BYTES) {
+    throw new Error("Bounded synthesis prompt still exceeds the internal request budget");
+  }
+  return prompt;
 }
 
 function containsChinese(value: string): boolean {
