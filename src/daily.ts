@@ -6,6 +6,7 @@
  * quality gate -> deterministic Chinese Markdown rendering.
  */
 
+import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -21,7 +22,6 @@ import {
   MIN_DAILY_DEVELOPMENTS,
   renderChineseDigest,
   selectTopEvents,
-  validateSynthesis,
   type EvidenceCategory,
   type EvidenceRecord,
   type QualityReport,
@@ -41,6 +41,7 @@ import { fetchLobstersData } from "./lobsters.ts";
 import { fetchPhData } from "./ph.ts";
 import { callLlm, getLlmDiagnostics, parseLlmJson } from "./report.ts";
 import { PublicationStatus, classifyFailure } from "./run-status.ts";
+import { synthesizeWithQualityGate } from "./synthesis.ts";
 import { fetchTrendingData } from "./trending.ts";
 import { fetchSiteContent, loadWebState, saveWebState, type WebPageItem } from "./web.ts";
 
@@ -735,29 +736,26 @@ export async function runDaily(): Promise<void> {
   const basePrompt = buildSynthesisPrompt(selected, evidence);
   let synthesis: SynthesisResult | undefined;
   let quality: QualityReport | undefined;
-  let correction = "";
   let lastSynthesisError: unknown;
-  for (let attempt = 1; attempt <= 2; attempt++) {
-    const component = `synthesis/zh/attempt-${attempt}`;
-    try {
-      const raw = await callLlm(`${basePrompt}${correction}`, 6_000);
-      const candidate = parseLlmJson<SynthesisResult>(raw);
-      const candidateQuality = validateSynthesis(candidate, selected, evidence);
-      if (candidateQuality.status === "pass") {
-        synthesis = candidate;
-        quality = candidateQuality;
-        status.record(component, "ok");
-        break;
-      }
-      status.record(component, "degraded", "quality_gate_failed");
-      lastSynthesisError = new Error(candidateQuality.violations.join("; "));
-      correction = `\n\n上一轮输出被机械质量门拒绝。必须修正以下问题后重新输出完整 JSON：\n- ${candidateQuality.violations.join("\n- ")}\n`;
-    } catch (error) {
-      lastSynthesisError = error;
-      status.record(component, "degraded", classifyFailure(error));
-      correction =
-        "\n\n上一轮不是合法且可验证的严格 JSON。重新输出完整 JSON，不要解释，不要 Markdown fence。\n";
-    }
+  try {
+    const result = await synthesizeWithQualityGate(basePrompt, selected, evidence, {
+      invoke: callLlm,
+      parse: (raw) => parseLlmJson<SynthesisResult>(raw),
+      onAttempt: (outcome) => {
+        const component = `synthesis/zh/attempt-${outcome.attempt}`;
+        if (outcome.state === "ok") {
+          status.record(component, "ok");
+        } else if (outcome.reason === "quality_gate_failed") {
+          status.record(component, "degraded", "quality_gate_failed");
+        } else {
+          status.record(component, "degraded", classifyFailure(outcome.error));
+        }
+      },
+    });
+    synthesis = result.synthesis;
+    quality = result.quality;
+  } catch (error) {
+    lastSynthesisError = error;
   }
 
   if (!synthesis || !quality) {
@@ -768,7 +766,7 @@ export async function runDaily(): Promise<void> {
       eligibleEventCount: selected.length,
       developmentCount: 0,
       duplicateRatio: 0,
-      checks: [{ name: "synthesis", passed: false, detail: "two bounded synthesis attempts failed" }],
+      checks: [{ name: "synthesis", passed: false, detail: "bounded synthesis attempts failed" }],
       violations: [String(lastSynthesisError ?? "unknown synthesis failure")],
     };
     writeJson(path.join(digestDir, "quality-report.json"), failedQuality);
@@ -776,7 +774,7 @@ export async function runDaily(): Promise<void> {
     saveLlmDiagnostics(digestDir);
     status.save();
     status.logSummary(getLlmDiagnostics());
-    throw lastSynthesisError ?? new Error("Synthesis failed after two bounded attempts");
+    throw lastSynthesisError ?? new Error("Synthesis failed after bounded attempts");
   }
 
   writeJson(path.join(digestDir, "quality-report.json"), quality);

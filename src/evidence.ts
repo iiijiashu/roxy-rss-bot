@@ -715,6 +715,53 @@ function isSafePlainText(value: string): boolean {
   return !/[\r\n<>]/u.test(value) && !/\[[^\]]*\]\([^)]*\)/u.test(value);
 }
 
+const SYNTHESIS_DEVELOPMENT_KEYS = ["event_id", "source_ids", "summary", "title", "why_it_matters"] as const;
+const SYNTHESIS_EVENT_ID_PATTERN = /^event:[0-9a-f]{16}$/u;
+
+function developmentSchemaViolations(value: unknown): string[] {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return ["must be an object"];
+
+  const record = value as Record<string, unknown>;
+  const recordKeys = Object.keys(record);
+  const missingKeys = SYNTHESIS_DEVELOPMENT_KEYS.filter((key) => !recordKeys.includes(key));
+  const unexpectedKeyCount = recordKeys.filter(
+    (key) => !SYNTHESIS_DEVELOPMENT_KEYS.includes(key as (typeof SYNTHESIS_DEVELOPMENT_KEYS)[number]),
+  ).length;
+  const violations: string[] = [];
+  if (missingKeys.length > 0) violations.push(`missing fields: ${missingKeys.join(", ")}`);
+  if (unexpectedKeyCount > 0) {
+    violations.push(`unexpected fields present (count=${unexpectedKeyCount})`);
+  }
+
+  const eventId = record["event_id"];
+  if (typeof eventId !== "string" || !SYNTHESIS_EVENT_ID_PATTERN.test(eventId)) {
+    violations.push("event_id must match event:<16 lowercase hex characters>");
+  }
+
+  for (const field of ["title", "summary", "why_it_matters"] as const) {
+    const fieldValue = record[field];
+    if (typeof fieldValue !== "string" || !fieldValue.trim()) {
+      violations.push(`${field} must be a non-empty string`);
+    } else if (!isSafePlainText(fieldValue)) {
+      violations.push(`${field} must be single-line plain text`);
+    }
+  }
+
+  const sourceIds = record["source_ids"];
+  if (!Array.isArray(sourceIds) || sourceIds.length === 0) {
+    violations.push("source_ids must be a non-empty array");
+  } else {
+    if (!sourceIds.every((item) => typeof item === "string" && item.trim().length > 0)) {
+      violations.push("source_ids entries must be non-empty strings");
+    }
+    if (new Set(sourceIds).size !== sourceIds.length) {
+      violations.push("source_ids must contain unique values");
+    }
+  }
+
+  return violations;
+}
+
 function mechanicalTokens(value: string): string[] {
   const tokens = new Set<string>();
   for (const match of value.matchAll(
@@ -774,38 +821,34 @@ export function validateSynthesis(
       ? rootDevelopments
       : [];
   const developments: SynthesizedDevelopment[] = [];
-  let schemaPassed = Boolean(root && rootKeys.length === 1 && rootKeys[0] === "developments");
-  if (!schemaPassed) violations.push("synthesis root must contain only developments");
-  const expectedDevelopmentKeys = ["event_id", "source_ids", "summary", "title", "why_it_matters"];
+  const developmentRawIndexes: number[] = [];
+  let schemaPassed = Boolean(
+    root && rootKeys.length === 1 && rootKeys[0] === "developments" && Array.isArray(rootDevelopments),
+  );
+  if (!root) {
+    violations.push("synthesis root must be an object containing only developments");
+  } else {
+    const missingRootKeys = rootKeys.includes("developments") ? [] : ["developments"];
+    const unexpectedRootKeyCount = rootKeys.filter((key) => key !== "developments").length;
+    if (missingRootKeys.length > 0) {
+      violations.push(`synthesis root is missing required fields: ${missingRootKeys.join(", ")}`);
+    }
+    if (unexpectedRootKeyCount > 0) {
+      violations.push(`synthesis root has unexpected fields (count=${unexpectedRootKeyCount})`);
+    }
+    if (rootKeys.includes("developments") && !Array.isArray(rootDevelopments)) {
+      violations.push("synthesis root field developments must be an array");
+    }
+  }
   for (const [index, value] of rawDevelopments.entries()) {
-    const record = value && typeof value === "object" ? (value as Record<string, unknown>) : undefined;
-    const sourceIds = record?.["source_ids"];
-    const recordKeys = record ? Object.keys(record).sort() : [];
-    if (
-      !record ||
-      recordKeys.length !== expectedDevelopmentKeys.length ||
-      recordKeys.some((key, keyIndex) => key !== expectedDevelopmentKeys[keyIndex]) ||
-      typeof record["event_id"] !== "string" ||
-      !record["event_id"].trim() ||
-      typeof record["title"] !== "string" ||
-      !record["title"].trim() ||
-      typeof record["summary"] !== "string" ||
-      !record["summary"].trim() ||
-      typeof record["why_it_matters"] !== "string" ||
-      !record["why_it_matters"].trim() ||
-      ![record["title"], record["summary"], record["why_it_matters"]].every(
-        (field) => typeof field === "string" && isSafePlainText(field),
-      ) ||
-      !Array.isArray(sourceIds) ||
-      sourceIds.length === 0 ||
-      !sourceIds.every((item) => typeof item === "string" && item.trim().length > 0) ||
-      new Set(sourceIds).size !== sourceIds.length
-    ) {
+    const schemaViolations = developmentSchemaViolations(value);
+    if (schemaViolations.length > 0) {
       schemaPassed = false;
-      violations.push(`development ${index} has an invalid schema`);
+      violations.push(`development ${index} has an invalid schema: ${schemaViolations.join("; ")}`);
       continue;
     }
     developments.push(value as SynthesizedDevelopment);
+    developmentRawIndexes.push(index);
   }
   checks.push({
     name: "schema",
@@ -828,14 +871,11 @@ export function validateSynthesis(
   let inferencePassed = true;
   let groundingPassed = true;
   for (const [developmentIndex, development] of developments.entries()) {
+    const rawIndex = developmentRawIndexes[developmentIndex]!;
     const event = byEvent.get(development.event_id);
-    if (
-      !event ||
-      seenEventIds.has(development.event_id) ||
-      events[developmentIndex]?.id !== development.event_id
-    ) {
+    if (!event || seenEventIds.has(development.event_id) || events[rawIndex]?.id !== development.event_id) {
       evidencePassed = false;
-      violations.push(`unknown, duplicate, or out-of-order event_id: ${development.event_id}`);
+      violations.push(`development ${rawIndex}: unknown, duplicate, or out-of-order event_id`);
       continue;
     }
     seenEventIds.add(development.event_id);
@@ -855,17 +895,17 @@ export function validateSynthesis(
       )
     ) {
       evidencePassed = false;
-      violations.push(`${development.event_id}: invalid/missing primary source_ids`);
+      violations.push(`development ${rawIndex}: invalid/missing primary source_ids`);
     }
     if (![development.title, development.summary, development.why_it_matters].every(containsChinese)) {
       languagePassed = false;
-      violations.push(`${development.event_id}: title/summary/why_it_matters must contain Chinese`);
+      violations.push(`development ${rawIndex}: title/summary/why_it_matters must contain Chinese`);
     }
     const combined = `${development.title} ${development.summary} ${development.why_it_matters}`;
     for (const rule of UNSUPPORTED_INFERENCE_PATTERNS) {
       if (rule.pattern.test(combined)) {
         inferencePassed = false;
-        violations.push(`${development.event_id}: unsupported inference (${rule.label})`);
+        violations.push(`development ${rawIndex}: unsupported inference (${rule.label})`);
       }
     }
     const selectedRecords = selected.filter(Boolean) as EvidenceRecord[];
@@ -873,7 +913,7 @@ export function validateSynthesis(
     for (const token of mechanicalTokens(combined)) {
       if (!corpusTokens.has(token)) {
         groundingPassed = false;
-        violations.push(`${development.event_id}: unsupported mechanical token ${token}`);
+        violations.push(`development ${rawIndex}: unsupported mechanical token ${token}`);
       }
     }
   }
