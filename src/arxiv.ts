@@ -5,6 +5,8 @@
  * sorted by submission date, filtered to last 48h.
  */
 
+import { fetchWithTimeout } from "./http.ts";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -119,7 +121,7 @@ export async function fetchArxivData(): Promise<ArxivData> {
         max_results: String(ARXIV_MAX_RESULTS),
       });
 
-      const resp = await fetch(`${API_URL}?${params}`, {
+      const resp = await fetchWithTimeout(`${API_URL}?${params}`, {
         headers: { "User-Agent": "agents-radar/1.0" },
       });
 

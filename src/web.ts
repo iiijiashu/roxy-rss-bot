@@ -13,6 +13,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { sleep } from "./date.ts";
+import { fetchWithTimeout } from "./http.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -41,6 +42,8 @@ export interface WebState {
 export interface WebFetchResult {
   site: "anthropic" | "openai";
   siteName: string;
+  /** False only when discovery itself failed; omitted in older fixtures means success. */
+  fetchSuccess?: boolean;
   isFirstRun: boolean;
   newItems: WebPageItem[];
   /** Total URLs discovered in sitemap (for context in the report) */
@@ -114,15 +117,9 @@ const WEB_HEADERS = {
 };
 
 async function httpGet(url: string): Promise<string> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-  try {
-    const resp = await fetch(url, { headers: WEB_HEADERS, signal: controller.signal });
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    return await resp.text();
-  } finally {
-    clearTimeout(timer);
-  }
+  const resp = await fetchWithTimeout(url, { headers: WEB_HEADERS }, FETCH_TIMEOUT_MS);
+  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  return await resp.text();
 }
 
 // ---------------------------------------------------------------------------
@@ -353,6 +350,7 @@ export async function fetchSiteContent(
   return {
     site,
     siteName: cfg.name,
+    fetchSuccess: true,
     isFirstRun,
     newItems: items,
     totalDiscovered: allDiscovered.length,

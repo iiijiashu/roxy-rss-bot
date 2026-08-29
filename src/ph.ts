@@ -5,6 +5,8 @@
  * then filter locally for AI-related topics.
  */
 
+import { fetchWithTimeout } from "./http.ts";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -117,7 +119,7 @@ export async function fetchPhData(): Promise<PhData> {
   const twoDaysAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
 
   try {
-    const resp = await fetch(API_URL, {
+    const resp = await fetchWithTimeout(API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

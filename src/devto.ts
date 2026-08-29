@@ -2,6 +2,8 @@
  * Dev.to AI articles fetched via the Forem API.
  */
 
+import { fetchWithTimeout } from "./http.ts";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -68,7 +70,7 @@ export async function fetchDevtoData(): Promise<DevtoData> {
             top: "1", // top articles from the past 1 day
           });
 
-          const resp = await fetch(`${API_URL}?${params}`, {
+          const resp = await fetchWithTimeout(`${API_URL}?${params}`, {
             headers: { "User-Agent": "agents-radar/1.0" },
           });
 

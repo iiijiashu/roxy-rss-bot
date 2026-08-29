@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { toRfc822, escapeXml, normalizeSiteUrl } from "../generate-manifest.ts";
+import { toRfc822, escapeXml, normalizeSiteUrl, stableGeneratedAt } from "../generate-manifest.ts";
 
 // ---------------------------------------------------------------------------
 // toRfc822
@@ -82,5 +82,17 @@ describe("normalizeSiteUrl", () => {
     "   ",
   ])("rejects unsafe or ambiguous URL %s", (value) => {
     expect(() => normalizeSiteUrl(value)).toThrow();
+  });
+});
+
+describe("stableGeneratedAt", () => {
+  it("derives a deterministic timestamp from the newest digest date", () => {
+    expect(stableGeneratedAt([{ date: "2026-08-29", reports: ["ai-cli"] }]).toISOString()).toBe(
+      "2026-08-29T00:00:00.000Z",
+    );
+  });
+
+  it("uses the Unix epoch for an empty archive", () => {
+    expect(stableGeneratedAt([]).toISOString()).toBe("1970-01-01T00:00:00.000Z");
   });
 });

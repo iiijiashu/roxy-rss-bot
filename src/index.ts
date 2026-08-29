@@ -34,6 +34,7 @@ import {
   assertReportHighlights,
   saveFile,
   autoGenFooter,
+  getLlmDiagnostics,
   LLM_TOKENS_TRENDING,
 } from "./report.ts";
 import { buildCliReportContent, buildOpenclawReportContent } from "./report-builders.ts";
@@ -46,7 +47,7 @@ import {
   saveHfReport,
   saveCommunityReport,
 } from "./report-savers.ts";
-import { loadWebState, fetchSiteContent, type WebFetchResult, type WebState } from "./web.ts";
+import { loadWebState, saveWebState, fetchSiteContent, type WebFetchResult, type WebState } from "./web.ts";
 import { fetchTrendingData, type TrendingData } from "./trending.ts";
 import { fetchHnData, type HnData } from "./hn.ts";
 import { fetchPhData, type PhData } from "./ph.ts";
@@ -57,6 +58,7 @@ import { fetchLobstersData, type LobstersData } from "./lobsters.ts";
 import { loadConfig } from "./config.ts";
 import { toCstDateStr, toUtcStr } from "./date.ts";
 import { type Lang, MSG, ISSUE_LABELS, CLI_ISSUE_TITLE, OPENCLAW_ISSUE_TITLE } from "./i18n.ts";
+import { PublicationStatus, classifyFailure } from "./run-status.ts";
 
 // ---------------------------------------------------------------------------
 // Repo config — loaded from config.yml, falls back to built-in defaults
@@ -88,7 +90,7 @@ async function fetchAllData(
   webState: WebState,
 ): Promise<{
   fetched: RepoFetch[];
-  skillsData: { prs: GitHubItem[]; issues: GitHubItem[] };
+  skillsData: { prs: GitHubItem[]; issues: GitHubItem[]; fetchSuccess: boolean };
   webResults: WebFetchResult[];
   trendingData: TrendingData;
   hnData: HnData;
@@ -127,21 +129,21 @@ async function fetchAllData(
           console.log(
             `  [${cfg.id}] issues: ${issues.length}, prs: ${prs.length}, releases: ${releases.length}`,
           );
-          return { cfg, issues, prs, releases };
+          return { cfg, issues, prs, releases, fetchSuccess: true };
         } catch (err) {
           console.error(`  [${cfg.id}] fetch failed: ${err}`);
-          return { cfg, issues: [], prs: [], releases: [] };
+          return { cfg, issues: [], prs: [], releases: [], fetchSuccess: false };
         }
       }),
     ),
     fetchSkillsData(CLAUDE_SKILLS_REPO)
       .then((d) => {
         console.log(`  [claude-code-skills] prs: ${d.prs.length}, issues: ${d.issues.length}`);
-        return d;
+        return { ...d, fetchSuccess: true };
       })
       .catch((err) => {
         console.error(`  [claude-code-skills] fetch failed: ${err}`);
-        return { prs: [] as GitHubItem[], issues: [] as GitHubItem[] };
+        return { prs: [] as GitHubItem[], issues: [] as GitHubItem[], fetchSuccess: false };
       }),
     Promise.all([
       fetchSiteContent("anthropic", webState).catch((err): WebFetchResult => {
@@ -149,6 +151,7 @@ async function fetchAllData(
         return {
           site: "anthropic",
           siteName: "Anthropic (Claude)",
+          fetchSuccess: false,
           isFirstRun: false,
           newItems: [],
           totalDiscovered: 0,
@@ -156,7 +159,14 @@ async function fetchAllData(
       }),
       fetchSiteContent("openai", webState).catch((err): WebFetchResult => {
         console.error(`  [web/openai] fetch failed: ${err}`);
-        return { site: "openai", siteName: "OpenAI", isFirstRun: false, newItems: [], totalDiscovered: 0 };
+        return {
+          site: "openai",
+          siteName: "OpenAI",
+          fetchSuccess: false,
+          isFirstRun: false,
+          newItems: [],
+          totalDiscovered: 0,
+        };
       }),
     ]),
     fetchTrendingData().catch(
@@ -193,12 +203,23 @@ async function fetchAllData(
 // ---------------------------------------------------------------------------
 
 /** Call LLM with logging and error fallback. */
-async function summarize(id: string, prompt: string, failMsg: string, maxTokens?: number): Promise<string> {
+async function summarize(
+  id: string,
+  prompt: string,
+  failMsg: string,
+  status: PublicationStatus,
+  component: string,
+  maxTokens?: number,
+): Promise<string> {
   console.log(`  [${id}] Calling LLM for summary...`);
   try {
-    return await callLlm(prompt, maxTokens);
+    const result = await callLlm(prompt, maxTokens);
+    status.record(component, "ok");
+    return result;
   } catch (err) {
-    console.error(`  [${id}] LLM call failed: ${err}`);
+    const code = classifyFailure(err);
+    status.record(component, "degraded", code);
+    console.error(`  [${id}] LLM call failed classification=${code}: ${err}`);
     return failMsg;
   }
 }
@@ -209,12 +230,15 @@ async function summarizeRepo(
   prompt: string,
   noActivityMsg: string,
   failMsg: string,
+  status: PublicationStatus,
+  component: string,
 ): Promise<RepoDigest> {
   if (!issues.length && !prs.length && !releases.length) {
     console.log(`  [${cfg.id}] No activity, skipping LLM call`);
+    status.record(component, "skipped", "no_activity");
     return { config: cfg, issues, prs, releases, summary: noActivityMsg };
   }
-  const summary = await summarize(cfg.id, prompt, failMsg);
+  const summary = await summarize(cfg.id, prompt, failMsg, status, component);
   return { config: cfg, issues, prs, releases, summary };
 }
 
@@ -225,6 +249,7 @@ async function generateSummaries(
   fetchedPeers: RepoFetch[],
   trendingData: TrendingData,
   dateStr: string,
+  status: PublicationStatus,
   lang: Lang = "zh",
 ): Promise<{
   cliDigests: RepoDigest[];
@@ -239,7 +264,14 @@ async function generateSummaries(
   const [cliDigests, openclawSummary, skillsSummary, peerDigests, trendingSummary] = await Promise.all([
     Promise.all(
       fetchedCli.map((f) =>
-        summarizeRepo(f, buildCliPrompt(f.cfg, f.issues, f.prs, f.releases, dateStr, lang), noActivity, fail),
+        summarizeRepo(
+          f,
+          buildCliPrompt(f.cfg, f.issues, f.prs, f.releases, dateStr, lang),
+          noActivity,
+          fail,
+          status,
+          `summary/${f.cfg.id}/${lang}`,
+        ),
       ),
     ),
     summarizeRepo(
@@ -256,11 +288,15 @@ async function generateSummaries(
       ),
       noActivity,
       fail,
+      status,
+      `summary/${fetchedOpenclaw.cfg.id}/${lang}`,
     ).then((d) => d.summary),
     summarize(
       "claude-code-skills",
       buildSkillsPrompt(skillsData.prs, skillsData.issues, dateStr, lang),
       MSG.skillsFailed[lang],
+      status,
+      `summary/claude-code-skills/${lang}`,
     ),
     Promise.all(
       fetchedPeers.map((f) =>
@@ -269,6 +305,8 @@ async function generateSummaries(
           buildPeerPrompt(f.cfg, f.issues, f.prs, f.releases, dateStr, undefined, undefined, lang),
           noActivity,
           fail,
+          status,
+          `summary/${f.cfg.id}/${lang}`,
         ),
       ),
     ),
@@ -281,12 +319,93 @@ async function generateSummaries(
         "trending",
         buildTrendingPrompt(trendingData, dateStr, lang),
         MSG.trendingFailed[lang],
+        status,
+        `summary/trending/${lang}`,
         LLM_TOKENS_TRENDING,
       );
     })(),
   ]);
 
   return { cliDigests, openclawSummary, skillsSummary, peerDigests, trendingSummary };
+}
+
+async function callLlmWithFallback(
+  status: PublicationStatus,
+  component: string,
+  prompt: string,
+  fallback: string,
+): Promise<string> {
+  try {
+    const result = await callLlm(prompt);
+    status.record(component, "ok");
+    return result;
+  } catch (err) {
+    const code = classifyFailure(err);
+    status.record(component, "degraded", code);
+    console.error(`  [${component}] LLM call failed classification=${code}; using fallback: ${err}`);
+    return fallback;
+  }
+}
+
+function comparisonFallback(lang: Lang, subject: "tools" | "agents"): string {
+  if (lang === "zh") {
+    return subject === "tools"
+      ? "> ⚠️ 今日横向对比生成失败。各工具的独立摘要和原始链接仍保留，可继续阅读。"
+      : "> ⚠️ 今日 Agent 生态横向对比生成失败。各项目的独立摘要和原始链接仍保留。";
+  }
+  return subject === "tools"
+    ? "> ⚠️ Today's cross-tool comparison is unavailable. Individual summaries and source links are preserved."
+    : "> ⚠️ Today's agent-ecosystem comparison is unavailable. Individual summaries and source links are preserved.";
+}
+
+function deterministicHighlights(reports: Record<string, string>, lang: Lang): ReportHighlights {
+  const result: ReportHighlights = {};
+  for (const [reportId, markdown] of Object.entries(reports)) {
+    const title =
+      markdown
+        .split("\n")
+        .map((line) => line.trim())
+        .find((line) => /^#\s+/.test(line))
+        ?.replace(/^#\s+/, "") ?? reportId;
+    result[reportId] = [
+      lang === "zh"
+        ? `${title}：自动亮点提取暂时降级，请查看完整报告。`
+        : `${title}: automatic highlight extraction degraded; see the full report.`,
+    ];
+  }
+  return result;
+}
+
+function reportExists(dateStr: string, fileName: string): boolean {
+  return fs.existsSync(path.join("digests", dateStr, fileName));
+}
+
+function annotateDegradedCoreReports(dateStr: string, status: PublicationStatus): void {
+  const degraded = status.toJSON().components.filter((component) => component.state === "degraded");
+  if (degraded.length === 0) return;
+
+  const files: Array<{ fileName: string; lang: Lang }> = [
+    { fileName: "ai-cli.md", lang: "zh" },
+    { fileName: "ai-agents.md", lang: "zh" },
+    { fileName: "ai-cli-en.md", lang: "en" },
+    { fileName: "ai-agents-en.md", lang: "en" },
+  ];
+  for (const { fileName, lang } of files) {
+    const filePath = path.join("digests", dateStr, fileName);
+    if (!fs.existsSync(filePath)) continue;
+    const content = fs.readFileSync(filePath, "utf-8");
+    if (content.includes("<!-- roxy-degraded -->")) continue;
+    const banner =
+      lang === "zh"
+        ? `<!-- roxy-degraded -->\n> ⚠️ **本期为降级发布**：${degraded.length} 个组件未完整完成；已保留可验证内容与原始链接。详情见 \`run-status.json\`。`
+        : `<!-- roxy-degraded -->\n> ⚠️ **Degraded publication**: ${degraded.length} component(s) did not complete; verified content and source links were preserved. See \`run-status.json\`.`;
+    const newline = content.indexOf("\n");
+    const annotated =
+      newline >= 0
+        ? `${content.slice(0, newline)}\n\n${banner}\n${content.slice(newline + 1)}`
+        : `${banner}\n\n${content}`;
+    fs.writeFileSync(filePath, annotated, "utf-8");
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -303,6 +422,7 @@ async function main(): Promise<void> {
   const digestRepo = process.env["DIGEST_REPO"] ?? "";
 
   const providerName = process.env["LLM_PROVIDER"] ?? "anthropic";
+  const publicationStatus = new PublicationStatus(dateStr, providerName);
   console.log(`[${now.toISOString()}] Starting digest | provider: ${providerName}`);
 
   // 1. Fetch all data in parallel
@@ -320,6 +440,67 @@ async function main(): Promise<void> {
     lobstersData,
   } = await fetchAllData(since, webState);
 
+  for (const repo of fetched) {
+    publicationStatus.record(
+      `fetch/github/${repo.cfg.id}`,
+      repo.fetchSuccess === false ? "degraded" : "ok",
+      repo.fetchSuccess === false ? "source_fetch_failed" : undefined,
+    );
+  }
+  publicationStatus.record(
+    "fetch/github/claude-code-skills",
+    skillsData.fetchSuccess ? "ok" : "degraded",
+    skillsData.fetchSuccess ? undefined : "source_fetch_failed",
+  );
+  for (const result of webResults) {
+    publicationStatus.record(
+      `fetch/web/${result.site}`,
+      result.fetchSuccess === false ? "degraded" : "ok",
+      result.fetchSuccess === false ? "source_fetch_failed" : undefined,
+    );
+  }
+  publicationStatus.record(
+    "fetch/trending",
+    trendingData.trendingFetchSuccess || trendingData.searchRepos.length > 0 ? "ok" : "degraded",
+    trendingData.trendingFetchSuccess || trendingData.searchRepos.length > 0
+      ? undefined
+      : "source_fetch_failed",
+  );
+  publicationStatus.record(
+    "fetch/hn",
+    hnData.fetchSuccess ? "ok" : "degraded",
+    hnData.fetchSuccess ? undefined : "source_fetch_failed",
+  );
+  publicationStatus.record(
+    "fetch/ph",
+    phData.fetchSuccess ? "ok" : process.env["PRODUCTHUNT_TOKEN"] ? "degraded" : "skipped",
+    phData.fetchSuccess
+      ? undefined
+      : process.env["PRODUCTHUNT_TOKEN"]
+        ? "source_fetch_failed"
+        : "not_configured",
+  );
+  publicationStatus.record(
+    "fetch/arxiv",
+    arxivData.fetchSuccess ? "ok" : "skipped",
+    arxivData.fetchSuccess ? undefined : "no_recent_items",
+  );
+  publicationStatus.record(
+    "fetch/hf",
+    hfData.fetchSuccess ? "ok" : "degraded",
+    hfData.fetchSuccess ? undefined : "source_fetch_failed",
+  );
+  publicationStatus.record(
+    "fetch/devto",
+    devtoData.fetchSuccess ? "ok" : "degraded",
+    devtoData.fetchSuccess ? undefined : "source_fetch_failed",
+  );
+  publicationStatus.record(
+    "fetch/lobsters",
+    lobstersData.fetchSuccess ? "ok" : "degraded",
+    lobstersData.fetchSuccess ? undefined : "source_fetch_failed",
+  );
+
   const peerIds = new Set(OPENCLAW_PEERS.map((p) => p.id));
   const fetchedCli = fetched.filter((f) => f.cfg.id !== OPENCLAW.id && !peerIds.has(f.cfg.id));
   const fetchedOpenclaw = fetched.find((f) => f.cfg.id === OPENCLAW.id)!;
@@ -328,8 +509,26 @@ async function main(): Promise<void> {
   // 2. Generate per-repo LLM summaries in parallel (zh + en simultaneously)
   console.log("  Generating summaries in ZH and EN in parallel...");
   const [zhSummaries, enSummaries] = await Promise.all([
-    generateSummaries(fetchedCli, fetchedOpenclaw, skillsData, fetchedPeers, trendingData, dateStr, "zh"),
-    generateSummaries(fetchedCli, fetchedOpenclaw, skillsData, fetchedPeers, trendingData, dateStr, "en"),
+    generateSummaries(
+      fetchedCli,
+      fetchedOpenclaw,
+      skillsData,
+      fetchedPeers,
+      trendingData,
+      dateStr,
+      publicationStatus,
+      "zh",
+    ),
+    generateSummaries(
+      fetchedCli,
+      fetchedOpenclaw,
+      skillsData,
+      fetchedPeers,
+      trendingData,
+      dateStr,
+      publicationStatus,
+      "en",
+    ),
   ]);
 
   // 3. Generate comparisons and independent source reports together. Agnes
@@ -346,46 +545,172 @@ async function main(): Promise<void> {
   });
 
   const comparisonPromise = Promise.all([
-    callLlm(buildComparisonPrompt(zhSummaries.cliDigests, dateStr, "zh")),
-    callLlm(buildPeersComparisonPrompt(makeOpenclawDigest("zh"), zhSummaries.peerDigests, dateStr, "zh")),
-    callLlm(buildComparisonPrompt(enSummaries.cliDigests, dateStr, "en")),
-    callLlm(buildPeersComparisonPrompt(makeOpenclawDigest("en"), enSummaries.peerDigests, dateStr, "en")),
+    callLlmWithFallback(
+      publicationStatus,
+      "comparison/tools/zh",
+      buildComparisonPrompt(zhSummaries.cliDigests, dateStr, "zh"),
+      comparisonFallback("zh", "tools"),
+    ),
+    callLlmWithFallback(
+      publicationStatus,
+      "comparison/agents/zh",
+      buildPeersComparisonPrompt(makeOpenclawDigest("zh"), zhSummaries.peerDigests, dateStr, "zh"),
+      comparisonFallback("zh", "agents"),
+    ),
+    callLlmWithFallback(
+      publicationStatus,
+      "comparison/tools/en",
+      buildComparisonPrompt(enSummaries.cliDigests, dateStr, "en"),
+      comparisonFallback("en", "tools"),
+    ),
+    callLlmWithFallback(
+      publicationStatus,
+      "comparison/agents/en",
+      buildPeersComparisonPrompt(makeOpenclawDigest("en"), enSummaries.peerDigests, dateStr, "en"),
+      comparisonFallback("en", "agents"),
+    ),
   ]);
 
-  const sourceReportsPromise = Promise.all([
-    saveWebReport(webResults, webState, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
-    saveWebReport(webResults, webState, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
-    saveTrendingReport(
-      trendingData,
-      zhSummaries.trendingSummary,
-      utcStr,
-      dateStr,
-      digestRepo,
-      autoGenFooter("zh"),
-      "zh",
-    ),
-    saveTrendingReport(
-      trendingData,
-      enSummaries.trendingSummary,
-      utcStr,
-      dateStr,
-      digestRepo,
-      autoGenFooter("en"),
-      "en",
-    ),
-    saveHnReport(hnData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
-    saveHnReport(hnData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
-    savePhReport(phData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
-    savePhReport(phData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
-    saveArxivReport(arxivData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
-    saveArxivReport(arxivData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
-    saveHfReport(hfData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
-    saveHfReport(hfData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
-    saveCommunityReport(devtoData, lobstersData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
-    saveCommunityReport(devtoData, lobstersData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
-  ]);
+  const hasWebContent = webResults.some((result) => result.newItems.length > 0);
+  const hasTrendingData = trendingData.trendingRepos.length > 0 || trendingData.searchRepos.length > 0;
+  const sourceReportJobs: Array<{
+    component: string;
+    fileName: string;
+    expected: boolean;
+    run: () => Promise<void>;
+  }> = [
+    {
+      component: "report/web/zh",
+      fileName: "ai-web.md",
+      expected: hasWebContent,
+      run: () => saveWebReport(webResults, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
+    },
+    {
+      component: "report/web/en",
+      fileName: "ai-web-en.md",
+      expected: hasWebContent,
+      run: () => saveWebReport(webResults, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
+    },
+    {
+      component: "report/trending/zh",
+      fileName: "ai-trending.md",
+      expected: hasTrendingData,
+      run: () =>
+        saveTrendingReport(
+          trendingData,
+          zhSummaries.trendingSummary,
+          utcStr,
+          dateStr,
+          digestRepo,
+          autoGenFooter("zh"),
+          "zh",
+        ),
+    },
+    {
+      component: "report/trending/en",
+      fileName: "ai-trending-en.md",
+      expected: hasTrendingData,
+      run: () =>
+        saveTrendingReport(
+          trendingData,
+          enSummaries.trendingSummary,
+          utcStr,
+          dateStr,
+          digestRepo,
+          autoGenFooter("en"),
+          "en",
+        ),
+    },
+    {
+      component: "report/hn/zh",
+      fileName: "ai-hn.md",
+      expected: hnData.fetchSuccess,
+      run: () => saveHnReport(hnData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
+    },
+    {
+      component: "report/hn/en",
+      fileName: "ai-hn-en.md",
+      expected: hnData.fetchSuccess,
+      run: () => saveHnReport(hnData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
+    },
+    {
+      component: "report/ph/zh",
+      fileName: "ai-ph.md",
+      expected: phData.fetchSuccess,
+      run: () => savePhReport(phData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
+    },
+    {
+      component: "report/ph/en",
+      fileName: "ai-ph-en.md",
+      expected: phData.fetchSuccess,
+      run: () => savePhReport(phData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
+    },
+    {
+      component: "report/arxiv/zh",
+      fileName: "ai-arxiv.md",
+      expected: arxivData.fetchSuccess,
+      run: () => saveArxivReport(arxivData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
+    },
+    {
+      component: "report/arxiv/en",
+      fileName: "ai-arxiv-en.md",
+      expected: arxivData.fetchSuccess,
+      run: () => saveArxivReport(arxivData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
+    },
+    {
+      component: "report/hf/zh",
+      fileName: "ai-hf.md",
+      expected: hfData.fetchSuccess,
+      run: () => saveHfReport(hfData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
+    },
+    {
+      component: "report/hf/en",
+      fileName: "ai-hf-en.md",
+      expected: hfData.fetchSuccess,
+      run: () => saveHfReport(hfData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
+    },
+    {
+      component: "report/community/zh",
+      fileName: "ai-community.md",
+      expected: devtoData.fetchSuccess || lobstersData.fetchSuccess,
+      run: () =>
+        saveCommunityReport(devtoData, lobstersData, utcStr, dateStr, digestRepo, autoGenFooter("zh"), "zh"),
+    },
+    {
+      component: "report/community/en",
+      fileName: "ai-community-en.md",
+      expected: devtoData.fetchSuccess || lobstersData.fetchSuccess,
+      run: () =>
+        saveCommunityReport(devtoData, lobstersData, utcStr, dateStr, digestRepo, autoGenFooter("en"), "en"),
+    },
+  ];
 
-  const [comparisons] = await Promise.all([comparisonPromise, sourceReportsPromise]);
+  const sourceReportsPromise = Promise.allSettled(sourceReportJobs.map((job) => job.run()));
+  const [comparisons, sourceReportResults] = await Promise.all([comparisonPromise, sourceReportsPromise]);
+  for (const [index, result] of sourceReportResults.entries()) {
+    const job = sourceReportJobs[index]!;
+    if (result.status === "rejected") {
+      const code = classifyFailure(result.reason);
+      publicationStatus.record(job.component, "degraded", code);
+      console.error(`  [${job.component}] saver failed classification=${code}: ${result.reason}`);
+    } else if (!job.expected) {
+      publicationStatus.record(job.component, "skipped", "no_data");
+    } else if (reportExists(dateStr, job.fileName)) {
+      publicationStatus.record(job.component, "ok");
+    } else {
+      publicationStatus.record(job.component, "degraded", "missing_report");
+    }
+  }
+  const webReportsReady =
+    !hasWebContent || (reportExists(dateStr, "ai-web.md") && reportExists(dateStr, "ai-web-en.md"));
+  if (webReportsReady) {
+    saveWebState(webState);
+    publicationStatus.record("state/web", "ok");
+    console.log("  [web] State committed after both language reports completed.");
+  } else {
+    publicationStatus.record("state/web", "degraded", "reports_incomplete");
+    console.warn("  [web] State not committed; discovered content will be retried on the next run.");
+  }
   const [zhComparison, zhPeersComparison, enComparison, enPeersComparison] = comparisons;
 
   const comparisonByLang = { zh: zhComparison, en: enComparison };
@@ -425,6 +750,8 @@ async function main(): Promise<void> {
 
     console.log(`  Saved ${saveFile(cliContent[lang], dateStr, `ai-cli${suffix}.md`)}`);
     console.log(`  Saved ${saveFile(openclawContent[lang], dateStr, `ai-agents${suffix}.md`)}`);
+    publicationStatus.record(`report/core/cli/${lang}`, "ok");
+    publicationStatus.record(`report/core/agents/${lang}`, "ok");
   }
 
   // 5. Generate highlights for Telegram notification
@@ -458,33 +785,27 @@ async function main(): Promise<void> {
   // usually returns valid JSON. Each language runs independently so a failure
   // in one never wipes the other.
   const genHighlights = async (reports: Record<string, string>, lang: Lang): Promise<ReportHighlights> => {
+    let finalCode = "unknown_error";
     for (let attempt = 1; attempt <= 2; attempt++) {
       try {
         const parsed = parseLlmJson<unknown>(await callLlm(buildHighlightsPrompt(reports, lang), 2048));
         assertReportHighlights(parsed, lang);
+        publicationStatus.record(`highlights/${lang}`, "ok");
         return parsed;
       } catch (err) {
+        finalCode = classifyFailure(err);
         const tag = attempt < 2 ? "retrying" : "giving up";
-        console.error(`  [highlights] ${lang} attempt ${attempt} failed (${tag}): ${err}`);
+        console.error(
+          `  [highlights] ${lang} attempt ${attempt} failed classification=${finalCode} (${tag}): ${err}`,
+        );
       }
     }
-    return {};
+    publicationStatus.record(`highlights/${lang}`, "degraded", finalCode);
+    return deterministicHighlights(reports, lang);
   };
   const [zhRes, enRes] = await Promise.all([genHighlights(zhReports, "zh"), genHighlights(enReports, "en")]);
   highlights.zh = zhRes;
   highlights.en = enRes;
-
-  // Chinese is the primary Roxy notification language. Do not silently publish
-  // English text in its place; fail the run after the dedicated retry instead.
-  const zhEmpty = Object.keys(highlights.zh).length === 0;
-  const enEmpty = Object.keys(highlights.en).length === 0;
-  if (zhEmpty) {
-    throw new Error("Chinese highlights generation failed after 2 attempts");
-  }
-  if (enEmpty) {
-    console.warn("  [highlights] en empty — backfilling from zh");
-    highlights.en = highlights.zh;
-  }
 
   const highlightsPath = saveFile(JSON.stringify(highlights, null, 2), dateStr, "highlights.json");
   console.log(`  Saved ${highlightsPath}`);
@@ -492,26 +813,49 @@ async function main(): Promise<void> {
   // 6. Create GitHub issues for CLI + OpenClaw (zh + en)
   if (digestRepo) {
     for (const lang of ["zh", "en"] as const) {
-      const cliUrl = await createGitHubIssue(
-        CLI_ISSUE_TITLE(dateStr, lang),
-        cliContent[lang],
-        ISSUE_LABELS.cli[lang],
-      );
-      console.log(`  Created CLI issue (${lang}): ${cliUrl}`);
+      try {
+        const cliUrl = await createGitHubIssue(
+          CLI_ISSUE_TITLE(dateStr, lang),
+          cliContent[lang],
+          ISSUE_LABELS.cli[lang],
+        );
+        publicationStatus.record(`issue/cli/${lang}`, "ok");
+        console.log(`  Published CLI issue (${lang}): ${cliUrl}`);
+      } catch (err) {
+        const code = classifyFailure(err);
+        publicationStatus.record(`issue/cli/${lang}`, "degraded", code);
+        console.error(`  [issue/cli/${lang}] publication failed classification=${code}: ${err}`);
+      }
 
-      const ocUrl = await createGitHubIssue(
-        OPENCLAW_ISSUE_TITLE(dateStr, lang),
-        openclawContent[lang],
-        ISSUE_LABELS.openclaw[lang],
-      );
-      console.log(`  Created OpenClaw issue (${lang}): ${ocUrl}`);
+      try {
+        const ocUrl = await createGitHubIssue(
+          OPENCLAW_ISSUE_TITLE(dateStr, lang),
+          openclawContent[lang],
+          ISSUE_LABELS.openclaw[lang],
+        );
+        publicationStatus.record(`issue/agents/${lang}`, "ok");
+        console.log(`  Published OpenClaw issue (${lang}): ${ocUrl}`);
+      } catch (err) {
+        const code = classifyFailure(err);
+        publicationStatus.record(`issue/agents/${lang}`, "degraded", code);
+        console.error(`  [issue/agents/${lang}] publication failed classification=${code}: ${err}`);
+      }
+    }
+  } else {
+    for (const lang of ["zh", "en"] as const) {
+      publicationStatus.record(`issue/cli/${lang}`, "skipped", "not_configured");
+      publicationStatus.record(`issue/agents/${lang}`, "skipped", "not_configured");
     }
   }
 
+  annotateDegradedCoreReports(dateStr, publicationStatus);
+  const statusPath = publicationStatus.save();
+  console.log(`  Saved ${statusPath}`);
+  publicationStatus.logSummary(getLlmDiagnostics());
   console.log("Done!");
 }
 
 main().catch((err) => {
-  console.error(err);
+  console.error(`[fatal] classification=${classifyFailure(err)}`, err);
   process.exit(1);
 });

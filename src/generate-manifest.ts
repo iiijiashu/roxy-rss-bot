@@ -52,6 +52,11 @@ interface ReportContent {
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
+export function stableGeneratedAt(entries: DateEntry[]): Date {
+  const newestDate = entries[0]?.date;
+  return newestDate ? new Date(`${newestDate}T00:00:00.000Z`) : new Date(0);
+}
+
 export function toRfc822(date: Date): string {
   return (
     `${DAYS[date.getUTCDay()]}, ${String(date.getUTCDate()).padStart(2, "0")} ` +
@@ -121,8 +126,9 @@ async function main(): Promise<void> {
     })
     .filter((e) => e.reports.length > 0);
 
+  const generatedAt = stableGeneratedAt(entries);
   const manifest: Manifest = {
-    generated: new Date().toISOString(),
+    generated: generatedAt.toISOString(),
     dates: entries,
   };
 
@@ -139,7 +145,7 @@ async function main(): Promise<void> {
     }
   }
 
-  const buildDate = toRfc822(new Date());
+  const buildDate = toRfc822(generatedAt);
 
   const itemXmlChunks: string[] = [];
   for (const { date, report } of feedItems) {

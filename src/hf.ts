@@ -5,6 +5,8 @@
  * HF Hub API, returning a mapped subset of fields.
  */
 
+import { fetchWithTimeout } from "./http.ts";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -61,7 +63,7 @@ export async function fetchHfData(): Promise<HfData> {
       full: "false",
     });
 
-    const resp = await fetch(`${API_URL}?${params}`, {
+    const resp = await fetchWithTimeout(`${API_URL}?${params}`, {
       headers: { "User-Agent": "agents-radar/1.0" },
     });
 

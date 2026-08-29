@@ -2,6 +2,8 @@
  * Hacker News AI stories fetched from the official Firebase API.
  */
 
+import { fetchWithTimeout } from "./http.ts";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -100,7 +102,7 @@ function toHnStory(item: HnFirebaseItem, hnRank: number): HnStory {
 
 export async function fetchHnData(): Promise<HnData> {
   try {
-    const topResp = await fetch(HN_TOPSTORIES_URL, {
+    const topResp = await fetchWithTimeout(HN_TOPSTORIES_URL, {
       headers: { "User-Agent": "agents-radar/1.0" },
     });
     if (!topResp.ok) {
@@ -115,7 +117,7 @@ export async function fetchHnData(): Promise<HnData> {
       const batchIds = topIds.slice(i, i + HN_BATCH_SIZE);
       const items = await Promise.all(
         batchIds.map(async (id): Promise<HnFirebaseItem | null> => {
-          const resp = await fetch(HN_ITEM_URL(id), {
+          const resp = await fetchWithTimeout(HN_ITEM_URL(id), {
             headers: { "User-Agent": "agents-radar/1.0" },
           });
           if (!resp.ok) {

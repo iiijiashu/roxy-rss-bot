@@ -24,10 +24,20 @@ jobs:
       contents: write
     runs-on: ubuntu-24.04
     timeout-minutes: 75
+    outputs:
+      publishable: ${{ steps.validate.outputs.publishable }}
+      deploy: ${{ steps.publish.outputs.deploy }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Determine digest date
+        id: date
+        run: |
+          digest_date="$(TZ=Asia/Shanghai date +%F)"
+          echo "date=${digest_date}" >> "$GITHUB_OUTPUT"
+          echo "DIGEST_DATE=${digest_date}" >> "$GITHUB_ENV"
 
       - name: Restore published digest history
         env:
@@ -37,6 +47,8 @@ jobs:
             git fetch --no-tags origin "refs/heads/${PUBLISH_BRANCH}:refs/remotes/origin/${PUBLISH_BRANCH}"
             git checkout "refs/remotes/origin/${PUBLISH_BRANCH}" -- digests manifest.json feed.xml
           fi
+          # Never let a previous same-day publication make a failed rerun look healthy.
+          rm -rf "digests/${DIGEST_DATE}"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
@@ -50,27 +62,78 @@ jobs:
       - name: Install dependencies without lifecycle scripts
         run: pnpm install --frozen-lockfile --ignore-scripts
 
-      - name: Generate batched Agnes digest and RSS
+      - name: Generate resilient Agnes digest
+        id: generate
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ github.token }}
           AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
           AGNES_MODEL: agnes-2.5-flash
           AGNES_BATCH_WINDOW_MS: "25"
-          AGNES_MAX_BATCH_TASKS: "64"
-          AGNES_MAX_BATCH_INPUT_BYTES: "1000000"
-          AGNES_MAX_BATCH_OUTPUT_TOKENS: "60000"
-          AGNES_REQUEST_BUDGET: "4"
+          AGNES_MAX_BATCH_TASKS: "4"
+          AGNES_MAX_BATCH_INPUT_BYTES: "180000"
+          AGNES_MAX_BATCH_OUTPUT_TOKENS: "18000"
+          AGNES_REQUEST_BUDGET: "18"
+          AGNES_RETRY_BUDGET: "6"
+          AGNES_MAX_TASK_ATTEMPTS: "3"
+          AGNES_MAX_IN_FLIGHT: "2"
+          AGNES_TIMEOUT_MS: "180000"
+          AGNES_RETRY_BASE_MS: "1000"
           LLM_PROVIDER: agnes
-          LLM_MAX_TOKENS: "4000"
-          LLM_CONCURRENCY: "64"
+          LLM_MAX_TOKENS: "5000"
+          LLM_CONCURRENCY: "12"
+          # Logical guardrail only; physical Agnes requests remain capped at 18.
+          LLM_CALL_BUDGET: "80"
+          HTTP_TIMEOUT_MS: "20000"
           PAGES_URL: https://${{ github.repository_owner }}.github.io/roxy-rss-bot
-        run: |
-          pnpm start
-          pnpm manifest
-          echo "DIGEST_DATE=$(TZ=Asia/Shanghai date +%F)" >> "$GITHUB_ENV"
+        run: pnpm start
 
-      - name: Upload manual validation output
-        if: github.event_name == 'workflow_dispatch'
+      - name: Rebuild manifest and feed
+        id: manifest
+        if: always()
+        continue-on-error: true
+        env:
+          PAGES_URL: https://${{ github.repository_owner }}.github.io/roxy-rss-bot
+        run: pnpm manifest
+
+      - name: Validate publication boundary
+        id: validate
+        if: always()
+        run: |
+          echo "publishable=false" >> "$GITHUB_OUTPUT"
+          if [ "${{ steps.generate.outcome }}" != "success" ]; then
+            echo "Digest process exited unsuccessfully; refusing to publish partial state." >&2
+            exit 1
+          fi
+          if [ "${{ steps.manifest.outcome }}" != "success" ]; then
+            echo "Manifest/feed generation failed; refusing to publish." >&2
+            exit 1
+          fi
+          pnpm validate:publication "${DIGEST_DATE}"
+          echo "publishable=true" >> "$GITHUB_OUTPUT"
+
+      - name: Write run summary
+        if: always()
+        run: |
+          {
+            echo "## Roxy Daily RSS"
+            echo ""
+            echo "- Date: \`${DIGEST_DATE}\`"
+            echo "- Generate step: \`${{ steps.generate.outcome }}\`"
+            echo "- Manifest step: \`${{ steps.manifest.outcome }}\`"
+            echo "- Publishable: \`${{ steps.validate.outputs.publishable || 'false' }}\`"
+            if [ -f "digests/${DIGEST_DATE}/run-status.json" ]; then
+              echo "- Publication health: \`$(jq -r '.status' "digests/${DIGEST_DATE}/run-status.json")\`"
+              echo ""
+              echo "### Degraded components"
+              jq -r '.components[] | select(.state == "degraded") | "- `" + .component + "`: `" + (.code // "unknown") + "`"' \
+                "digests/${DIGEST_DATE}/run-status.json"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload validation evidence
+        if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: roxy-digest-${{ github.run_id }}
@@ -78,14 +141,16 @@ jobs:
             digests/${{ env.DIGEST_DATE }}/
             manifest.json
             feed.xml
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 3
 
       - name: Commit generated content to publishing branch
-        if: github.event_name == 'schedule' || inputs.publish
+        id: publish
+        if: steps.validate.outputs.publishable == 'true' && (github.event_name == 'schedule' || inputs.publish)
         env:
           PUBLISH_BRANCH: digest-output
         run: |
+          echo "deploy=false" >> "$GITHUB_OUTPUT"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add digests/ manifest.json feed.xml
@@ -106,9 +171,11 @@ jobs:
             exit 0
           fi
           git push origin "${published_commit}:refs/heads/${PUBLISH_BRANCH}"
+          echo "published_commit=${published_commit}" >> "$GITHUB_OUTPUT"
+          echo "deploy=true" >> "$GITHUB_OUTPUT"
 
   pages:
-    if: github.event_name == 'schedule' || inputs.publish
+    if: always() && needs.digest.outputs.deploy == 'true'
     needs: digest
     permissions:
       contents: read

@@ -14,6 +14,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { NOTIFY_LABELS } from "./i18n.ts";
 import type { Highlights } from "./notify.ts";
+import { fetchWithTimeout } from "./http.ts";
 
 const PAGES_URL_DEFAULT = "https://duanyytop.github.io/agents-radar";
 
@@ -26,7 +27,7 @@ function getWebhookUrls(): string[] {
 }
 
 async function sendToOneWebhook(webhookUrl: string, title: string, content: string): Promise<void> {
-  const res = await fetch(webhookUrl, {
+  const res = await fetchWithTimeout(webhookUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

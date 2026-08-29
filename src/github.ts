@@ -3,6 +3,8 @@
  * Reads GITHUB_TOKEN and DIGEST_REPO from environment at call time.
  */
 
+import { fetchWithTimeout } from "./http.ts";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -60,6 +62,8 @@ export interface RepoFetch {
   issues: GitHubItem[];
   prs: GitHubItem[];
   releases: GitHubRelease[];
+  /** False when the repository API fetch failed; absent means successful legacy data. */
+  fetchSuccess?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -80,7 +84,7 @@ function headers(): Record<string, string> {
 async function githubGet<T>(url: string, params: Record<string, string> = {}): Promise<T> {
   const u = new URL(url);
   for (const [k, v] of Object.entries(params)) u.searchParams.set(k, v);
-  const resp = await fetch(u.toString(), { headers: headers() });
+  const resp = await fetchWithTimeout(u.toString(), { headers: headers() });
   if (!resp.ok) throw new Error(`GitHub API error ${resp.status} (${url}): ${await resp.text()}`);
   return resp.json() as Promise<T>;
 }
@@ -155,7 +159,7 @@ export async function fetchRecentReleases(repo: string, since: Date): Promise<Gi
 
 export async function ensureLabel(name: string, color: string): Promise<void> {
   const digestRepo = process.env["DIGEST_REPO"] ?? "";
-  const resp = await fetch(`https://api.github.com/repos/${digestRepo}/labels`, {
+  const resp = await fetchWithTimeout(`https://api.github.com/repos/${digestRepo}/labels`, {
     method: "POST",
     headers: { ...headers(), "Content-Type": "application/json" },
     body: JSON.stringify({ name, color }),
@@ -252,7 +256,7 @@ export async function closeStaleIssues(days: number): Promise<number> {
 
     await Promise.all(
       stale.map(async (i) => {
-        const resp = await fetch(`https://api.github.com/repos/${digestRepo}/issues/${i.number}`, {
+        const resp = await fetchWithTimeout(`https://api.github.com/repos/${digestRepo}/issues/${i.number}`, {
           method: "PATCH",
           headers: { ...headers(), "Content-Type": "application/json" },
           body: JSON.stringify({ state: "closed" }),
@@ -267,17 +271,35 @@ export async function closeStaleIssues(days: number): Promise<number> {
 
 export async function createGitHubIssue(title: string, body: string, label: string): Promise<string> {
   const digestRepo = process.env["DIGEST_REPO"] ?? "";
+  if (!digestRepo) throw new Error("DIGEST_REPO is required to publish GitHub issues");
   body = neutralizeGitHubRefs(body);
   if (body.length > GITHUB_ISSUE_BODY_LIMIT) {
     body = body.slice(0, GITHUB_ISSUE_BODY_LIMIT - TRUNCATION_NOTICE.length) + TRUNCATION_NOTICE;
   }
   await ensureLabel(label, LABEL_COLORS[label] ?? "0075ca");
-  const resp = await fetch(`https://api.github.com/repos/${digestRepo}/issues`, {
-    method: "POST",
-    headers: { ...headers(), "Content-Type": "application/json" },
-    body: JSON.stringify({ title, body, labels: [label] }),
+
+  const existingIssues = await githubGet<
+    Array<{ number: number; title: string; html_url: string; pull_request?: unknown }>
+  >(`https://api.github.com/repos/${digestRepo}/issues`, {
+    state: "all",
+    sort: "created",
+    direction: "desc",
+    per_page: "100",
   });
-  if (!resp.ok) throw new Error(`Failed to create issue: ${await resp.text()}`);
+  const existing = existingIssues.find((issue) => issue.title === title && !issue.pull_request);
+  const endpoint = existing
+    ? `https://api.github.com/repos/${digestRepo}/issues/${existing.number}`
+    : `https://api.github.com/repos/${digestRepo}/issues`;
+  const resp = await fetchWithTimeout(endpoint, {
+    method: existing ? "PATCH" : "POST",
+    headers: { ...headers(), "Content-Type": "application/json" },
+    body: JSON.stringify(
+      existing ? { body, labels: [label], state: "open" } : { title, body, labels: [label] },
+    ),
+  });
+  if (!resp.ok) {
+    throw new Error(`Failed to ${existing ? "update" : "create"} issue: ${await resp.text()}`);
+  }
   const data = (await resp.json()) as { html_url: string };
   return data.html_url;
 }

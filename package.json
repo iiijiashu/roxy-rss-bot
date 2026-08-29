@@ -11,6 +11,7 @@
     "format": "prettier --write src",
     "format:check": "prettier --check src",
     "manifest": "tsx src/generate-manifest.ts",
+    "validate:publication": "tsx src/validate-publication.ts",
     "weekly": "tsx src/weekly.ts",
     "monthly": "tsx src/monthly.ts",
     "notify": "tsx src/notify.ts",

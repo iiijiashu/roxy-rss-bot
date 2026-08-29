@@ -2,6 +2,8 @@
  * Lobste.rs AI stories fetched via tag-based JSON endpoints (e.g., /t/ai.json).
  */
 
+import { fetchWithTimeout } from "./http.ts";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -58,7 +60,7 @@ export async function fetchLobstersData(): Promise<LobstersData> {
     await Promise.all(
       TAG_URLS.map(async (tagUrl) => {
         try {
-          const resp = await fetch(tagUrl, {
+          const resp = await fetchWithTimeout(tagUrl, {
             headers: { "User-Agent": "agents-radar/1.0" },
           });
 
