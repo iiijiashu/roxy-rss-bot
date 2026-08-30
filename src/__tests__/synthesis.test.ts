@@ -1801,6 +1801,42 @@ describe("bounded synthesis repair", () => {
     expect(invoke.mock.calls[2]![0]).not.toContain("guaranteed outcome claim");
   });
 
+  it("allows one final inference-only repair after a changed labeled regression", async () => {
+    const { records, events, development } = validFixture();
+    const sentiment = {
+      ...development,
+      why_it_matters: "社区普遍认可这一变化会影响智能体应用。",
+    };
+    const guaranteeAndEditorial = {
+      ...development,
+      summary: "安全智能体增加隔离执行和审计日志。".repeat(10),
+      why_it_matters: "这会确保接口始终可用。",
+    };
+    const impactRegression = {
+      ...development,
+      why_it_matters: "这会显著提升开发效率。",
+    };
+    const invoke = vi
+      .fn<(prompt: string, maxTokens: number) => Promise<string>>()
+      .mockResolvedValueOnce(JSON.stringify({ developments: [sentiment] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [guaranteeAndEditorial] }))
+      .mockRejectedValueOnce(Object.assign(new Error("bounded timeout"), { code: "timeout" }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [impactRegression] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [development] }));
+
+    await expect(
+      synthesizeWithQualityGate("BASE_PROMPT", events, records, {
+        invoke,
+        parse: (raw) => JSON.parse(raw) as unknown,
+      }),
+    ).resolves.toMatchObject({ quality: { status: "pass" } });
+
+    expect(invoke).toHaveBeenCalledTimes(5);
+    expect(invoke.mock.calls[4]![0]).toContain("按原始 evidence 从零改写");
+    expect(invoke.mock.calls[4]![0]).not.toContain("community sentiment");
+    expect(invoke.mock.calls[4]![0]).not.toContain("guaranteed outcome claim");
+  });
+
   it("does not reach a later mechanical candidate after two failed quality repairs", async () => {
     const { records, events, development } = validFixture();
     const editorialFailure = {

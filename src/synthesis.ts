@@ -764,6 +764,23 @@ function canUseFinalEditorialQualityRepair(
   );
 }
 
+function canUseFinalInferenceQualityRepair(
+  qualityFailureCount: number,
+  quality: QualityReport,
+  previousInferenceLabels: readonly string[],
+  hasSurgicalRepair: boolean,
+): boolean {
+  if (qualityFailureCount !== 3 || quality.developmentCount !== quality.eligibleEventCount) {
+    return false;
+  }
+  const failedChecks = quality.checks.filter((check) => !check.passed).map((check) => check.name);
+  if (failedChecks.length !== 1 || failedChecks[0] !== "unsupported_inference") return false;
+  const inferenceLabels = [...new Set(safeInferenceLabels(quality))].sort();
+  if (inferenceLabels.length === 0) return false;
+  const previousLabels = [...new Set(previousInferenceLabels)].sort();
+  return hasSurgicalRepair || inferenceLabels.join("\n") !== previousLabels.join("\n");
+}
+
 function qualityCorrection(quality: QualityReport, events: EventCandidate[]): string {
   const mechanicalDetails = safeMechanicalCorrectionDetails(quality);
   const lexicalDetails = safeLexicalCorrectionDetails(quality);
@@ -1293,6 +1310,12 @@ export async function synthesizeWithQualityGate(
         canUseBoundedSecondQualityRepair(qualityFailureCount, quality, bestDevelopmentCount) ||
         canUseLabeledInferenceOnlyRepair(qualityFailureCount, quality, priorInferenceLabels) ||
         canUseFinalEditorialQualityRepair(qualityFailureCount, quality, hasSurgicalRepair) ||
+        canUseFinalInferenceQualityRepair(
+          qualityFailureCount,
+          quality,
+          priorInferenceLabels,
+          hasSurgicalRepair,
+        ) ||
         (qualityFailureCount === 2 && hasSurgicalRepair))
     ) {
       correction = hasSurgicalRepair
