@@ -781,6 +781,27 @@ function canUseFinalInferenceQualityRepair(
   return hasSurgicalRepair || inferenceLabels.join("\n") !== previousLabels.join("\n");
 }
 
+function canUseFinalLifecycleInferenceQualityRepair(
+  qualityFailureCount: number,
+  quality: QualityReport,
+  surgicalIndexes: readonly number[],
+): boolean {
+  if (
+    qualityFailureCount !== 3 ||
+    quality.developmentCount !== quality.eligibleEventCount ||
+    surgicalIndexes.length !== 1 ||
+    safeInferenceLabels(quality).length === 0
+  ) {
+    return false;
+  }
+  const failedChecks = quality.checks.filter((check) => !check.passed).map((check) => check.name);
+  return (
+    failedChecks.length === 2 &&
+    failedChecks.includes("unsupported_inference") &&
+    failedChecks.includes("lifecycle_language")
+  );
+}
+
 function qualityCorrection(quality: QualityReport, events: EventCandidate[]): string {
   const mechanicalDetails = safeMechanicalCorrectionDetails(quality);
   const lexicalDetails = safeLexicalCorrectionDetails(quality);
@@ -1316,6 +1337,7 @@ export async function synthesizeWithQualityGate(
           priorInferenceLabels,
           hasSurgicalRepair,
         ) ||
+        canUseFinalLifecycleInferenceQualityRepair(qualityFailureCount, quality, surgicalIndexes) ||
         (qualityFailureCount === 2 && hasSurgicalRepair))
     ) {
       correction = hasSurgicalRepair

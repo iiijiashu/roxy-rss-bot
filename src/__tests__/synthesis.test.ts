@@ -1837,6 +1837,206 @@ describe("bounded synthesis repair", () => {
     expect(invoke.mock.calls[4]![0]).not.toContain("guaranteed outcome claim");
   });
 
+  it("allows one final labeled inference and lifecycle repair", async () => {
+    const record: EvidenceRecord = {
+      ...evidence(),
+      id: "github:org/project:pr:42:created",
+      sourceType: "github_pr",
+      sourceName: "Project GitHub",
+      authority: "primary-community",
+      url: "https://github.com/org/project/pull/42",
+      title: "Add a new agent API",
+      content: "This pull request proposes a new agent API.",
+      category: "agent",
+      metadata: {
+        repo: "org/project",
+        kind: "pr",
+        issue_or_pr_number: 42,
+        activity: "created",
+        state: "open",
+      },
+    };
+    const siblingRecord: EvidenceRecord = {
+      ...evidence(),
+      id: "S2",
+      url: "https://example.com/sibling-agent",
+      title: "Sibling Agent Update",
+      content: "Sibling Agent adds isolated execution and audit logs.",
+      category: "agent",
+    };
+    const records = [record, siblingRecord];
+    const events = records.map((item) => groupEvidence([item])[0]!);
+    const sibling: SynthesizedDevelopment = {
+      event_id: events[1]!.id,
+      title: "Sibling Agent 增加隔离执行",
+      summary: "Sibling Agent 增加隔离执行和审计日志。",
+      why_it_matters: "这会影响智能体的隔离边界和审计能力。",
+      source_ids: [siblingRecord.id],
+    };
+    const editorialAndLifecycle = {
+      event_id: events[0]!.id,
+      title: "Project 智能体 API 新增提案".repeat(4),
+      summary: "该 PR 已合并智能体 API，并优化工具调用。".repeat(8),
+      why_it_matters: "这会影响智能体应用的接口设计。",
+      source_ids: [record.id],
+    };
+    const inferenceAndLifecycle = {
+      ...editorialAndLifecycle,
+      title: "Project 智能体 API 新增提案",
+      summary: "该 PR 已合并智能体 API。",
+      why_it_matters: "这会确保接口始终可用。",
+    };
+    const valid = {
+      ...inferenceAndLifecycle,
+      summary: "该 PR 提议新增智能体 API，尚未合并。",
+      why_it_matters: "若合并，这会影响智能体应用的接口设计。",
+    };
+    const invoke = vi
+      .fn<(prompt: string, maxTokens: number) => Promise<string>>()
+      .mockResolvedValueOnce(JSON.stringify({ developments: [editorialAndLifecycle, sibling] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [editorialAndLifecycle] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [inferenceAndLifecycle] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [valid] }));
+
+    await expect(
+      synthesizeWithQualityGate("BASE_PROMPT", events, records, {
+        invoke,
+        parse: (raw) => JSON.parse(raw) as unknown,
+      }),
+    ).resolves.toMatchObject({ quality: { status: "pass" } });
+
+    expect(invoke).toHaveBeenCalledTimes(4);
+    expect(invoke.mock.calls[3]![0]).toContain("严格按 metadata.activity/state 写 GitHub 生命周期");
+    expect(invoke.mock.calls[3]![0]).toContain("按原始 evidence 从零改写");
+    expect(invoke.mock.calls[3]![0]).toContain("developments 必须恰好包含 1 条");
+    expect(invoke.mock.calls[3]![0]).not.toContain("guaranteed outcome claim");
+    expect(invoke.mock.calls[3]![0]).not.toContain("Sibling Agent Update");
+    expect(invoke.mock.calls[3]![0]).not.toContain("这会确保接口始终可用");
+    expect(invoke.mock.calls[3]![0]).not.toContain("若合并，这会影响智能体应用的接口设计");
+
+    const inferenceLifecycleAndEditorial = {
+      ...inferenceAndLifecycle,
+      summary: "该 PR 已合并智能体 API，并优化工具调用。".repeat(8),
+    };
+    const rejectInvoke = vi
+      .fn<(prompt: string, maxTokens: number) => Promise<string>>()
+      .mockResolvedValueOnce(JSON.stringify({ developments: [editorialAndLifecycle, sibling] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [editorialAndLifecycle] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [inferenceLifecycleAndEditorial] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [valid] }));
+
+    await expect(
+      synthesizeWithQualityGate("BASE_PROMPT", events, records, {
+        invoke: rejectInvoke,
+        parse: (raw) => JSON.parse(raw) as unknown,
+      }),
+    ).rejects.toThrow(/unsupported_inference/u);
+    expect(rejectInvoke).toHaveBeenCalledTimes(3);
+
+    const incompleteInvoke = vi
+      .fn<(prompt: string, maxTokens: number) => Promise<string>>()
+      .mockResolvedValueOnce(JSON.stringify({ developments: [editorialAndLifecycle, sibling] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [editorialAndLifecycle] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [valid] }));
+
+    await expect(
+      synthesizeWithQualityGate("BASE_PROMPT", events, records, {
+        invoke: incompleteInvoke,
+        parse: (raw) => JSON.parse(raw) as unknown,
+      }),
+    ).rejects.toThrow(/development_count/u);
+    expect(incompleteInvoke).toHaveBeenCalledTimes(3);
+
+    const repeatedInvoke = vi
+      .fn<(prompt: string, maxTokens: number) => Promise<string>>()
+      .mockResolvedValueOnce(JSON.stringify({ developments: [editorialAndLifecycle, sibling] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [editorialAndLifecycle] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [inferenceAndLifecycle] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [inferenceAndLifecycle] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: [valid] }));
+
+    await expect(
+      synthesizeWithQualityGate("BASE_PROMPT", events, records, {
+        invoke: repeatedInvoke,
+        parse: (raw) => JSON.parse(raw) as unknown,
+      }),
+    ).rejects.toThrow(/unsupported_inference/u);
+    expect(repeatedInvoke).toHaveBeenCalledTimes(4);
+  });
+
+  it("does not final-repair lifecycle and inference failures across multiple developments", async () => {
+    const pullRequests = ["alpha", "beta"].map(
+      (name, index): EvidenceRecord => ({
+        ...evidence(),
+        id: `github:org/${name}:pr:${index + 1}:created`,
+        sourceType: "github_pr",
+        sourceName: `${name} GitHub`,
+        authority: "primary-community",
+        url: `https://github.com/org/${name}/pull/${index + 1}`,
+        title: `Add the ${name} agent API`,
+        content: `This pull request proposes the ${name} agent API.`,
+        category: "agent",
+        metadata: {
+          repo: `org/${name}`,
+          kind: "pr",
+          issue_or_pr_number: index + 1,
+          activity: "created",
+          state: "open",
+        },
+      }),
+    );
+    const siblingRecord: EvidenceRecord = {
+      ...evidence(),
+      id: "S3",
+      url: "https://example.com/stable-sibling",
+      title: "Stable Sibling Update",
+      content: "Stable Sibling adds isolated execution and audit logs.",
+      category: "agent",
+    };
+    const records = [...pullRequests, siblingRecord];
+    const events = records.map((record) => groupEvidence([record])[0]!);
+    const editorialAndLifecycle = pullRequests.map((record, index) => ({
+      event_id: events[index]!.id,
+      title: index === 0 ? "Alpha 智能体 API 提案" : "Beta 工具 API 提案",
+      summary: `${index === 0 ? "Alpha" : "Beta"} PR 已合并智能体 API，并优化工具调用。`.repeat(8),
+      why_it_matters: index === 0 ? "这会影响 Alpha 应用的接口设计。" : "这会影响 Beta 工具的集成设计。",
+      source_ids: [record.id],
+    }));
+    const inferenceAndLifecycle = editorialAndLifecycle.map((development, index) => ({
+      ...development,
+      summary: `${index === 0 ? "Alpha" : "Beta"} PR 已合并智能体 API。`,
+      why_it_matters: index === 0 ? "这会确保 Alpha 接口始终可用。" : "这会保证 Beta 工具调用永远正确。",
+    }));
+    const valid = inferenceAndLifecycle.map((development, index) => ({
+      ...development,
+      summary: `${index === 0 ? "Alpha" : "Beta"} PR 提议新增智能体 API，尚未合并。`,
+      why_it_matters:
+        index === 0 ? "若合并，这会影响 Alpha 应用的接口设计。" : "若合并，这会影响 Beta 工具的集成设计。",
+    }));
+    const sibling: SynthesizedDevelopment = {
+      event_id: events[2]!.id,
+      title: "Stable Sibling 增加隔离执行",
+      summary: "Stable Sibling 增加隔离执行和审计日志。",
+      why_it_matters: "这会影响智能体的隔离边界和审计能力。",
+      source_ids: [siblingRecord.id],
+    };
+    const invoke = vi
+      .fn<(prompt: string, maxTokens: number) => Promise<string>>()
+      .mockResolvedValueOnce(JSON.stringify({ developments: [...editorialAndLifecycle, sibling] }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: editorialAndLifecycle }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: inferenceAndLifecycle }))
+      .mockResolvedValueOnce(JSON.stringify({ developments: valid }));
+
+    await expect(
+      synthesizeWithQualityGate("BASE_PROMPT", events, records, {
+        invoke,
+        parse: (raw) => JSON.parse(raw) as unknown,
+      }),
+    ).rejects.toThrow(/unsupported_inference/u);
+    expect(invoke).toHaveBeenCalledTimes(3);
+  });
+
   it("does not reach a later mechanical candidate after two failed quality repairs", async () => {
     const { records, events, development } = validFixture();
     const editorialFailure = {
