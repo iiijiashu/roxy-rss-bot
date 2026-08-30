@@ -3,6 +3,13 @@
  * Reads GITHUB_TOKEN and DIGEST_REPO from environment at call time.
  */
 
+import {
+  discardResponseBody,
+  fetchWithTimeout,
+  readResponseJsonWithTimeout,
+  readResponseTextWithTimeout,
+} from "./http.ts";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -41,6 +48,8 @@ export interface GitHubItem {
   labels: GitHubLabel[];
   created_at: string;
   updated_at: string;
+  closed_at?: string | null;
+  merged_at?: string | null;
   comments: number;
   reactions?: GitHubReactions;
   body?: string | null;
@@ -53,6 +62,7 @@ export interface GitHubRelease {
   name: string;
   body?: string | null;
   published_at: string;
+  html_url?: string;
 }
 
 export interface RepoFetch {
@@ -60,29 +70,64 @@ export interface RepoFetch {
   issues: GitHubItem[];
   prs: GitHubItem[];
   releases: GitHubRelease[];
+  /** False when the repository API fetch failed; absent means successful legacy data. */
+  fetchSuccess?: boolean;
+  /** True when a configured API traversal limit was reached before the time window ended. */
+  truncated?: boolean;
+}
+
+export type GitHubActivity = "created" | "merged" | "closed" | "engagement_delta";
+
+/** Select the timestamp that actually proves the classified GitHub activity. */
+export function githubActivityTimestamp(item: GitHubItem, activity: GitHubActivity): string {
+  if (activity === "created") return item.created_at;
+  if (activity === "merged") return item.merged_at ?? item.updated_at;
+  if (activity === "closed") return item.closed_at ?? item.updated_at;
+  return item.updated_at;
+}
+
+export interface GitHubItemsResult {
+  items: GitHubItem[];
+  truncated: boolean;
+  pagesFetched: number;
+}
+
+export interface GitHubReleasesResult {
+  releases: GitHubRelease[];
+  truncated: boolean;
+  pagesFetched: number;
 }
 
 // ---------------------------------------------------------------------------
 // Internals
 // ---------------------------------------------------------------------------
 
-/** Maximum pages to fetch for paginated repos (100 items/page). */
+/** Keep response bodies small enough for slow proxies while retaining a bounded daily window. */
+export const GITHUB_PAGE_SIZE = 30;
 const MAX_PAGES = 5;
+const GITHUB_BODY_TIMEOUT_MS = 60_000;
+const GITHUB_BODY_LIMIT_BYTES = 8 * 1024 * 1024;
+export const MAX_RECENT_ITEMS = MAX_PAGES * GITHUB_PAGE_SIZE;
 
 function headers(): Record<string, string> {
-  return {
-    Authorization: `Bearer ${process.env["GITHUB_TOKEN"] ?? ""}`,
+  const requestHeaders: Record<string, string> = {
     Accept: "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28",
   };
+  const token = process.env["GITHUB_TOKEN"]?.trim();
+  if (token) requestHeaders.Authorization = `Bearer ${token}`;
+  return requestHeaders;
 }
 
 async function githubGet<T>(url: string, params: Record<string, string> = {}): Promise<T> {
   const u = new URL(url);
   for (const [k, v] of Object.entries(params)) u.searchParams.set(k, v);
-  const resp = await fetch(u.toString(), { headers: headers() });
-  if (!resp.ok) throw new Error(`GitHub API error ${resp.status} (${url}): ${await resp.text()}`);
-  return resp.json() as Promise<T>;
+  const resp = await fetchWithTimeout(u.toString(), { headers: headers() });
+  if (!resp.ok) {
+    const body = await readResponseTextWithTimeout(resp, GITHUB_BODY_TIMEOUT_MS, 64 * 1024);
+    throw new Error(`GitHub API error ${resp.status} (${url}): ${body}`);
+  }
+  return readResponseJsonWithTimeout<T>(resp, GITHUB_BODY_TIMEOUT_MS, GITHUB_BODY_LIMIT_BYTES);
 }
 
 async function fetchItemPage(
@@ -95,7 +140,7 @@ async function fetchItemPage(
     state: "all",
     sort: "updated",
     direction: "desc",
-    per_page: "100",
+    per_page: String(GITHUB_PAGE_SIZE),
     page: String(page),
   };
   // /pulls does not support `since`; filter client-side instead
@@ -112,57 +157,110 @@ async function fetchItemPage(
 /**
  * Fetch items updated since `since`.
  * Paginated repos: keeps fetching until a page ends before `since` or MAX_PAGES reached.
- * Regular repos: single page of 50.
+ * Regular repos: one bounded page.
  */
 export async function fetchRecentItems(
   cfg: RepoConfig,
   itemType: "issues" | "pulls",
   since: Date,
 ): Promise<GitHubItem[]> {
+  return (await fetchRecentItemsWithMeta(cfg, itemType, since)).items;
+}
+
+export async function fetchRecentItemsWithMeta(
+  cfg: RepoConfig,
+  itemType: "issues" | "pulls",
+  since: Date,
+): Promise<GitHubItemsResult> {
   if (!cfg.paginated) {
     const params: Record<string, string> = {
       state: "all",
       sort: "updated",
       direction: "desc",
-      per_page: "50",
+      per_page: String(GITHUB_PAGE_SIZE),
     };
     if (itemType === "issues") params["since"] = since.toISOString();
     const items = await githubGet<GitHubItem[]>(
       `https://api.github.com/repos/${cfg.repo}/${itemType}`,
       params,
     );
-    return itemType === "pulls" ? items.filter((i) => new Date(i.updated_at) >= since) : items;
+    return {
+      items: itemType === "pulls" ? items.filter((i) => new Date(i.updated_at) >= since) : items,
+      truncated: items.length >= GITHUB_PAGE_SIZE,
+      pagesFetched: 1,
+    };
   }
 
   const all: GitHubItem[] = [];
+  const seenNumbers = new Set<number>();
+  let pagesFetched = 0;
+  let truncated = false;
   for (let page = 1; page <= MAX_PAGES; page++) {
     const items = await fetchItemPage(cfg.repo, itemType, since, page);
+    pagesFetched = page;
     if (items.length === 0) break;
-    all.push(...items);
+    for (const item of items) {
+      if (seenNumbers.has(item.number)) continue;
+      seenNumbers.add(item.number);
+      all.push(item);
+    }
     const last = items[items.length - 1];
     if (last && new Date(last.updated_at) < since) break;
-    if (items.length < 100) break;
+    if (items.length < GITHUB_PAGE_SIZE) break;
+    if (page === MAX_PAGES) truncated = true;
   }
-  return all;
+  return { items: all, truncated, pagesFetched };
 }
 
 export async function fetchRecentReleases(repo: string, since: Date): Promise<GitHubRelease[]> {
-  const releases = await githubGet<GitHubRelease[]>(`https://api.github.com/repos/${repo}/releases`, {
-    per_page: "10",
-  });
-  return releases.filter((r) => new Date(r.published_at) >= since);
+  return (await fetchRecentReleasesWithMeta(repo, since)).releases;
+}
+
+export async function fetchRecentReleasesWithMeta(repo: string, since: Date): Promise<GitHubReleasesResult> {
+  const releases: GitHubRelease[] = [];
+  const seenTags = new Set<string>();
+  let pagesFetched = 0;
+  let truncated = false;
+  for (let page = 1; page <= MAX_PAGES; page++) {
+    const batch = await githubGet<GitHubRelease[]>(`https://api.github.com/repos/${repo}/releases`, {
+      per_page: String(GITHUB_PAGE_SIZE),
+      page: String(page),
+    });
+    pagesFetched = page;
+    if (batch.length === 0) break;
+    for (const release of batch) {
+      if (
+        typeof release.published_at !== "string" ||
+        !Number.isFinite(Date.parse(release.published_at)) ||
+        Date.parse(release.published_at) < since.getTime() ||
+        seenTags.has(release.tag_name)
+      ) {
+        continue;
+      }
+      seenTags.add(release.tag_name);
+      releases.push(release);
+    }
+    // GitHub's release ordering is not a trustworthy published_at boundary:
+    // a long-lived draft can be published after newer-created releases. Stay
+    // bounded, but do not stop merely because one page contains an old release.
+    if (batch.length < GITHUB_PAGE_SIZE) break;
+    if (page === MAX_PAGES) truncated = true;
+  }
+  return { releases, truncated, pagesFetched };
 }
 
 export async function ensureLabel(name: string, color: string): Promise<void> {
   const digestRepo = process.env["DIGEST_REPO"] ?? "";
-  const resp = await fetch(`https://api.github.com/repos/${digestRepo}/labels`, {
+  const resp = await fetchWithTimeout(`https://api.github.com/repos/${digestRepo}/labels`, {
     method: "POST",
     headers: { ...headers(), "Content-Type": "application/json" },
     body: JSON.stringify({ name, color }),
   });
   if (!resp.ok && resp.status !== 422) {
-    throw new Error(`Failed to create label "${name}": ${await resp.text()}`);
+    const body = await readResponseTextWithTimeout(resp, undefined, 64 * 1024);
+    throw new Error(`Failed to create label "${name}": ${body}`);
   }
+  await discardResponseBody(resp);
 }
 
 /**
@@ -190,6 +288,14 @@ export async function fetchSkillsData(repo: string): Promise<{ prs: GitHubItem[]
 
 const GITHUB_ISSUE_BODY_LIMIT = 65536;
 const TRUNCATION_NOTICE = "\n\n---\n> ⚠️ 内容超过 GitHub Issue 上限，完整报告见提交的 Markdown 文件。";
+const MAX_EXISTING_ISSUE_LOOKUP_PAGES = 20;
+
+interface ExistingIssue {
+  number: number;
+  title: string;
+  html_url: string;
+  pull_request?: unknown;
+}
 
 /** GitHub label colors by label name. Default: "0075ca". */
 const LABEL_COLORS: Record<string, string> = {
@@ -228,6 +334,27 @@ function neutralizeGitHubRefs(text: string): string {
   );
 }
 
+async function findExistingIssueByTitle(
+  digestRepo: string,
+  title: string,
+): Promise<ExistingIssue | undefined> {
+  for (let page = 1; page <= MAX_EXISTING_ISSUE_LOOKUP_PAGES; page++) {
+    const issues = await githubGet<ExistingIssue[]>(`https://api.github.com/repos/${digestRepo}/issues`, {
+      state: "all",
+      sort: "created",
+      direction: "desc",
+      per_page: "100",
+      page: String(page),
+    });
+    const existing = issues.find((issue) => issue.title === title && !issue.pull_request);
+    if (existing) return existing;
+    if (issues.length < 100) return undefined;
+  }
+  throw new Error(
+    `Issue idempotency lookup exceeded ${MAX_EXISTING_ISSUE_LOOKUP_PAGES * 100} entries; refusing to create a possible duplicate`,
+  );
+}
+
 /**
  * Close open issues created more than `days` days ago.
  * Uses pagination to handle large backlogs. Returns the number of issues closed.
@@ -237,6 +364,7 @@ export async function closeStaleIssues(days: number): Promise<number> {
   if (!digestRepo) return 0;
   const cutoff = new Date(Date.now() - days * 86_400_000);
   let closed = 0;
+  const confirmedClosed = new Set<number>();
 
   // Always re-fetch page 1: closing issues shifts pagination, so incrementing
   // pages would skip items.
@@ -249,17 +377,29 @@ export async function closeStaleIssues(days: number): Promise<number> {
 
     const stale = issues.filter((i) => new Date(i.created_at) < cutoff);
     if (stale.length === 0) break;
+    const staleNumbers = stale.map((issue) => issue.number);
+    if (
+      new Set(staleNumbers).size !== staleNumbers.length ||
+      staleNumbers.some((number) => confirmedClosed.has(number))
+    ) {
+      throw new Error("GitHub stale-issue traversal did not make progress");
+    }
 
     await Promise.all(
       stale.map(async (i) => {
-        const resp = await fetch(`https://api.github.com/repos/${digestRepo}/issues/${i.number}`, {
+        const resp = await fetchWithTimeout(`https://api.github.com/repos/${digestRepo}/issues/${i.number}`, {
           method: "PATCH",
           headers: { ...headers(), "Content-Type": "application/json" },
           body: JSON.stringify({ state: "closed" }),
         });
-        if (!resp.ok) console.error(`[github] Failed to close #${i.number}: ${resp.status}`);
+        if (!resp.ok) {
+          await discardResponseBody(resp);
+          throw new Error(`Failed to close stale GitHub issue: HTTP ${resp.status}`);
+        }
+        await discardResponseBody(resp);
       }),
     );
+    for (const number of staleNumbers) confirmedClosed.add(number);
     closed += stale.length;
   }
   return closed;
@@ -267,17 +407,28 @@ export async function closeStaleIssues(days: number): Promise<number> {
 
 export async function createGitHubIssue(title: string, body: string, label: string): Promise<string> {
   const digestRepo = process.env["DIGEST_REPO"] ?? "";
+  if (!digestRepo) throw new Error("DIGEST_REPO is required to publish GitHub issues");
   body = neutralizeGitHubRefs(body);
   if (body.length > GITHUB_ISSUE_BODY_LIMIT) {
     body = body.slice(0, GITHUB_ISSUE_BODY_LIMIT - TRUNCATION_NOTICE.length) + TRUNCATION_NOTICE;
   }
+
+  const existing = await findExistingIssueByTitle(digestRepo, title);
   await ensureLabel(label, LABEL_COLORS[label] ?? "0075ca");
-  const resp = await fetch(`https://api.github.com/repos/${digestRepo}/issues`, {
-    method: "POST",
+  const endpoint = existing
+    ? `https://api.github.com/repos/${digestRepo}/issues/${existing.number}`
+    : `https://api.github.com/repos/${digestRepo}/issues`;
+  const resp = await fetchWithTimeout(endpoint, {
+    method: existing ? "PATCH" : "POST",
     headers: { ...headers(), "Content-Type": "application/json" },
-    body: JSON.stringify({ title, body, labels: [label] }),
+    body: JSON.stringify(
+      existing ? { body, labels: [label], state: "open" } : { title, body, labels: [label] },
+    ),
   });
-  if (!resp.ok) throw new Error(`Failed to create issue: ${await resp.text()}`);
-  const data = (await resp.json()) as { html_url: string };
+  if (!resp.ok) {
+    const body = await readResponseTextWithTimeout(resp, undefined, 64 * 1024);
+    throw new Error(`Failed to ${existing ? "update" : "create"} issue: ${body}`);
+  }
+  const data = await readResponseJsonWithTimeout<{ html_url: string }>(resp);
   return data.html_url;
 }

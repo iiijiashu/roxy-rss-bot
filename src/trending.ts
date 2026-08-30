@@ -2,6 +2,13 @@
  * GitHub trending and AI topic search data fetching.
  */
 
+import {
+  discardResponseBody,
+  fetchWithTimeout,
+  readResponseJsonWithTimeout,
+  readResponseTextWithTimeout,
+} from "./http.ts";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -51,18 +58,19 @@ const SEARCH_QUERIES = [
 
 async function fetchGitHubTrending(): Promise<{ repos: TrendingRepo[]; success: boolean }> {
   try {
-    const resp = await fetch("https://github.com/trending?since=daily&spoken_language_code=", {
+    const resp = await fetchWithTimeout("https://github.com/trending?since=daily&spoken_language_code=", {
       headers: {
         "User-Agent": "Mozilla/5.0 (compatible; agents-radar/1.0)",
         Accept: "text/html",
       },
     });
     if (!resp.ok) {
+      await discardResponseBody(resp);
       console.error(`  [trending] HTTP ${resp.status} fetching github.com/trending`);
       return { repos: [], success: false };
     }
 
-    const html = await resp.text();
+    const html = await readResponseTextWithTimeout(resp);
     const repos: TrendingRepo[] = [];
 
     // Split by article blocks
@@ -157,12 +165,13 @@ async function searchAiRepos(sevenDaysAgo: string): Promise<SearchRepo[]> {
       try {
         const query = `${q}+pushed:>${sevenDaysAgo}&sort=stars&order=desc`;
         const url = `https://api.github.com/search/repositories?q=${query}&per_page=15`;
-        const resp = await fetch(url, { headers });
+        const resp = await fetchWithTimeout(url, { headers });
         if (!resp.ok) {
+          await discardResponseBody(resp);
           console.error(`  [trending/search] "${label}": HTTP ${resp.status}`);
           return;
         }
-        const data = (await resp.json()) as SearchApiResponse;
+        const data = await readResponseJsonWithTimeout<SearchApiResponse>(resp);
         let added = 0;
         for (const item of data.items ?? []) {
           if (!seen.has(item.full_name)) {

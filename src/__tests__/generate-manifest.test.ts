@@ -1,5 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { toRfc822, escapeXml, normalizeSiteUrl } from "../generate-manifest.ts";
+import {
+  escapeXml,
+  feedContentFromMarkdown,
+  normalizeSiteUrl,
+  selectReportsForDate,
+  stableGeneratedAt,
+  toRfc822,
+} from "../generate-manifest.ts";
 
 // ---------------------------------------------------------------------------
 // toRfc822
@@ -82,5 +89,40 @@ describe("normalizeSiteUrl", () => {
     "   ",
   ])("rejects unsafe or ambiguous URL %s", (value) => {
     expect(() => normalizeSiteUrl(value)).toThrow();
+  });
+});
+
+describe("stableGeneratedAt", () => {
+  it("derives a deterministic timestamp from the newest digest date", () => {
+    expect(stableGeneratedAt([{ date: "2026-08-29", reports: ["ai-cli"] }]).toISOString()).toBe(
+      "2026-08-29T00:00:00.000Z",
+    );
+  });
+
+  it("uses the Unix epoch for an empty archive", () => {
+    expect(stableGeneratedAt([]).toISOString()).toBe("1970-01-01T00:00:00.000Z");
+  });
+});
+
+describe("selectReportsForDate", () => {
+  it("exposes only digest when evidence-first and legacy files coexist", () => {
+    expect(selectReportsForDate(["digest", "ai-daily", "ai-cli", "ai-web"])).toEqual(["digest"]);
+  });
+
+  it("prefers the legacy consolidated daily file over per-source files", () => {
+    expect(selectReportsForDate(["ai-daily", "ai-cli", "ai-web"])).toEqual(["ai-daily"]);
+  });
+
+  it("preserves per-source reports for historical dates", () => {
+    expect(selectReportsForDate(["ai-cli", "ai-web"])).toEqual(["ai-cli", "ai-web"]);
+  });
+});
+
+describe("feedContentFromMarkdown", () => {
+  it("renders the full report body instead of a title-only fallback", () => {
+    const content = feedContentFromMarkdown("# 日报\n\n发生了什么：完整正文。\n");
+    expect(content.summary).toContain("发生了什么");
+    expect(content.fullHtml).toContain("<h1>日报</h1>");
+    expect(content.fullHtml).toContain("完整正文");
   });
 });

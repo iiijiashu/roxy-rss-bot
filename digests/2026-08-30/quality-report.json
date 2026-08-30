@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "passed": true,
+  "status": "pass",
+  "eligibleEventCount": 20,
+  "developmentCount": 20,
+  "duplicateRatio": 0,
+  "checks": [
+    {
+      "name": "schema",
+      "passed": true,
+      "detail": "strict development schema"
+    },
+    {
+      "name": "development_count",
+      "passed": true,
+      "detail": "expected=20 actual=20"
+    },
+    {
+      "name": "evidence_coverage",
+      "passed": true,
+      "detail": "all source_ids valid"
+    },
+    {
+      "name": "chinese_only",
+      "passed": true,
+      "detail": "all fields contain Chinese"
+    },
+    {
+      "name": "unsupported_inference",
+      "passed": true,
+      "detail": "none detected"
+    },
+    {
+      "name": "lifecycle_language",
+      "passed": true,
+      "detail": "GitHub lifecycle language is evidence-aligned"
+    },
+    {
+      "name": "editorial_style",
+      "passed": true,
+      "detail": "uniform bounded editorial style"
+    },
+    {
+      "name": "mechanical_grounding",
+      "passed": true,
+      "detail": "dates/numbers/versions grounded"
+    },
+    {
+      "name": "lexical_grounding",
+      "passed": true,
+      "detail": "ASCII claim tokens grounded"
+    },
+    {
+      "name": "duplicate_ratio",
+      "passed": true,
+      "detail": "ratio=0.000"
+    },
+    {
+      "name": "freshness_validity",
+      "passed": true,
+      "detail": "every event has current non-metadata evidence"
+    }
+  ],
+  "violations": []
+}

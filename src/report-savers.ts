@@ -24,7 +24,7 @@ import {
 } from "./prompts-data.ts";
 import { callLlm, saveFile, LLM_TOKENS_WEB, LLM_TOKENS_LISTING } from "./report.ts";
 import { createGitHubIssue } from "./github.ts";
-import { saveWebState, type WebFetchResult, type WebState } from "./web.ts";
+import { type WebFetchResult } from "./web.ts";
 import type { HnData } from "./hn.ts";
 import type { PhData } from "./ph.ts";
 import type { TrendingData } from "./trending.ts";
@@ -39,7 +39,6 @@ import type { LobstersData } from "./lobsters.ts";
 
 export async function saveWebReport(
   webResults: WebFetchResult[],
-  webState: WebState,
   utcStr: string,
   dateStr: string,
   digestRepo: string,
@@ -79,21 +78,20 @@ export async function saveWebReport(
       console.log(`  Saved ${saveFile(webContent, dateStr, fileName)}`);
 
       if (digestRepo) {
-        const issueTitle = WEB_REPORT.issueTitle(dateStr, isFirstRun, lang);
-        const webLabel = ISSUE_LABELS.web[lang];
-        const webUrl = await createGitHubIssue(issueTitle, webContent, webLabel);
-        console.log(`  Created web issue (${lang}): ${webUrl}`);
+        try {
+          const issueTitle = WEB_REPORT.issueTitle(dateStr, isFirstRun, lang);
+          const webLabel = ISSUE_LABELS.web[lang];
+          const webUrl = await createGitHubIssue(issueTitle, webContent, webLabel);
+          console.log(`  Created web issue (${lang}): ${webUrl}`);
+        } catch (err) {
+          console.error(`  [web/${lang}] Optional issue publication failed: ${err}`);
+        }
       }
     } catch (err) {
       console.error(`  [web/${lang}] Report generation failed: ${err}`);
     }
   } else {
     console.log(`  [web/${lang}] No new content detected, skipping report.`);
-  }
-
-  if (lang === "zh") {
-    saveWebState(webState);
-    console.log("  [web] State saved.");
   }
 }
 
