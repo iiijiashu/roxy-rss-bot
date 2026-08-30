@@ -23,7 +23,7 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-24.04
-    timeout-minutes: 75
+    timeout-minutes: 360
     outputs:
       publishable: ${{ steps.validate.outputs.publishable }}
       deploy: ${{ steps.publish.outputs.deploy }}
@@ -47,8 +47,19 @@ jobs:
             git fetch --no-tags origin "refs/heads/${PUBLISH_BRANCH}:refs/remotes/origin/${PUBLISH_BRANCH}"
             git checkout "refs/remotes/origin/${PUBLISH_BRANCH}" -- digests manifest.json feed.xml
           fi
-          # Never let a previous same-day publication make a failed rerun look healthy.
+          # Keep the first same-day input state so reruns regenerate the same
+          # evidence window, while removing stale outputs that could mask failure.
+          input_state_tmp="${RUNNER_TEMP}/roxy-daily-input-state-${DIGEST_DATE}.json"
+          rm -f "${input_state_tmp}"
+          if [ -f "digests/${DIGEST_DATE}/input-state.json" ]; then
+            cp "digests/${DIGEST_DATE}/input-state.json" "${input_state_tmp}"
+          fi
+          find digests -mindepth 2 -maxdepth 2 -type f -name input-state.json -delete
           rm -rf "digests/${DIGEST_DATE}"
+          mkdir -p "digests/${DIGEST_DATE}"
+          if [ -f "${input_state_tmp}" ]; then
+            mv "${input_state_tmp}" "digests/${DIGEST_DATE}/input-state.json"
+          fi
 
       - name: Setup pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
@@ -70,24 +81,25 @@ jobs:
           AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
           AGNES_MODEL: agnes-2.5-flash
           AGNES_BATCH_WINDOW_MS: "25"
-          AGNES_MAX_BATCH_TASKS: "2"
+          AGNES_MAX_BATCH_TASKS: "1"
           AGNES_MAX_BATCH_INPUT_BYTES: "180000"
-          AGNES_MAX_BATCH_OUTPUT_TOKENS: "12000"
-          # The evidence-first pipeline performs at most three logical synthesis
-          # calls. Each task may make three physical attempts: one initial
-          # request plus two retries.
-          AGNES_REQUEST_BUDGET: "9"
-          AGNES_RETRY_BUDGET: "6"
-          AGNES_MAX_TASK_ATTEMPTS: "3"
+          AGNES_MAX_BATCH_OUTPUT_TOKENS: "8000"
+          # Twenty selected events are synthesized as ten bounded two-event tasks.
+          # Each task allows three standard attempts plus up to four narrowly gated
+          # lifecycle/editorial/inference and final single-fact repairs. Provider-level retries are
+          # disabled because the outer quality loop already retries bounded failures.
+          AGNES_REQUEST_BUDGET: "36"
+          AGNES_RETRY_BUDGET: "1"
+          AGNES_MAX_TASK_ATTEMPTS: "1"
           AGNES_MAX_IN_FLIGHT: "1"
-          AGNES_TIMEOUT_MS: "180000"
+          AGNES_TIMEOUT_MS: "120000"
           AGNES_RETRY_BASE_MS: "1000"
           LLM_PROVIDER: agnes
-          LLM_MAX_TOKENS: "6000"
-          LLM_CONCURRENCY: "2"
-          # One synthesis plus up to two narrowly gated correction attempts.
-          # Provider-level split/retry remains separately bounded by AGNES_REQUEST_BUDGET.
-          LLM_CALL_BUDGET: "3"
+          LLM_MAX_TOKENS: "8000"
+          LLM_CONCURRENCY: "1"
+          # Two-event tasks share a hard 36-call logical/physical budget; each
+          # task reserves at least one call for every task still pending.
+          LLM_CALL_BUDGET: "36"
           HTTP_TIMEOUT_MS: "20000"
           PAGES_URL: https://${{ github.repository_owner }}.github.io/roxy-rss-bot
         run: pnpm start
@@ -99,6 +111,31 @@ jobs:
         env:
           PAGES_URL: https://${{ github.repository_owner }}.github.io/roxy-rss-bot
         run: pnpm manifest
+
+      - name: Collect three clean production evaluations
+        id: evaluate
+        if: steps.generate.outcome == 'success'
+        continue-on-error: true
+        env:
+          AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
+          AGNES_MODEL: agnes-2.5-flash
+          AGNES_BATCH_WINDOW_MS: "25"
+          AGNES_MAX_BATCH_TASKS: "1"
+          AGNES_MAX_BATCH_INPUT_BYTES: "180000"
+          AGNES_MAX_BATCH_OUTPUT_TOKENS: "8000"
+          # Each fresh evaluation provider is capped below production generation
+          # so generation + five possible evaluation runs fit the six-hour job.
+          AGNES_REQUEST_BUDGET: "24"
+          AGNES_RETRY_BUDGET: "1"
+          AGNES_MAX_TASK_ATTEMPTS: "1"
+          AGNES_MAX_IN_FLIGHT: "1"
+          AGNES_TIMEOUT_MS: "120000"
+          AGNES_RETRY_BASE_MS: "1000"
+          LLM_PROVIDER: agnes
+          LLM_MAX_TOKENS: "8000"
+          LLM_CONCURRENCY: "1"
+          LLM_CALL_BUDGET: "24"
+        run: pnpm eval:daily -- "${DIGEST_DATE}" --runs 3 --max-replacement-runs 2 --provider agnes --run-delay-ms 120000
 
       - name: Validate publication boundary
         id: validate
@@ -113,6 +150,10 @@ jobs:
             echo "Manifest/feed generation failed; refusing to publish." >&2
             exit 1
           fi
+          if [ "${{ steps.evaluate.outcome }}" != "success" ]; then
+            echo "Formal clean-run evaluation failed; refusing to publish." >&2
+            exit 1
+          fi
           pnpm validate:publication "${DIGEST_DATE}"
           echo "publishable=true" >> "$GITHUB_OUTPUT"
 
@@ -125,6 +166,7 @@ jobs:
             echo "- Date: \`${DIGEST_DATE}\`"
             echo "- Generate step: \`${{ steps.generate.outcome }}\`"
             echo "- Manifest step: \`${{ steps.manifest.outcome }}\`"
+            echo "- Evaluation step: \`${{ steps.evaluate.outcome }}\`"
             echo "- Publishable: \`${{ steps.validate.outputs.publishable || 'false' }}\`"
             if [ -f "digests/${DIGEST_DATE}/run-status.json" ]; then
               echo "- Publication health: \`$(jq -r '.status' "digests/${DIGEST_DATE}/run-status.json")\`"

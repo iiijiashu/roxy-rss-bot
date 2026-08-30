@@ -3,7 +3,8 @@
  *
  * Sources -> normalized evidence -> freshness verification -> event grouping /
  * dedup -> deterministic ranking -> one structured LLM synthesis -> mechanical
- * quality gate -> deterministic Chinese Markdown rendering.
+ * chunked structured LLM synthesis -> global mechanical quality gate ->
+ * deterministic Chinese Markdown rendering.
  */
 
 import "dotenv/config";
@@ -15,7 +16,6 @@ import { loadConfig } from "./config.ts";
 import { toCstDateStr } from "./date.ts";
 import { fetchDevtoData } from "./devto.ts";
 import {
-  buildSynthesisPrompt,
   DAILY_SELECTION_POLICY,
   groupEvidence,
   MAX_DAILY_DEVELOPMENTS,
@@ -41,24 +41,26 @@ import { fetchLobstersData } from "./lobsters.ts";
 import { fetchPhData } from "./ph.ts";
 import { callLlm, getLlmDiagnostics, parseLlmJson } from "./report.ts";
 import { PublicationStatus, classifyFailure } from "./run-status.ts";
-import { synthesizeWithQualityGate } from "./synthesis.ts";
+import { serializeJsonForPersistence } from "./redaction.ts";
+import { synthesizeInChunksWithQualityGate } from "./synthesis.ts";
 import { fetchTrendingData } from "./trending.ts";
-import { fetchSiteContent, loadWebState, saveWebState, type WebPageItem } from "./web.ts";
+import { fetchSiteContent, loadWebState, parseWebState, type WebPageItem, type WebState } from "./web.ts";
 
 interface GitHubSnapshotEntry {
-  comments: number;
+  /** Optional for state written before comment counts were persisted. */
+  comments?: number;
   reactions: number;
   state: string;
   updatedAt: string;
   observedAt: string;
 }
 
-interface GitHubState {
+export interface GitHubState {
   schemaVersion: 1;
   items: Record<string, GitHubSnapshotEntry>;
 }
 
-interface EventState {
+export interface EventState {
   schemaVersion: 2;
   events: Record<string, { eventKey: string; lastPublishedAt: string }>;
 }
@@ -70,8 +72,25 @@ interface DigestArtifact {
   developments: SynthesisResult["developments"];
 }
 
+export interface DailyInputState {
+  schemaVersion: 1;
+  date: string;
+  webState: WebState;
+  githubState: GitHubState;
+  eventState: EventState;
+}
+
+export interface DailyStateBundle {
+  schemaVersion: 1;
+  generation: string;
+  webState: WebState;
+  githubState: GitHubState;
+  eventState: EventState;
+}
+
 const GITHUB_STATE_FILE = path.join("digests", "github-state.json");
 const EVENT_STATE_FILE = path.join("digests", "event-state.json");
+const DAILY_STATE_FILE = path.join("digests", "daily-state.json");
 const RECENT_WINDOW_MS = 36 * 60 * 60 * 1000;
 const MAX_COMPARABLE_SNAPSHOT_AGE_MS = 72 * 60 * 60 * 1000;
 
@@ -87,7 +106,7 @@ function readJson(filePath: string): unknown | undefined {
 function writeJson(filePath: string, value: unknown): void {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   const tempPath = `${filePath}.${process.pid}.tmp`;
-  fs.writeFileSync(tempPath, `${JSON.stringify(value, null, 2)}\n`, "utf-8");
+  fs.writeFileSync(tempPath, serializeJsonForPersistence(value), "utf-8");
   fs.renameSync(tempPath, filePath);
 }
 
@@ -105,8 +124,7 @@ function saveLlmDiagnostics(digestDir: string): void {
   );
 }
 
-function loadGitHubState(): GitHubState {
-  const value = readJson(GITHUB_STATE_FILE);
+function parseGitHubState(value: unknown | undefined): GitHubState {
   if (value === undefined) return { schemaVersion: 1, items: {} };
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new Error(`Invalid GitHub state schema: ${GITHUB_STATE_FILE}`);
@@ -124,8 +142,7 @@ function loadGitHubState(): GitHubState {
     if (
       !key ||
       !entry ||
-      !Number.isInteger(entry.comments) ||
-      entry.comments < 0 ||
+      (entry.comments !== undefined && (!Number.isInteger(entry.comments) || entry.comments < 0)) ||
       !Number.isInteger(entry.reactions) ||
       entry.reactions < 0 ||
       typeof entry.state !== "string" ||
@@ -139,8 +156,11 @@ function loadGitHubState(): GitHubState {
   return candidate as GitHubState;
 }
 
-function loadEventState(): EventState {
-  const value = readJson(EVENT_STATE_FILE);
+function loadGitHubState(): GitHubState {
+  return parseGitHubState(readJson(GITHUB_STATE_FILE));
+}
+
+function parseEventState(value: unknown | undefined): EventState {
   if (value === undefined) return { schemaVersion: 2, events: {} };
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new Error(`Invalid event state schema: ${EVENT_STATE_FILE}`);
@@ -168,12 +188,78 @@ function loadEventState(): EventState {
   return candidate as EventState;
 }
 
+function loadEventState(): EventState {
+  return parseEventState(readJson(EVENT_STATE_FILE));
+}
+
+export function parseDailyStateBundle(value: unknown): DailyStateBundle {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("Invalid daily state bundle root");
+  }
+  const candidate = value as Partial<DailyStateBundle>;
+  if (
+    candidate.schemaVersion !== 1 ||
+    typeof candidate.generation !== "string" ||
+    !Number.isFinite(Date.parse(candidate.generation)) ||
+    candidate.webState === undefined ||
+    candidate.githubState === undefined ||
+    candidate.eventState === undefined
+  ) {
+    throw new Error("Invalid daily state bundle schema");
+  }
+  return {
+    schemaVersion: 1,
+    generation: candidate.generation,
+    webState: parseWebState(candidate.webState),
+    githubState: parseGitHubState(candidate.githubState),
+    eventState: parseEventState(candidate.eventState),
+  };
+}
+
+function loadDailyStateBundle(): DailyStateBundle | undefined {
+  const value = readJson(DAILY_STATE_FILE);
+  return value === undefined ? undefined : parseDailyStateBundle(value);
+}
+
+export function resolveDailyInputState(
+  persisted: unknown | undefined,
+  date: string,
+  current: DailyInputState,
+): { state: DailyInputState; reused: boolean } {
+  if (persisted === undefined) return { state: current, reused: false };
+  if (!persisted || typeof persisted !== "object" || Array.isArray(persisted)) {
+    throw new Error("Invalid daily input state root");
+  }
+  const candidate = persisted as Partial<DailyInputState>;
+  if (candidate.schemaVersion !== 1 || candidate.date !== date) {
+    throw new Error("Daily input state date mismatch or unsupported schema");
+  }
+  return {
+    reused: true,
+    state: {
+      schemaVersion: 1,
+      date,
+      webState: parseWebState(candidate.webState),
+      githubState: parseGitHubState(candidate.githubState),
+      eventState: parseEventState(candidate.eventState),
+    },
+  };
+}
+
+export function sortNoveltyKeys(keys: Iterable<string>): string[] {
+  return [...keys].sort((left, right) => left.localeCompare(right));
+}
+
 function githubKey(repo: string, item: GitHubItem, kind: "issue" | "pr"): string {
   return `${repo}:${kind}:${item.number}`;
 }
 
 function reactionCount(item: GitHubItem): number {
   return item.reactions?.["+1"] ?? 0;
+}
+
+function commentDelta(current: number, previous: GitHubSnapshotEntry | undefined): number {
+  return previous?.comments === undefined ? 0 : Math.max(0, current - previous.comments);
 }
 
 function isSince(value: string | null | undefined, since: Date): boolean {
@@ -243,7 +329,7 @@ function githubItemEvidence(
   observedAt: string,
   previous?: GitHubSnapshotEntry,
 ): EvidenceRecord {
-  const commentsDelta = previous ? Math.max(0, item.comments - previous.comments) : 0;
+  const commentsDelta = commentDelta(item.comments, previous);
   const reactionsDelta = previous ? Math.max(0, reactionCount(item) - previous.reactions) : 0;
   const observationIntervalHours = previous
     ? Math.max(0, (Date.parse(observedAt) - Date.parse(previous.observedAt)) / 3_600_000)
@@ -351,7 +437,7 @@ async function collectGitHubEvidence(
       for (const issue of issues) {
         const key = githubKey(cfg.repo, issue, "issue");
         const previous = comparableSnapshot(previousState.items[key], observedAt);
-        const commentsDelta = previous ? issue.comments - previous.comments : 0;
+        const commentsDelta = commentDelta(issue.comments, previous);
         const reactionsDelta = previous ? reactionCount(issue) - previous.reactions : 0;
         let activity: GitHubActivity | undefined;
         if (isSince(issue.closed_at, since)) activity = "closed";
@@ -370,7 +456,7 @@ async function collectGitHubEvidence(
       for (const pr of prs) {
         const key = githubKey(cfg.repo, pr, "pr");
         const previous = comparableSnapshot(previousState.items[key], observedAt);
-        const commentsDelta = previous ? pr.comments - previous.comments : 0;
+        const commentsDelta = commentDelta(pr.comments, previous);
         const reactionsDelta = previous ? reactionCount(pr) - previous.reactions : 0;
         let activity: GitHubActivity | undefined;
         if (isSince(pr.merged_at, since)) activity = "merged";
@@ -405,11 +491,22 @@ export async function runDaily(): Promise<void> {
 
   const status = new PublicationStatus(dateStr, process.env["LLM_PROVIDER"] ?? "unknown");
   const config = loadConfig();
-  const webState = loadWebState();
-  const previousGitHubState = loadGitHubState();
+  const committedState = loadDailyStateBundle();
+  const inputStatePath = path.join(digestDir, "input-state.json");
+  const inputState = resolveDailyInputState(readJson(inputStatePath), dateStr, {
+    schemaVersion: 1,
+    date: dateStr,
+    webState: committedState?.webState ?? loadWebState(),
+    githubState: committedState?.githubState ?? loadGitHubState(),
+    eventState: committedState?.eventState ?? loadEventState(),
+  });
+  if (!inputState.reused) writeJson(inputStatePath, inputState.state);
+  const webState = inputState.state.webState;
+  const previousGitHubState = inputState.state.githubState;
   const nextGitHubState: GitHubState = { schemaVersion: 1, items: { ...previousGitHubState.items } };
-  const eventState = loadEventState();
+  const eventState = inputState.state.eventState;
   const evidence: EvidenceRecord[] = [];
+  const repoConfigs = [config.cliRepos, [config.openclaw], config.openclawPeers].flat();
 
   const [
     anthropicResult,
@@ -421,6 +518,7 @@ export async function runDaily(): Promise<void> {
     hfResult,
     devtoResult,
     lobstersResult,
+    githubResult,
   ] = await Promise.allSettled([
     fetchSiteContent("anthropic", webState),
     fetchSiteContent("openai", webState),
@@ -431,6 +529,7 @@ export async function runDaily(): Promise<void> {
     fetchHfData(),
     fetchDevtoData(),
     fetchLobstersData(),
+    collectGitHubEvidence(repoConfigs, since, observedAt, previousGitHubState, nextGitHubState, status),
   ]);
 
   for (const [site, result] of [
@@ -667,21 +766,15 @@ export async function runDaily(): Promise<void> {
     status.record("source/lobsters", "degraded", classifyFailure(lobstersResult.reason));
   }
 
-  const repoConfigs = [config.cliRepos, [config.openclaw], config.openclawPeers].flat();
-  evidence.push(
-    ...(await collectGitHubEvidence(
-      repoConfigs,
-      since,
-      observedAt,
-      previousGitHubState,
-      nextGitHubState,
-      status,
-    )),
-  );
+  if (githubResult.status === "fulfilled") {
+    evidence.push(...githubResult.value);
+  } else {
+    status.record("source/github", "degraded", classifyFailure(githubResult.reason));
+  }
 
   const events = groupEvidence(evidence);
   const previousKeys = new Set(Object.keys(eventState.events));
-  const previousNoveltyKeys = [...previousKeys].sort();
+  const previousNoveltyKeys = sortNoveltyKeys(previousKeys);
   const selected = selectTopEvents(events, {
     previousKeys: new Set(previousNoveltyKeys),
     ...DAILY_SELECTION_POLICY,
@@ -733,20 +826,26 @@ export async function runDaily(): Promise<void> {
     );
   }
 
-  const basePrompt = buildSynthesisPrompt(selected, evidence);
   let synthesis: SynthesisResult | undefined;
   let quality: QualityReport | undefined;
   let lastSynthesisError: unknown;
   try {
-    const result = await synthesizeWithQualityGate(basePrompt, selected, evidence, {
-      invoke: callLlm,
+    const result = await synthesizeInChunksWithQualityGate(selected, evidence, {
+      invoke: (prompt, maxTokens) => callLlm(prompt, maxTokens, { responseFormat: "json_object" }),
       parse: (raw) => parseLlmJson<SynthesisResult>(raw),
-      onAttempt: (outcome) => {
-        const component = `synthesis/zh/attempt-${outcome.attempt}`;
+      onAttempt: (chunk, outcome) => {
+        const component = `synthesis/zh/chunk-${chunk}/attempt-${outcome.attempt}`;
         if (outcome.state === "ok") {
           status.record(component, "ok");
         } else if (outcome.reason === "quality_gate_failed") {
           status.record(component, "degraded", "quality_gate_failed");
+          console.warn(
+            `[synthesis] chunk=${chunk} attempt=${outcome.attempt} ` +
+              `failed_checks=${outcome.failedChecks.join(",")} ` +
+              `developments=${outcome.developmentCount}/${outcome.eligibleEventCount} ` +
+              `mechanical_token_shapes=${outcome.mechanicalTokenShapes.join(",") || "none"} ` +
+              `lexical_tokens=${outcome.lexicalTokens.join(",") || "none"}`,
+          );
         } else {
           status.record(component, "degraded", classifyFailure(outcome.error));
         }
@@ -798,8 +897,7 @@ export async function runDaily(): Promise<void> {
   status.record("artifact/digest", "ok");
   status.record("quality", "ok");
 
-  // State is committed only after successful synthesis + quality validation.
-  saveWebState(webState);
+  // A single atomic generation is committed only after successful synthesis + quality validation.
   const eventRetentionCutoff = now.getTime() - 30 * 24 * 60 * 60 * 1000;
   for (const [key, entry] of Object.entries(nextGitHubState.items)) {
     const lastObserved = Date.parse(entry.observedAt);
@@ -807,7 +905,6 @@ export async function runDaily(): Promise<void> {
       delete nextGitHubState.items[key];
   }
   nextGitHubState.items = sortedRecord(nextGitHubState.items);
-  writeJson(GITHUB_STATE_FILE, nextGitHubState);
   for (const [noveltyKey, entry] of Object.entries(eventState.events)) {
     const lastPublished = Date.parse(entry.lastPublishedAt);
     if (!Number.isFinite(lastPublished) || lastPublished < eventRetentionCutoff)
@@ -817,7 +914,14 @@ export async function runDaily(): Promise<void> {
     eventState.events[event.noveltyKey] = { eventKey: event.key, lastPublishedAt: observedAt };
   }
   eventState.events = sortedRecord(eventState.events);
-  writeJson(EVENT_STATE_FILE, eventState);
+  writeJson(DAILY_STATE_FILE, {
+    schemaVersion: 1,
+    generation: observedAt,
+    webState,
+    githubState: nextGitHubState,
+    eventState,
+  } satisfies DailyStateBundle);
+  status.record("state/daily-bundle", "ok");
 
   saveLlmDiagnostics(digestDir);
   status.save();

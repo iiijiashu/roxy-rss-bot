@@ -252,6 +252,18 @@ describe("callLlm", () => {
     expect(mockCall).toHaveBeenCalledWith("hello", 2048);
   });
 
+  it("forwards a structured-output request only when explicitly requested", async () => {
+    mockCall.mockResolvedValueOnce('{"ok":true}');
+
+    await expect(callLlm("return JSON", 2048, { responseFormat: "json_object" })).resolves.toBe(
+      '{"ok":true}',
+    );
+
+    expect(mockCall).toHaveBeenCalledWith("return JSON", 2048, {
+      responseFormat: "json_object",
+    });
+  });
+
   it("uses default maxTokens of 4096", async () => {
     mockCall.mockResolvedValueOnce("ok");
 

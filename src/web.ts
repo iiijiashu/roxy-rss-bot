@@ -13,8 +13,9 @@
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { serializeJsonForPersistence } from "./redaction.ts";
 import { sleep } from "./date.ts";
-import { fetchWithTimeout } from "./http.ts";
+import { discardResponseBody, fetchWithTimeout, readResponseTextWithTimeout } from "./http.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -148,6 +149,8 @@ const MAX_CONTENT_FETCH_PER_RUN = 25;
 const MAX_CONTENT_LENGTH = 1_500;
 /** Polite delay between individual page GETs (ms). */
 const FETCH_DELAY_MS = 300;
+/** Small worker pool; request starts remain globally paced by FETCH_DELAY_MS. */
+const MAX_CONTENT_FETCH_CONCURRENCY = 3;
 /** Per-page/sitemap timeout (ms). */
 const FETCH_TIMEOUT_MS = 10_000;
 /** Large first-party feeds can be slower than individual pages. */
@@ -158,6 +161,44 @@ const MAX_TIMESTAMP_SKEW_MS = 5 * 60 * 1000;
 const MAX_PAGE_BYTES = 5 * 1024 * 1024;
 const MAX_FEED_BYTES = 15 * 1024 * 1024;
 const MAX_REDIRECTS = 3;
+
+async function mapWithConcurrency<T, R>(
+  values: T[],
+  concurrency: number,
+  worker: (value: T, index: number) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(values.length);
+  let nextIndex = 0;
+  const runWorker = async (): Promise<void> => {
+    while (true) {
+      const index = nextIndex++;
+      if (index >= values.length) return;
+      results[index] = await worker(values[index]!, index);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(concurrency, values.length) }, () => runWorker()));
+  return results;
+}
+
+function createPacedStart(delayMs: number): () => Promise<void> {
+  let sequence = Promise.resolve();
+  let lastStart = 0;
+  return async () => {
+    let release!: () => void;
+    const previous = sequence;
+    sequence = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await previous;
+    try {
+      const waitMs = Math.max(0, lastStart + delayMs - Date.now());
+      if (waitMs > 0) await sleep(waitMs);
+      lastStart = Date.now();
+    } finally {
+      release();
+    }
+  };
+}
 
 // ---------------------------------------------------------------------------
 // HTTP helpers
@@ -197,62 +238,6 @@ export function sanitizeDiscoveredUrls(
   return [...byUrl.values()];
 }
 
-async function readLimitedResponseBody(
-  response: Response,
-  maxBytes: number,
-  timeoutMs: number,
-): Promise<string> {
-  const declaredLength = response.headers.get("content-length");
-  if (declaredLength !== null) {
-    const declaredBytes = Number(declaredLength);
-    if (Number.isFinite(declaredBytes) && declaredBytes > maxBytes) {
-      await response.body?.cancel("Response body exceeds limit").catch(() => undefined);
-      throw new Error("Response body exceeds limit");
-    }
-  }
-  if (!response.body) return "";
-
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  const chunks: string[] = [];
-  let receivedBytes = 0;
-  let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
-  const bodyTimeout = new Promise<never>((_resolve, reject) => {
-    timeoutHandle = setTimeout(() => {
-      const error = new Error(`HTTP response body timed out after ${timeoutMs}ms`);
-      error.name = "HTTPTimeoutError";
-      reject(error);
-      void reader.cancel(error).catch(() => undefined);
-    }, timeoutMs);
-  });
-
-  const consume = async (): Promise<string> => {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      receivedBytes += value.byteLength;
-      if (receivedBytes > maxBytes) {
-        await reader.cancel("Response body exceeds limit").catch(() => undefined);
-        throw new Error("Response body exceeds limit");
-      }
-      chunks.push(decoder.decode(value, { stream: true }));
-    }
-    chunks.push(decoder.decode());
-    return chunks.join("");
-  };
-
-  try {
-    return await Promise.race([consume(), bodyTimeout]);
-  } finally {
-    if (timeoutHandle) clearTimeout(timeoutHandle);
-    try {
-      reader.releaseLock();
-    } catch {
-      // A timed-out read can retain the lock until cancellation settles.
-    }
-  }
-}
-
 async function siteGet(
   site: "anthropic" | "openai",
   initialUrl: string,
@@ -269,15 +254,20 @@ async function siteGet(
     );
     if ([301, 302, 303, 307, 308].includes(response.status)) {
       const location = response.headers.get("location");
-      await response.body?.cancel().catch(() => undefined);
+      await discardResponseBody(response);
       if (!location || redirectCount === MAX_REDIRECTS) throw new Error("Invalid or excessive redirect");
       currentUrl = new URL(location, currentUrl).toString();
       continue;
     }
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    if (response.url && !isAllowedSiteUrl(site, response.url))
+    if (!response.ok) {
+      await discardResponseBody(response);
+      throw new Error(`HTTP ${response.status}`);
+    }
+    if (response.url && !isAllowedSiteUrl(site, response.url)) {
+      await discardResponseBody(response);
       throw new Error(`Disallowed ${site} response URL`);
-    return readLimitedResponseBody(response, maxBytes, timeoutMs);
+    }
+    return readResponseTextWithTimeout(response, timeoutMs, maxBytes);
   }
   throw new Error("Redirect limit exceeded");
 }
@@ -725,7 +715,7 @@ export function saveWebState(state: WebState): void {
       ),
     },
   };
-  fs.writeFileSync(tempPath, `${JSON.stringify(ordered, null, 2)}\n`, "utf-8");
+  fs.writeFileSync(tempPath, serializeJsonForPersistence(ordered), "utf-8");
   fs.renameSync(tempPath, STATE_FILE);
 }
 
@@ -893,78 +883,91 @@ export async function fetchSiteContent(
       });
     }
   } else {
-    // Fetch page content sequentially with a polite delay
+    const previousByUrl = new Map<string, WebUrlState | undefined>();
     for (const { loc, lastmod } of toFetch) {
       const previous = siteState.urls[loc];
+      previousByUrl.set(loc, previous);
       siteState.urls[loc] = {
         ...(previous ?? { status: "discovered" as const }),
         status: "fetched",
         ...(lastmod ? { sitemapLastmod: lastmod } : {}),
         lastAttemptAt: observedAt,
       };
-      try {
-        const html = await httpGet(site, loc);
-        const title = extractTitle(html) || titleFromUrl(loc);
-        const content = extractText(html);
-        const dates = extractPageDates(html);
-        const hash = contentHash(`${title}\n${content}`);
-        const observedTime = Date.parse(observedAt);
-        const hasFutureTimestamp = [dates.publishedAt, dates.updatedAt].some(
-          (timestamp) => timestamp && Date.parse(timestamp) > observedTime + MAX_TIMESTAMP_SKEW_MS,
-        );
-        if (hasFutureTimestamp) {
+    }
+
+    const waitForPacedStart = createPacedStart(FETCH_DELAY_MS);
+    const processed = await mapWithConcurrency(
+      toFetch,
+      MAX_CONTENT_FETCH_CONCURRENCY,
+      async ({ loc, lastmod }): Promise<{ item?: WebPageItem; failed: boolean }> => {
+        const previous = previousByUrl.get(loc);
+        await waitForPacedStart();
+        try {
+          const html = await httpGet(site, loc);
+          const title = extractTitle(html) || titleFromUrl(loc);
+          const content = extractText(html);
+          const dates = extractPageDates(html);
+          const hash = contentHash(`${title}\n${content}`);
+          const observedTime = Date.parse(observedAt);
+          const hasFutureTimestamp = [dates.publishedAt, dates.updatedAt].some(
+            (timestamp) => timestamp && Date.parse(timestamp) > observedTime + MAX_TIMESTAMP_SKEW_MS,
+          );
+          if (hasFutureTimestamp) {
+            siteState.urls[loc] = {
+              ...(previous ?? {}),
+              status: "retryable_failed",
+              ...(lastmod ? { sitemapLastmod: lastmod } : {}),
+              lastAttemptAt: observedAt,
+            };
+            console.error(`  [web/${site}] Future page timestamp; retaining retryable state for ${loc}`);
+            return { failed: true };
+          }
+          const freshness = classifyWebFreshness(dates.publishedAt, dates.updatedAt, observedAt, previous);
+          siteState.urls[loc] = {
+            status: "accepted",
+            ...(lastmod ? { sitemapLastmod: lastmod } : {}),
+            ...(dates.publishedAt ? { publishedAt: dates.publishedAt } : {}),
+            ...(dates.updatedAt ? { updatedAt: dates.updatedAt } : {}),
+            contentHash: hash,
+            lastAttemptAt: observedAt,
+            lastSuccessAt: observedAt,
+          };
+          // A sitemap-only timestamp change with identical content is not news.
+          if (previous?.contentHash === hash) return { failed: false };
+          // Pages without a trustworthy recent page-level date are ingested into
+          // state but excluded from current-news output.
+          if (freshness === "newly_discovered_historical") return { failed: false };
+          return {
+            failed: false,
+            item: {
+              url: loc,
+              title,
+              observedAt,
+              ...(lastmod ? { sitemapLastmod: lastmod } : {}),
+              ...(dates.publishedAt ? { publishedAt: dates.publishedAt } : {}),
+              ...(dates.updatedAt ? { updatedAt: dates.updatedAt } : {}),
+              content,
+              site,
+              category: urlCategory(loc),
+              freshness,
+              visibility: "full_text",
+              contentHash: hash,
+            },
+          };
+        } catch (err) {
           siteState.urls[loc] = {
             ...(previous ?? {}),
             status: "retryable_failed",
             ...(lastmod ? { sitemapLastmod: lastmod } : {}),
             lastAttemptAt: observedAt,
           };
-          processingFailures++;
-          console.error(`  [web/${site}] Future page timestamp; retaining retryable state for ${loc}`);
-          continue;
+          console.error(`  [web/${site}] Failed to fetch ${loc}: ${err}`);
+          return { failed: true };
         }
-        const freshness = classifyWebFreshness(dates.publishedAt, dates.updatedAt, observedAt, previous);
-        siteState.urls[loc] = {
-          status: "accepted",
-          ...(lastmod ? { sitemapLastmod: lastmod } : {}),
-          ...(dates.publishedAt ? { publishedAt: dates.publishedAt } : {}),
-          ...(dates.updatedAt ? { updatedAt: dates.updatedAt } : {}),
-          contentHash: hash,
-          lastAttemptAt: observedAt,
-          lastSuccessAt: observedAt,
-        };
-        // A sitemap-only timestamp change with identical content is not news.
-        if (previous?.contentHash === hash) continue;
-        // Pages without a trustworthy recent page-level date are ingested into
-        // state but excluded from current-news output.
-        if (freshness === "newly_discovered_historical") continue;
-        items.push({
-          url: loc,
-          title,
-          observedAt,
-          ...(lastmod ? { sitemapLastmod: lastmod } : {}),
-          ...(dates.publishedAt ? { publishedAt: dates.publishedAt } : {}),
-          ...(dates.updatedAt ? { updatedAt: dates.updatedAt } : {}),
-          content,
-          site,
-          category: urlCategory(loc),
-          freshness,
-          visibility: "full_text",
-          contentHash: hash,
-        });
-      } catch (err) {
-        siteState.urls[loc] = {
-          ...(previous ?? {}),
-          status: "retryable_failed",
-          ...(lastmod ? { sitemapLastmod: lastmod } : {}),
-          lastAttemptAt: observedAt,
-        };
-        processingFailures++;
-        console.error(`  [web/${site}] Failed to fetch ${loc}: ${err}`);
-      } finally {
-        await sleep(FETCH_DELAY_MS);
-      }
-    }
+      },
+    );
+    processingFailures += processed.filter((result) => result.failed).length;
+    items.push(...processed.flatMap((result) => (result.item ? [result.item] : [])));
   }
 
   // Preserve unfetched first-run candidates as explicitly discovered so they

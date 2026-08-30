@@ -2,7 +2,7 @@
  * Dev.to AI articles fetched via the Forem API.
  */
 
-import { fetchWithTimeout } from "./http.ts";
+import { discardResponseBody, fetchWithTimeout, readResponseJsonWithTimeout } from "./http.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -75,11 +75,12 @@ export async function fetchDevtoData(): Promise<DevtoData> {
           });
 
           if (!resp.ok) {
+            await discardResponseBody(resp);
             console.error(`  [devto] "${tag}": HTTP ${resp.status}`);
             return;
           }
 
-          const raw = (await resp.json()) as DevtoApiArticle[];
+          const raw = await readResponseJsonWithTimeout<DevtoApiArticle[]>(resp);
           for (const a of raw) {
             if (!seen.has(a.id)) {
               seen.set(a.id, {

@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import {
@@ -14,6 +15,17 @@ import {
   type EventCandidate,
 } from "./evidence.ts";
 import { toCstDateStr } from "./date.ts";
+import { feedContentFromMarkdown } from "./generate-manifest.ts";
+import {
+  FORMAL_EVALUATION_CLEAN_RUNS,
+  MAX_EVALUATION_REPLACEMENT_RUNS,
+  MAX_EVALUATION_SYNTHESIS_ATTEMPTS,
+  MAX_QUALITY_REPAIR_ATTEMPTS_PER_RUN,
+  MAX_TOTAL_QUALITY_REPAIR_ATTEMPTS,
+  MIN_FORMAL_FIRST_PASS_RUNS,
+} from "./evaluation-policy.ts";
+import { synthesisStructureSha256 } from "./evaluation-hash.ts";
+import { credentialShapedTextFiles } from "./redaction.ts";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const DAILY_REPORT = "digest";
@@ -28,6 +40,17 @@ const AUTHORITIES = new Set(["primary", "primary-community", "secondary", "commu
 const VISIBILITIES = new Set(["full_text", "official_summary", "metadata_only", "structured_api"]);
 const CATEGORIES = new Set(["model", "agent", "tool", "infrastructure", "open_source", "paper", "research"]);
 const FRESHNESS_WINDOW_MS = 72 * 60 * 60 * 1000;
+const RECOVERABLE_EVALUATION_FAILURE_CODES = new Set([
+  "empty_response",
+  "invalid_envelope",
+  "invalid_json",
+  "omitted_task",
+  "output_limit",
+  "rate_limit",
+  "server_error",
+  "timeout",
+  "transport",
+]);
 
 interface ManifestEntry {
   date: string;
@@ -133,6 +156,104 @@ interface LlmDiagnosticsShape {
   errors?: Record<string, number>;
 }
 
+interface EvaluationShape {
+  schemaVersion: number;
+  date: string;
+  evidenceSha256: string;
+  targetCleanRuns: number;
+  maxReplacementRuns: number;
+  runsExecuted: number;
+  cleanRunsCollected: number;
+  replacementsUsed: number;
+  passRate: number;
+  passed: boolean;
+  acceptance: {
+    selectionIdentical: boolean;
+    selectionCountInRange: boolean;
+    requiredProvider: string | null;
+    providerMatched: boolean;
+    structureIdentical: boolean;
+    cleanRuns: boolean;
+    acceptableRuns: boolean;
+    recoveredRuns: number;
+    firstPassRuns: number;
+    boundedQualityRepairs: boolean;
+    boundedSynthesisAttempts: boolean;
+    atLeastOneFirstPass: boolean;
+    totalQualityRepairAttempts: number;
+    health: "healthy" | "degraded";
+  };
+  selection: { identical: boolean; addedEventIds: string[]; removedEventIds: string[] };
+  runs: Array<{
+    run: number;
+    qualityPassed: boolean;
+    firstPass: boolean;
+    qualityRepairAttempts: number;
+    providerClean: boolean;
+    providerRecovered: boolean;
+    passed: boolean;
+    countedForAcceptance: boolean;
+    replacementReason?: string;
+    code?: string;
+    structureSha256?: string;
+    developmentCount: number;
+    attempts: Array<{ reason?: string; code?: string }>;
+    diagnostics: {
+      provider: string;
+      diagnosticsAvailable?: boolean;
+      diagnosticsValid?: boolean;
+      requests?: number;
+      retryRequests?: number;
+      tasksResolved?: number;
+      tasksRetried?: number;
+      tasksFailed?: number;
+      errors?: Record<string, number>;
+    };
+  }>;
+}
+
+interface ReplayProvenanceShape {
+  schemaVersion: number;
+  date: string;
+  selectionIdentical: boolean;
+  applied: boolean;
+  outputEvidenceSha256: string;
+}
+
+function evaluationDiagnosticsReconcile(
+  run: EvaluationShape["runs"][number],
+  failedAttempts: Array<{ code?: string }>,
+): boolean {
+  const diagnostics = run.diagnostics;
+  if (
+    diagnostics.diagnosticsAvailable !== true ||
+    diagnostics.diagnosticsValid !== true ||
+    !Number.isInteger(diagnostics.requests) ||
+    diagnostics.requests! < 1 ||
+    diagnostics.retryRequests !== 0 ||
+    diagnostics.tasksRetried !== 0 ||
+    !Number.isInteger(diagnostics.tasksResolved) ||
+    !Number.isInteger(diagnostics.tasksFailed) ||
+    !diagnostics.errors ||
+    typeof diagnostics.errors !== "object" ||
+    Array.isArray(diagnostics.errors)
+  ) {
+    return false;
+  }
+  const errorCodes = Object.entries(diagnostics.errors)
+    .flatMap(([code, count]) =>
+      Number.isInteger(count) && count >= 0 ? Array(count).fill(code) : ["invalid_diagnostic_count"],
+    )
+    .sort();
+  const failedCodes = failedAttempts.map((attempt) => attempt.code ?? "").sort();
+  return (
+    diagnostics.requests === run.attempts.length &&
+    diagnostics.tasksResolved === run.attempts.length - failedAttempts.length &&
+    diagnostics.tasksFailed === failedAttempts.length &&
+    JSON.stringify(errorCodes) === JSON.stringify(failedCodes)
+  );
+}
+
 export interface PublicationValidation {
   date: string;
   status: "ok" | "degraded";
@@ -171,6 +292,10 @@ export function validatePublication(date: string, root = "."): PublicationValida
   if (!DATE_RE.test(date)) throw new Error(`invalid digest date: ${date}`);
 
   const errors: string[] = [];
+  const credentialFiles = credentialShapedTextFiles(path.join(root, "digests"));
+  if (credentialFiles.length > 0) {
+    errors.push(`credential-shaped text remains in publishable digests: ${credentialFiles.join(", ")}`);
+  }
   const coreReports = [DAILY_REPORT];
   const reportPath = path.posix.join("digests", date, `${DAILY_REPORT}.md`);
   let markdown = "";
@@ -187,6 +312,7 @@ export function validatePublication(date: string, root = "."): PublicationValida
   }
 
   let status: "ok" | "degraded" = "degraded";
+  let diagnosticsProvider: string | undefined;
   try {
     const value = parseRequiredJson<StatusShape>(root, path.posix.join("digests", date, "run-status.json"));
     if (value.schemaVersion !== 1 || value.date !== date || !Array.isArray(value.components)) {
@@ -208,6 +334,7 @@ export function validatePublication(date: string, root = "."): PublicationValida
     if (!diagnostics || typeof diagnostics.provider !== "string" || !diagnostics.provider.trim()) {
       throw new Error("llm-diagnostics.json has an invalid provider");
     }
+    diagnosticsProvider = diagnostics.provider.trim().toLowerCase();
     for (const value of [
       diagnostics.requests,
       diagnostics.retryRequests,
@@ -241,7 +368,10 @@ export function validatePublication(date: string, root = "."): PublicationValida
       "evidence_coverage",
       "chinese_only",
       "unsupported_inference",
+      "lifecycle_language",
+      "editorial_style",
       "mechanical_grounding",
+      "lexical_grounding",
       "duplicate_ratio",
       "freshness_validity",
     ]);
@@ -355,6 +485,181 @@ export function validatePublication(date: string, root = "."): PublicationValida
       throw new Error("highlights.json does not match the leading digest developments");
     }
     highlightLanguages = ["zh"];
+  } catch (error) {
+    errors.push(String(error));
+  }
+
+  try {
+    const evidenceRelativePath = path.posix.join("digests", date, "evidence.json");
+    const evidenceRaw = readRequired(root, evidenceRelativePath);
+    const evidenceSha256 = crypto.createHash("sha256").update(evidenceRaw).digest("hex");
+    const evaluation = parseRequiredJson<EvaluationShape>(
+      root,
+      path.posix.join("digests", date, "evaluation-report.json"),
+    );
+    if (
+      evaluation.schemaVersion !== 3 ||
+      evaluation.date !== date ||
+      evaluation.passed !== true ||
+      !evaluation.acceptance ||
+      !evaluation.selection ||
+      !Array.isArray(evaluation.runs)
+    ) {
+      throw new Error("evaluation-report.json has an invalid or failing schema");
+    }
+    if (evaluation.evidenceSha256 !== evidenceSha256) {
+      throw new Error("evaluation-report.json evidence hash does not match evidence.json");
+    }
+    if (
+      evaluation.targetCleanRuns !== FORMAL_EVALUATION_CLEAN_RUNS ||
+      !Number.isInteger(evaluation.maxReplacementRuns) ||
+      evaluation.maxReplacementRuns < 0 ||
+      evaluation.maxReplacementRuns > MAX_EVALUATION_REPLACEMENT_RUNS ||
+      !Number.isInteger(evaluation.runsExecuted) ||
+      evaluation.runsExecuted < FORMAL_EVALUATION_CLEAN_RUNS ||
+      evaluation.runsExecuted > FORMAL_EVALUATION_CLEAN_RUNS + evaluation.maxReplacementRuns ||
+      evaluation.runsExecuted !== evaluation.runs.length ||
+      evaluation.cleanRunsCollected !== FORMAL_EVALUATION_CLEAN_RUNS ||
+      !Number.isInteger(evaluation.replacementsUsed) ||
+      evaluation.replacementsUsed < 0 ||
+      evaluation.replacementsUsed > evaluation.maxReplacementRuns ||
+      evaluation.replacementsUsed !== evaluation.runsExecuted - evaluation.cleanRunsCollected ||
+      evaluation.passRate !== 1 ||
+      evaluation.runs.filter((run) => run.countedForAcceptance === true).length !==
+        FORMAL_EVALUATION_CLEAN_RUNS
+    ) {
+      throw new Error("evaluation-report.json requires exactly 3 counted clean runs and 0..2 replacements");
+    }
+    const requiredProvider = evaluation.acceptance.requiredProvider?.trim().toLowerCase();
+    if (!requiredProvider || !diagnosticsProvider || requiredProvider !== diagnosticsProvider) {
+      throw new Error("evaluation-report.json must pin the production provider");
+    }
+    const countedRuns = evaluation.runs.filter((run) => run.countedForAcceptance === true);
+    const replacementRuns = evaluation.runs.filter((run) => run.countedForAcceptance !== true);
+    if (!digest || synthesisStructureSha256(digest) !== countedRuns[0]?.structureSha256) {
+      throw new Error("evaluation-report.json does not match the published digest structure");
+    }
+    const cleanRunInvalid = countedRuns.some(
+      (run) =>
+        run.qualityPassed !== true ||
+        run.providerClean !== true ||
+        run.providerRecovered !== false ||
+        run.passed !== true ||
+        run.replacementReason !== undefined ||
+        !Array.isArray(run.attempts) ||
+        !evaluationDiagnosticsReconcile(run, []) ||
+        !Number.isInteger(run.developmentCount) ||
+        run.developmentCount < MIN_DAILY_DEVELOPMENTS ||
+        run.developmentCount > MAX_DAILY_DEVELOPMENTS ||
+        !/^[a-f0-9]{64}$/u.test(run.structureSha256 ?? ""),
+    );
+    const replacementRunInvalid = replacementRuns.some((run) => {
+      if (run.replacementReason === "provider_recovered") {
+        const failedAttempts = Array.isArray(run.attempts)
+          ? run.attempts.filter((attempt) => attempt.reason === "request_or_parse_failed")
+          : [];
+        return (
+          run.qualityPassed !== true ||
+          run.providerClean !== false ||
+          run.providerRecovered !== true ||
+          run.passed !== true ||
+          failedAttempts.length < 1 ||
+          failedAttempts.length > 2 ||
+          failedAttempts.some(
+            (attempt) => !attempt.code || !RECOVERABLE_EVALUATION_FAILURE_CODES.has(attempt.code),
+          ) ||
+          !evaluationDiagnosticsReconcile(run, failedAttempts) ||
+          !Number.isInteger(run.developmentCount) ||
+          run.developmentCount < MIN_DAILY_DEVELOPMENTS ||
+          run.developmentCount > MAX_DAILY_DEVELOPMENTS
+        );
+      }
+      if (
+        !run.replacementReason ||
+        !RECOVERABLE_EVALUATION_FAILURE_CODES.has(run.replacementReason) ||
+        run.code !== run.replacementReason ||
+        run.qualityPassed !== false ||
+        run.providerClean !== false ||
+        run.providerRecovered !== false ||
+        run.passed !== false ||
+        !Array.isArray(run.attempts) ||
+        run.attempts.some((attempt) => attempt.reason === "quality_gate_failed")
+      ) {
+        return true;
+      }
+      const failedAttempts = run.attempts.filter((attempt) => attempt.reason === "request_or_parse_failed");
+      return (
+        failedAttempts.length < 1 ||
+        failedAttempts.at(-1)?.code !== run.replacementReason ||
+        failedAttempts.some(
+          (attempt) => !attempt.code || !RECOVERABLE_EVALUATION_FAILURE_CODES.has(attempt.code),
+        ) ||
+        !evaluationDiagnosticsReconcile(run, failedAttempts)
+      );
+    });
+    if (
+      cleanRunInvalid ||
+      replacementRunInvalid ||
+      replacementRuns.length !== evaluation.replacementsUsed ||
+      evaluation.acceptance.recoveredRuns !==
+        replacementRuns.filter((run) => run.replacementReason === "provider_recovered").length ||
+      new Set(countedRuns.map((run) => run.structureSha256)).size !== 1
+    ) {
+      throw new Error("evaluation-report.json requires strictly classified replacement runs");
+    }
+    if (
+      evaluation.acceptance.selectionIdentical !== true ||
+      evaluation.acceptance.selectionCountInRange !== true ||
+      evaluation.acceptance.providerMatched !== true ||
+      evaluation.acceptance.structureIdentical !== true ||
+      evaluation.acceptance.cleanRuns !== true ||
+      evaluation.acceptance.acceptableRuns !== true ||
+      evaluation.acceptance.boundedQualityRepairs !== true ||
+      evaluation.acceptance.boundedSynthesisAttempts !== true ||
+      evaluation.acceptance.atLeastOneFirstPass !== true ||
+      evaluation.acceptance.firstPassRuns < MIN_FORMAL_FIRST_PASS_RUNS ||
+      evaluation.acceptance.firstPassRuns !== countedRuns.filter((run) => run.firstPass === true).length ||
+      evaluation.acceptance.totalQualityRepairAttempts !==
+        evaluation.runs.reduce((total, run) => total + run.qualityRepairAttempts, 0) ||
+      evaluation.acceptance.totalQualityRepairAttempts > MAX_TOTAL_QUALITY_REPAIR_ATTEMPTS ||
+      evaluation.acceptance.health !== (evaluation.replacementsUsed > 0 ? "degraded" : "healthy") ||
+      evaluation.runs.some(
+        (run) =>
+          !Array.isArray(run.attempts) ||
+          run.attempts.length > MAX_EVALUATION_SYNTHESIS_ATTEMPTS ||
+          !Number.isInteger(run.qualityRepairAttempts) ||
+          run.qualityRepairAttempts < 0 ||
+          run.qualityRepairAttempts > MAX_QUALITY_REPAIR_ATTEMPTS_PER_RUN ||
+          run.qualityRepairAttempts !==
+            run.attempts.filter((attempt) => attempt.reason === "quality_gate_failed").length,
+      ) ||
+      evaluation.selection.identical !== true ||
+      evaluation.selection.addedEventIds.length !== 0 ||
+      evaluation.selection.removedEventIds.length !== 0 ||
+      evaluation.runs.some(
+        (run, index) =>
+          run.run !== index + 1 || run.diagnostics?.provider?.trim().toLowerCase() !== requiredProvider,
+      )
+    ) {
+      throw new Error("evaluation-report.json did not satisfy the production acceptance policy");
+    }
+
+    const provenancePath = path.join(root, "digests", date, "replay-provenance.json");
+    if (fs.existsSync(provenancePath)) {
+      const provenance = parseRequiredJson<ReplayProvenanceShape>(
+        root,
+        path.posix.join("digests", date, "replay-provenance.json"),
+      );
+      if (
+        provenance.schemaVersion !== 2 ||
+        provenance.date !== date ||
+        provenance.selectionIdentical !== true ||
+        provenance.applied !== true ||
+        provenance.outputEvidenceSha256 !== evidenceSha256
+      ) {
+        throw new Error("replay-provenance.json does not match the applied evidence snapshot");
+      }
+    }
   } catch (error) {
     errors.push(String(error));
   }
@@ -698,6 +1003,20 @@ export function validatePublication(date: string, root = "."): PublicationValida
     if (!currentDateReports.has(DAILY_REPORT)) throw new Error(`feed.xml is missing ${date}/${DAILY_REPORT}`);
     if ([...currentDateReports].some((report) => report !== DAILY_REPORT)) {
       throw new Error("feed.xml exposes legacy per-source reports for an evidence-first date");
+    }
+    const matchingItems = (feed.match(/<item>[\s\S]*?<\/item>/gu) ?? []).filter((item) =>
+      new RegExp(`#${date}/${DAILY_REPORT}(?:\\s|<)`, "u").test(item),
+    );
+    if (matchingItems.length !== 1) {
+      throw new Error(`feed.xml must contain exactly one item for ${date}/${DAILY_REPORT}`);
+    }
+    const expectedContent = feedContentFromMarkdown(markdown);
+    const item = matchingItems[0]!;
+    if (
+      !item.includes(`<description>${expectedContent.summary}</description>`) ||
+      !item.includes(`<content:encoded>${expectedContent.fullHtml}</content:encoded>`)
+    ) {
+      throw new Error("feed.xml content does not match digest.md");
     }
   } catch (error) {
     errors.push(String(error));

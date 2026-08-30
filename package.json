@@ -5,6 +5,8 @@
   "packageManager": "pnpm@9.15.9",
   "scripts": {
     "start": "tsx src/daily.ts",
+    "eval:daily": "tsx src/evaluate-daily.ts",
+    "replay:daily": "tsx src/replay-daily.ts",
     "start:legacy": "tsx src/index.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src",

@@ -3,7 +3,12 @@
  * Reads GITHUB_TOKEN and DIGEST_REPO from environment at call time.
  */
 
-import { fetchWithTimeout } from "./http.ts";
+import {
+  discardResponseBody,
+  fetchWithTimeout,
+  readResponseJsonWithTimeout,
+  readResponseTextWithTimeout,
+} from "./http.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -97,9 +102,12 @@ export interface GitHubReleasesResult {
 // Internals
 // ---------------------------------------------------------------------------
 
-/** Maximum pages to fetch for paginated repos (100 items/page). */
+/** Keep response bodies small enough for slow proxies while retaining a bounded daily window. */
+export const GITHUB_PAGE_SIZE = 30;
 const MAX_PAGES = 5;
-export const MAX_RECENT_ITEMS = MAX_PAGES * 100;
+const GITHUB_BODY_TIMEOUT_MS = 60_000;
+const GITHUB_BODY_LIMIT_BYTES = 8 * 1024 * 1024;
+export const MAX_RECENT_ITEMS = MAX_PAGES * GITHUB_PAGE_SIZE;
 
 function headers(): Record<string, string> {
   const requestHeaders: Record<string, string> = {
@@ -115,8 +123,11 @@ async function githubGet<T>(url: string, params: Record<string, string> = {}): P
   const u = new URL(url);
   for (const [k, v] of Object.entries(params)) u.searchParams.set(k, v);
   const resp = await fetchWithTimeout(u.toString(), { headers: headers() });
-  if (!resp.ok) throw new Error(`GitHub API error ${resp.status} (${url}): ${await resp.text()}`);
-  return resp.json() as Promise<T>;
+  if (!resp.ok) {
+    const body = await readResponseTextWithTimeout(resp, GITHUB_BODY_TIMEOUT_MS, 64 * 1024);
+    throw new Error(`GitHub API error ${resp.status} (${url}): ${body}`);
+  }
+  return readResponseJsonWithTimeout<T>(resp, GITHUB_BODY_TIMEOUT_MS, GITHUB_BODY_LIMIT_BYTES);
 }
 
 async function fetchItemPage(
@@ -129,7 +140,7 @@ async function fetchItemPage(
     state: "all",
     sort: "updated",
     direction: "desc",
-    per_page: "100",
+    per_page: String(GITHUB_PAGE_SIZE),
     page: String(page),
   };
   // /pulls does not support `since`; filter client-side instead
@@ -146,7 +157,7 @@ async function fetchItemPage(
 /**
  * Fetch items updated since `since`.
  * Paginated repos: keeps fetching until a page ends before `since` or MAX_PAGES reached.
- * Regular repos: single page of 50.
+ * Regular repos: one bounded page.
  */
 export async function fetchRecentItems(
   cfg: RepoConfig,
@@ -166,7 +177,7 @@ export async function fetchRecentItemsWithMeta(
       state: "all",
       sort: "updated",
       direction: "desc",
-      per_page: "50",
+      per_page: String(GITHUB_PAGE_SIZE),
     };
     if (itemType === "issues") params["since"] = since.toISOString();
     const items = await githubGet<GitHubItem[]>(
@@ -175,22 +186,27 @@ export async function fetchRecentItemsWithMeta(
     );
     return {
       items: itemType === "pulls" ? items.filter((i) => new Date(i.updated_at) >= since) : items,
-      truncated: items.length >= 50,
+      truncated: items.length >= GITHUB_PAGE_SIZE,
       pagesFetched: 1,
     };
   }
 
   const all: GitHubItem[] = [];
+  const seenNumbers = new Set<number>();
   let pagesFetched = 0;
   let truncated = false;
   for (let page = 1; page <= MAX_PAGES; page++) {
     const items = await fetchItemPage(cfg.repo, itemType, since, page);
     pagesFetched = page;
     if (items.length === 0) break;
-    all.push(...items);
+    for (const item of items) {
+      if (seenNumbers.has(item.number)) continue;
+      seenNumbers.add(item.number);
+      all.push(item);
+    }
     const last = items[items.length - 1];
     if (last && new Date(last.updated_at) < since) break;
-    if (items.length < 100) break;
+    if (items.length < GITHUB_PAGE_SIZE) break;
     if (page === MAX_PAGES) truncated = true;
   }
   return { items: all, truncated, pagesFetched };
@@ -202,27 +218,32 @@ export async function fetchRecentReleases(repo: string, since: Date): Promise<Gi
 
 export async function fetchRecentReleasesWithMeta(repo: string, since: Date): Promise<GitHubReleasesResult> {
   const releases: GitHubRelease[] = [];
+  const seenTags = new Set<string>();
   let pagesFetched = 0;
   let truncated = false;
   for (let page = 1; page <= MAX_PAGES; page++) {
     const batch = await githubGet<GitHubRelease[]>(`https://api.github.com/repos/${repo}/releases`, {
-      per_page: "100",
+      per_page: String(GITHUB_PAGE_SIZE),
       page: String(page),
     });
     pagesFetched = page;
     if (batch.length === 0) break;
-    releases.push(
-      ...batch.filter(
-        (release) =>
-          typeof release.published_at === "string" &&
-          Number.isFinite(Date.parse(release.published_at)) &&
-          Date.parse(release.published_at) >= since.getTime(),
-      ),
-    );
+    for (const release of batch) {
+      if (
+        typeof release.published_at !== "string" ||
+        !Number.isFinite(Date.parse(release.published_at)) ||
+        Date.parse(release.published_at) < since.getTime() ||
+        seenTags.has(release.tag_name)
+      ) {
+        continue;
+      }
+      seenTags.add(release.tag_name);
+      releases.push(release);
+    }
     // GitHub's release ordering is not a trustworthy published_at boundary:
     // a long-lived draft can be published after newer-created releases. Stay
     // bounded, but do not stop merely because one page contains an old release.
-    if (batch.length < 100) break;
+    if (batch.length < GITHUB_PAGE_SIZE) break;
     if (page === MAX_PAGES) truncated = true;
   }
   return { releases, truncated, pagesFetched };
@@ -236,8 +257,10 @@ export async function ensureLabel(name: string, color: string): Promise<void> {
     body: JSON.stringify({ name, color }),
   });
   if (!resp.ok && resp.status !== 422) {
-    throw new Error(`Failed to create label "${name}": ${await resp.text()}`);
+    const body = await readResponseTextWithTimeout(resp, undefined, 64 * 1024);
+    throw new Error(`Failed to create label "${name}": ${body}`);
   }
+  await discardResponseBody(resp);
 }
 
 /**
@@ -341,6 +364,7 @@ export async function closeStaleIssues(days: number): Promise<number> {
   if (!digestRepo) return 0;
   const cutoff = new Date(Date.now() - days * 86_400_000);
   let closed = 0;
+  const confirmedClosed = new Set<number>();
 
   // Always re-fetch page 1: closing issues shifts pagination, so incrementing
   // pages would skip items.
@@ -353,6 +377,13 @@ export async function closeStaleIssues(days: number): Promise<number> {
 
     const stale = issues.filter((i) => new Date(i.created_at) < cutoff);
     if (stale.length === 0) break;
+    const staleNumbers = stale.map((issue) => issue.number);
+    if (
+      new Set(staleNumbers).size !== staleNumbers.length ||
+      staleNumbers.some((number) => confirmedClosed.has(number))
+    ) {
+      throw new Error("GitHub stale-issue traversal did not make progress");
+    }
 
     await Promise.all(
       stale.map(async (i) => {
@@ -361,9 +392,14 @@ export async function closeStaleIssues(days: number): Promise<number> {
           headers: { ...headers(), "Content-Type": "application/json" },
           body: JSON.stringify({ state: "closed" }),
         });
-        if (!resp.ok) console.error(`[github] Failed to close #${i.number}: ${resp.status}`);
+        if (!resp.ok) {
+          await discardResponseBody(resp);
+          throw new Error(`Failed to close stale GitHub issue: HTTP ${resp.status}`);
+        }
+        await discardResponseBody(resp);
       }),
     );
+    for (const number of staleNumbers) confirmedClosed.add(number);
     closed += stale.length;
   }
   return closed;
@@ -390,8 +426,9 @@ export async function createGitHubIssue(title: string, body: string, label: stri
     ),
   });
   if (!resp.ok) {
-    throw new Error(`Failed to ${existing ? "update" : "create"} issue: ${await resp.text()}`);
+    const body = await readResponseTextWithTimeout(resp, undefined, 64 * 1024);
+    throw new Error(`Failed to ${existing ? "update" : "create"} issue: ${body}`);
   }
-  const data = (await resp.json()) as { html_url: string };
+  const data = await readResponseJsonWithTimeout<{ html_url: string }>(resp);
   return data.html_url;
 }

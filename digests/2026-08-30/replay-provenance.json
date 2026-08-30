@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 2,
+  "date": "2026-08-30",
+  "mode": "frozen_evidence",
+  "observedAt": "2026-08-29T16:42:30.504Z",
+  "inputSha256": "329de9f58905a0173bf75d3c8694dcf23fc1e2333949b69ffb743227a6671a8d",
+  "recordCount": 361,
+  "groupedEventCount": 293,
+  "selectedEventCount": 20,
+  "selectionIdentical": true,
+  "selectionChangeAccepted": false,
+  "applied": true,
+  "outputEvidenceSha256": "329de9f58905a0173bf75d3c8694dcf23fc1e2333949b69ffb743227a6671a8d"
+}

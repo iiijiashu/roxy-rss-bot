@@ -11,16 +11,16 @@
  *   AGNES_MAX_BATCH_TASKS         - maximum tasks in one request (default: 4)
  *   AGNES_MAX_BATCH_INPUT_BYTES   - maximum serialized input bytes (default: 180000)
  *   AGNES_MAX_BATCH_OUTPUT_TOKENS - maximum output tokens per request (default: 18000)
- *   AGNES_REQUEST_BUDGET          - maximum physical requests per process (default: 16)
- *   AGNES_RETRY_BUDGET            - maximum retry requests per process (default: 6)
- *   AGNES_MAX_TASK_ATTEMPTS       - maximum physical attempts per task (default: 3)
+ *   AGNES_REQUEST_BUDGET          - maximum physical requests per process (default: 36)
+ *   AGNES_RETRY_BUDGET            - maximum retry requests per process (default: 1)
+ *   AGNES_MAX_TASK_ATTEMPTS       - maximum physical attempts per task (default: 1)
  *   AGNES_MAX_IN_FLIGHT           - maximum simultaneous physical requests (default: 2)
- *   AGNES_TIMEOUT_MS              - per-request timeout (default: 180000)
+ *   AGNES_TIMEOUT_MS              - per-request timeout (default: 120000)
  *   AGNES_RETRY_BASE_MS           - base retry delay (default: 1000)
  */
 
 import OpenAI from "openai";
-import type { LlmProvider, LlmProviderDiagnostics } from "./types.ts";
+import type { LlmCallOptions, LlmProvider, LlmProviderDiagnostics } from "./types.ts";
 
 const AGNES_BASE_URL = "https://apihub.agnes-ai.com/v1";
 const DEFAULT_MODEL = "agnes-2.5-flash";
@@ -28,11 +28,11 @@ const DEFAULT_BATCH_WINDOW_MS = 25;
 const DEFAULT_MAX_BATCH_TASKS = 4;
 const DEFAULT_MAX_BATCH_INPUT_BYTES = 180_000;
 const DEFAULT_MAX_BATCH_OUTPUT_TOKENS = 18_000;
-const DEFAULT_REQUEST_BUDGET = 16;
-const DEFAULT_RETRY_BUDGET = 6;
-const DEFAULT_MAX_TASK_ATTEMPTS = 3;
+const DEFAULT_REQUEST_BUDGET = 36;
+const DEFAULT_RETRY_BUDGET = 1;
+const DEFAULT_MAX_TASK_ATTEMPTS = 1;
 const DEFAULT_MAX_IN_FLIGHT = 2;
-const DEFAULT_TIMEOUT_MS = 180_000;
+const DEFAULT_TIMEOUT_MS = 120_000;
 const DEFAULT_RETRY_BASE_MS = 1_000;
 const MAX_API_KEY_BYTES = 16_384;
 const MAX_TASK_OUTPUT_BYTES = 256 * 1024;
@@ -62,6 +62,7 @@ interface PendingTask {
   id: string;
   prompt: string;
   maxTokens: number;
+  responseFormat?: LlmCallOptions["responseFormat"];
   resolve: (content: string) => void;
   reject: (error: Error) => void;
 }
@@ -87,6 +88,7 @@ export type AgnesFailureCode =
   | "invalid_result"
   | "omitted_task"
   | "empty_response"
+  | "output_limit"
   | "input_limit"
   | "budget_exhausted"
   | "provider_error";
@@ -359,7 +361,7 @@ export class AgnesProvider implements LlmProvider {
     };
   }
 
-  call(prompt: string, maxTokens: number): Promise<string> {
+  call(prompt: string, maxTokens: number, options?: LlmCallOptions): Promise<string> {
     const normalizedPrompt = prompt.trim();
     if (!normalizedPrompt) return Promise.reject(new Error("Agnes task prompt is empty"));
     if (!Number.isSafeInteger(maxTokens) || maxTokens <= 0) {
@@ -371,6 +373,7 @@ export class AgnesProvider implements LlmProvider {
         id: `T${String(this.nextTaskId++).padStart(6, "0")}`,
         prompt: normalizedPrompt,
         maxTokens,
+        responseFormat: options?.responseFormat,
         resolve,
         reject,
       });
@@ -534,10 +537,12 @@ export class AgnesProvider implements LlmProvider {
       const response = await this.withRequestSlot(() => {
         console.log(`[agnes] request=${requestNumber} status=started queue_ms=${Date.now() - queuedAt}`);
         const singleTask = tasks.length === 1 ? tasks[0]! : undefined;
+        const useJsonResponse = tasks.length > 1 || singleTask?.responseFormat === "json_object";
         return this.client.chat.completions.create({
           model: this.model,
-          temperature: 0.2,
+          temperature: 0,
           max_tokens: maxTokens,
+          ...(useJsonResponse ? { response_format: { type: "json_object" as const } } : {}),
           messages: singleTask
             ? [
                 { role: "system", content: SINGLE_TASK_SYSTEM_PROMPT },
@@ -549,6 +554,14 @@ export class AgnesProvider implements LlmProvider {
               ],
         });
       });
+      const finishReason = response.choices[0]?.finish_reason;
+      if (finishReason === "length") {
+        throw new AgnesProviderError(
+          "output_limit",
+          "Agnes stopped because the output token limit was reached",
+          true,
+        );
+      }
       const raw = response.choices[0]?.message?.content;
       if (!raw) {
         throw new AgnesProviderError("empty_response", "Agnes returned an empty batch response", true);
@@ -591,7 +604,7 @@ export class AgnesProvider implements LlmProvider {
 
       console.log(
         `[agnes] request=${requestNumber} status=ok returned=${byId.size}/${tasks.length} ` +
-          `elapsed_ms=${Date.now() - queuedAt}`,
+          `finish_reason=${finishReason ?? "unknown"} elapsed_ms=${Date.now() - queuedAt}`,
       );
       return byId;
     } catch (error) {

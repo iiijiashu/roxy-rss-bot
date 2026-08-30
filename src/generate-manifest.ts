@@ -46,7 +46,7 @@ interface Manifest {
   dates: DateEntry[];
 }
 
-interface ReportContent {
+export interface ReportContent {
   summary: string;
   fullHtml: string;
 }
@@ -94,36 +94,23 @@ export function normalizeSiteUrl(raw = DEFAULT_SITE_URL): string {
   return parsed.href.replace(/\/+$/, "");
 }
 
-async function getReportContent(date: string, report: string): Promise<ReportContent> {
+export function feedContentFromMarkdown(markdown: string): ReportContent {
+  const html = marked.parse(markdown, { async: false }) as string;
+  const textOnly = html
+    .replace(/<[^>]+>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const summary = textOnly.length > 500 ? textOnly.slice(0, 500) + "..." : textOnly;
+  const safeHtml = html.replace(/]]>/g, "]]]]><![CDATA[");
+  return {
+    summary: escapeXml(summary),
+    fullHtml: `<![CDATA[${safeHtml}]]>`,
+  };
+}
+
+function getReportContent(date: string, report: string): ReportContent {
   const filePath = path.join(DIGESTS_DIR, date, `${report}.md`);
-
-  try {
-    const markdown = fs.readFileSync(filePath, "utf-8");
-    const html = await marked.parse(markdown, { async: false });
-
-    // Extract summary text from original HTML (before CDATA escape)
-    const textOnly = html
-      .replace(/<[^>]+>/g, "")
-      .replace(/\s+/g, " ")
-      .trim();
-    const summary = textOnly.length > 500 ? textOnly.slice(0, 500) + "..." : textOnly;
-
-    // Escape CDATA end marker to prevent injection
-    const safeHtml = html.replace(/]]>/g, "]]]]><![CDATA[");
-
-    return {
-      summary: escapeXml(summary), // Plain text, XML-escaped, no CDATA
-      fullHtml: `<![CDATA[${safeHtml}]]>`, // HTML in CDATA, no escaping needed
-    };
-  } catch {
-    // Fallback to title-only content on any error
-    const label = reportLabel(report);
-    const title = `${label} ${date}`;
-    return {
-      summary: escapeXml(title),
-      fullHtml: `<![CDATA[${escapeXml(title)}]]>`,
-    };
-  }
+  return feedContentFromMarkdown(fs.readFileSync(filePath, "utf-8"));
 }
 
 async function main(): Promise<void> {
@@ -168,7 +155,7 @@ async function main(): Promise<void> {
     const link = `${siteUrl}/#${date}/${report}`;
     const parts = date.split("-").map(Number);
     const pubDate = toRfc822(new Date(Date.UTC(parts[0]!, parts[1]! - 1, parts[2]!)));
-    const content = await getReportContent(date, report);
+    const content = getReportContent(date, report);
     itemXmlChunks.push(
       [
         "    <item>",

@@ -3,18 +3,29 @@ import { AgnesProvider } from "../providers/agnes.ts";
 
 vi.mock("openai", () => {
   const create = vi.fn();
+  const construct = vi.fn();
   class MockOpenAI {
+    constructor(options: unknown) {
+      construct(options);
+    }
+
     chat = { completions: { create } };
   }
   return {
     default: MockOpenAI,
     __mockCreate: create,
+    __mockConstruct: construct,
   };
 });
 
 async function getCreateMock() {
   const mod = await import("openai");
   return (mod as unknown as { __mockCreate: ReturnType<typeof vi.fn> }).__mockCreate;
+}
+
+async function getConstructMock() {
+  const mod = await import("openai");
+  return (mod as unknown as { __mockConstruct: ReturnType<typeof vi.fn> }).__mockConstruct;
 }
 
 interface SubmittedTask {
@@ -46,7 +57,7 @@ function submittedTasks(call: unknown[]): SubmittedTask[] {
 
 describe("AgnesProvider batching", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it("coalesces concurrent logical tasks into one provider request", async () => {
@@ -75,10 +86,13 @@ describe("AgnesProvider batching", () => {
     const request = create.mock.calls[0]?.[0] as {
       model: string;
       max_tokens: number;
+      temperature: number;
       messages: Array<{ role: string; content: string }>;
     };
     expect(request.model).toBe("agnes-2.5-flash");
     expect(request.max_tokens).toBe(300);
+    expect(request.temperature).toBe(0);
+    expect(request).toMatchObject({ response_format: { type: "json_object" } });
     expect(request.messages[0]?.role).toBe("system");
     expect(request.messages[0]?.content).toContain("untrusted public source data");
     expect(submittedTasks(create.mock.calls[0] ?? [])).toEqual([
@@ -100,13 +114,89 @@ describe("AgnesProvider batching", () => {
       requestBudget: 1,
       maxTaskAttempts: 1,
     });
-    await expect(provider.call("return strict JSON", 100)).resolves.toBe('{"developments":[]}');
+    await expect(provider.call("return strict JSON", 100, { responseFormat: "json_object" })).resolves.toBe(
+      '{"developments":[]}',
+    );
 
     const request = create.mock.calls[0]?.[0] as {
       messages: Array<{ role: string; content: string }>;
+      response_format?: { type: string };
     };
+    expect(request.response_format).toEqual({ type: "json_object" });
     expect(request.messages[0]?.content).toContain("untrusted public source data");
     expect(request.messages[1]).toEqual({ role: "user", content: "return strict JSON" });
+  });
+
+  it("keeps text-mode single tasks free of JSON response constraints", async () => {
+    const create = await getCreateMock();
+    create.mockResolvedValueOnce({ choices: [{ message: { content: "plain text" } }] });
+
+    const provider = new AgnesProvider({
+      apiKey: "test",
+      batchWindowMs: 1,
+      maxBatchTasks: 1,
+      requestBudget: 1,
+      maxTaskAttempts: 1,
+    });
+    await expect(provider.call("return prose", 100)).resolves.toBe("plain text");
+
+    expect(create.mock.calls[0]?.[0]).not.toHaveProperty("response_format");
+  });
+
+  it("uses bounded local defaults for requests, retries, attempts, and timeout", async () => {
+    const create = await getCreateMock();
+    const construct = await getConstructMock();
+    create.mockResolvedValue({ choices: [{ message: { content: "ok" } }] });
+
+    const provider = new AgnesProvider({ apiKey: "test", batchWindowMs: 1, maxBatchTasks: 1 });
+    for (let index = 0; index < 36; index++) {
+      await expect(provider.call(`task-${index}`, 100)).resolves.toBe("ok");
+    }
+    await expect(provider.call("over-budget", 100)).rejects.toThrow(
+      /AGNES request budget exhausted \(requests=36\/36/u,
+    );
+
+    expect(create).toHaveBeenCalledTimes(36);
+    expect(construct).toHaveBeenLastCalledWith(expect.objectContaining({ maxRetries: 0, timeout: 120_000 }));
+
+    create.mockReset();
+    create.mockResolvedValue({
+      choices: [{ finish_reason: "length", message: { content: "truncated" } }],
+    });
+    const noProviderRetry = new AgnesProvider({ apiKey: "test", batchWindowMs: 1, maxBatchTasks: 1 });
+    await expect(noProviderRetry.call("structured", 100)).rejects.toThrow(
+      "Agnes stopped because the output token limit was reached",
+    );
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
+  it("classifies a token-limited response and retries instead of returning truncated JSON", async () => {
+    const create = await getCreateMock();
+    create
+      .mockResolvedValueOnce({
+        choices: [{ finish_reason: "length", message: { content: '{"developments":[' } }],
+      })
+      .mockResolvedValueOnce({
+        choices: [{ finish_reason: "stop", message: { content: '{"developments":[]}' } }],
+      });
+
+    const provider = new AgnesProvider({
+      apiKey: "test",
+      batchWindowMs: 1,
+      requestBudget: 2,
+      retryBudget: 1,
+      maxTaskAttempts: 2,
+      retryBaseMs: 1,
+    });
+
+    await expect(provider.call("return strict JSON", 100)).resolves.toBe('{"developments":[]}');
+    expect(create).toHaveBeenCalledTimes(2);
+    expect(provider.getDiagnostics()).toMatchObject({
+      requests: 2,
+      retryRequests: 1,
+      tasksRetried: 1,
+      errors: { output_limit: 1 },
+    });
   });
 
   it("serializes object content for callers that requested JSON", async () => {

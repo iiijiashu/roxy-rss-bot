@@ -5,7 +5,7 @@
  * sorted by submission date, filtered to last 48h.
  */
 
-import { fetchWithTimeout } from "./http.ts";
+import { discardResponseBody, fetchWithTimeout, readResponseTextWithTimeout } from "./http.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -126,11 +126,12 @@ export async function fetchArxivData(): Promise<ArxivData> {
       });
 
       if (!resp.ok) {
+        await discardResponseBody(resp);
         console.error(`  [arxiv] ${cat}: HTTP ${resp.status}`);
         continue;
       }
 
-      const xml = await resp.text();
+      const xml = await readResponseTextWithTimeout(resp);
 
       // Split into entries
       const entryBlocks = xml.split("<entry>").slice(1);

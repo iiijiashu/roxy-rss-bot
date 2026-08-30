@@ -14,7 +14,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { NOTIFY_LABELS } from "./i18n.ts";
 import type { ReportHighlights } from "./prompts-data.ts";
-import { fetchWithTimeout } from "./http.ts";
+import { discardResponseBody, fetchWithTimeout, readResponseTextWithTimeout } from "./http.ts";
 
 export interface Highlights {
   zh: ReportHighlights;
@@ -42,9 +42,10 @@ async function sendTelegram(text: string): Promise<void> {
     }),
   });
   if (!res.ok) {
-    const body = await res.text();
+    const body = await readResponseTextWithTimeout(res, undefined, 64 * 1024);
     throw new Error(`Telegram API ${res.status}: ${body}`);
   }
+  await discardResponseBody(res);
 }
 
 export function buildMessage(

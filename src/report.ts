@@ -18,7 +18,12 @@ export const LLM_TOKENS_TRENDING = 6144;
 export const LLM_TOKENS_LISTING = 6144;
 export const LLM_TOKENS_WEB = 8192;
 export const LLM_TOKENS_ROLLUP = 8192;
-import { type LlmProvider, type LlmProviderDiagnostics, createProvider } from "./providers/index.ts";
+import {
+  type LlmCallOptions,
+  type LlmProvider,
+  type LlmProviderDiagnostics,
+  createProvider,
+} from "./providers/index.ts";
 
 const provider: LlmProvider = createProvider();
 
@@ -96,14 +101,20 @@ function configuredMaxTokens(requested: number): number {
   return Math.min(requested, limit);
 }
 
-export async function callLlm(prompt: string, maxTokens = LLM_TOKENS_DEFAULT): Promise<string> {
+export async function callLlm(
+  prompt: string,
+  maxTokens = LLM_TOKENS_DEFAULT,
+  options?: LlmCallOptions,
+): Promise<string> {
   const effectiveMaxTokens = configuredMaxTokens(maxTokens);
   for (let attempt = 0; ; attempt++) {
     consumeCallBudget();
     await acquireSlot();
     let released = false;
     try {
-      return await provider.call(prompt, effectiveMaxTokens);
+      return await (options
+        ? provider.call(prompt, effectiveMaxTokens, options)
+        : provider.call(prompt, effectiveMaxTokens));
     } catch (err) {
       if (!provider.handlesRetries && attempt < MAX_RETRIES && is429(err)) {
         releaseSlot();

@@ -2,7 +2,12 @@
  * GitHub trending and AI topic search data fetching.
  */
 
-import { fetchWithTimeout } from "./http.ts";
+import {
+  discardResponseBody,
+  fetchWithTimeout,
+  readResponseJsonWithTimeout,
+  readResponseTextWithTimeout,
+} from "./http.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -60,11 +65,12 @@ async function fetchGitHubTrending(): Promise<{ repos: TrendingRepo[]; success: 
       },
     });
     if (!resp.ok) {
+      await discardResponseBody(resp);
       console.error(`  [trending] HTTP ${resp.status} fetching github.com/trending`);
       return { repos: [], success: false };
     }
 
-    const html = await resp.text();
+    const html = await readResponseTextWithTimeout(resp);
     const repos: TrendingRepo[] = [];
 
     // Split by article blocks
@@ -161,10 +167,11 @@ async function searchAiRepos(sevenDaysAgo: string): Promise<SearchRepo[]> {
         const url = `https://api.github.com/search/repositories?q=${query}&per_page=15`;
         const resp = await fetchWithTimeout(url, { headers });
         if (!resp.ok) {
+          await discardResponseBody(resp);
           console.error(`  [trending/search] "${label}": HTTP ${resp.status}`);
           return;
         }
-        const data = (await resp.json()) as SearchApiResponse;
+        const data = await readResponseJsonWithTimeout<SearchApiResponse>(resp);
         let added = 0;
         for (const item of data.items ?? []) {
           if (!seen.has(item.full_name)) {

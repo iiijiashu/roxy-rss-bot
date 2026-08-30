@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  closeStaleIssues,
   createGitHubIssue,
   fetchRecentItemsWithMeta,
   fetchRecentReleasesWithMeta,
+  GITHUB_PAGE_SIZE,
   githubActivityTimestamp,
   type GitHubItem,
 } from "../github.ts";
@@ -16,6 +18,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.useRealTimers();
   if (originalRepo === undefined) delete process.env["DIGEST_REPO"];
   else process.env["DIGEST_REPO"] = originalRepo;
   if (originalToken === undefined) delete process.env["GITHUB_TOKEN"];
@@ -119,6 +122,33 @@ describe("createGitHubIssue", () => {
   });
 });
 
+describe("closeStaleIssues", () => {
+  it("fails closed when GitHub refuses to close a stale issue", async () => {
+    const staleIssue = { number: 7, created_at: "2026-01-01T00:00:00.000Z" };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify([staleIssue]), { status: 200 }))
+      .mockResolvedValueOnce(new Response("denied", { status: 500 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(closeStaleIssues(30)).rejects.toThrow("Failed to close stale GitHub issue: HTTP 500");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("stops when a successful close does not advance the open-issue page", async () => {
+    const staleIssue = { number: 7, created_at: "2026-01-01T00:00:00.000Z" };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify([staleIssue]), { status: 200 }))
+      .mockResolvedValueOnce(new Response(null, { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify([staleIssue]), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(closeStaleIssues(30)).rejects.toThrow("GitHub stale-issue traversal did not make progress");
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+});
+
 function githubItem(number: number, updatedAt = "2026-08-29T02:00:00.000Z"): GitHubItem {
   return {
     number,
@@ -149,6 +179,41 @@ describe("bounded GitHub pagination", () => {
       | Record<string, string>
       | undefined;
     expect(requestHeaders?.Authorization).toBeUndefined();
+    expect(new URL(String(fetchMock.mock.calls[0]?.[0])).searchParams.get("per_page")).toBe(
+      String(GITHUB_PAGE_SIZE),
+    );
+  });
+
+  it("allows a bounded GitHub body to complete after the global twenty-second source budget", async () => {
+    vi.useFakeTimers();
+    const response = new Response(
+      new ReadableStream<Uint8Array>({
+        start(controller) {
+          setTimeout(() => {
+            controller.enqueue(new TextEncoder().encode(JSON.stringify([githubItem(1)])));
+            controller.close();
+          }, 25_000);
+        },
+      }),
+      { status: 200 },
+    );
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response));
+
+    const pending = fetchRecentItemsWithMeta(
+      { id: "repo", repo: "owner/repo", name: "Repo", paginated: false },
+      "pulls",
+      new Date("2026-08-28T00:00:00.000Z"),
+    );
+    const settled = pending.then(
+      (value) => ({ state: "resolved" as const, value }),
+      (error: unknown) => ({ state: "rejected" as const, error }),
+    );
+
+    await vi.advanceTimersByTimeAsync(25_000);
+    await expect(settled).resolves.toMatchObject({
+      state: "resolved",
+      value: { items: [{ number: 1 }] },
+    });
   });
 
   it("uses updated_at for a new engagement delta instead of an old merge/close timestamp", () => {
@@ -162,7 +227,9 @@ describe("bounded GitHub pagination", () => {
   it("marks a pull traversal truncated when all five full pages are still inside the time window", async () => {
     const fetchMock = vi.fn().mockImplementation(async (input: string | URL | Request) => {
       const page = Number(new URL(String(input)).searchParams.get("page"));
-      const items = Array.from({ length: 100 }, (_, index) => githubItem((page - 1) * 100 + index + 1));
+      const items = Array.from({ length: GITHUB_PAGE_SIZE }, (_, index) =>
+        githubItem((page - 1) * GITHUB_PAGE_SIZE + index + 1),
+      );
       return new Response(JSON.stringify(items), { status: 200 });
     });
     vi.stubGlobal("fetch", fetchMock);
@@ -173,8 +240,30 @@ describe("bounded GitHub pagination", () => {
       new Date("2026-08-28T00:00:00.000Z"),
     );
     expect(result).toMatchObject({ pagesFetched: 5, truncated: true });
-    expect(result.items).toHaveLength(500);
+    expect(result.items).toHaveLength(GITHUB_PAGE_SIZE * 5);
     expect(fetchMock).toHaveBeenCalledTimes(5);
+  });
+
+  it("deduplicates an item that moves across GitHub pagination boundaries", async () => {
+    const fetchMock = vi.fn().mockImplementation(async (input: string | URL | Request) => {
+      const page = Number(new URL(String(input)).searchParams.get("page"));
+      const items =
+        page === 1
+          ? Array.from({ length: GITHUB_PAGE_SIZE }, (_, index) => githubItem(index + 1))
+          : [githubItem(GITHUB_PAGE_SIZE), githubItem(GITHUB_PAGE_SIZE + 1)];
+      return new Response(JSON.stringify(items), { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await fetchRecentItemsWithMeta(
+      { id: "repo", repo: "owner/repo", name: "Repo", paginated: true },
+      "pulls",
+      new Date("2026-08-28T00:00:00.000Z"),
+    );
+
+    expect(result.pagesFetched).toBe(2);
+    expect(result.items).toHaveLength(GITHUB_PAGE_SIZE + 1);
+    expect(result.items.filter((item) => item.number === GITHUB_PAGE_SIZE)).toHaveLength(1);
   });
 
   it("filters old releases but continues until a short page ends the bounded traversal", async () => {
@@ -182,7 +271,7 @@ describe("bounded GitHub pagination", () => {
       const page = Number(new URL(String(input)).searchParams.get("page"));
       const releases =
         page === 1
-          ? Array.from({ length: 100 }, (_, index) => ({
+          ? Array.from({ length: GITHUB_PAGE_SIZE }, (_, index) => ({
               tag_name: `v1.${index}`,
               name: `Release ${index}`,
               published_at: "2026-08-20T02:00:00.000Z",
@@ -200,5 +289,38 @@ describe("bounded GitHub pagination", () => {
     expect(result.releases).toHaveLength(1);
     expect(result.releases[0]?.tag_name).toBe("v2.current");
     expect(result.releases.some((release) => release.tag_name === "v2.old")).toBe(false);
+  });
+
+  it("deduplicates a release that moves across GitHub pagination boundaries", async () => {
+    const fetchMock = vi.fn().mockImplementation(async (input: string | URL | Request) => {
+      const page = Number(new URL(String(input)).searchParams.get("page"));
+      const releases =
+        page === 1
+          ? Array.from({ length: GITHUB_PAGE_SIZE }, (_, index) => ({
+              tag_name: `v${index + 1}`,
+              name: `Release ${index + 1}`,
+              published_at: "2026-08-29T01:00:00.000Z",
+            }))
+          : [
+              {
+                tag_name: `v${GITHUB_PAGE_SIZE}`,
+                name: `Release ${GITHUB_PAGE_SIZE}`,
+                published_at: "2026-08-29T01:00:00.000Z",
+              },
+              {
+                tag_name: `v${GITHUB_PAGE_SIZE + 1}`,
+                name: `Release ${GITHUB_PAGE_SIZE + 1}`,
+                published_at: "2026-08-29T01:00:00.000Z",
+              },
+            ];
+      return new Response(JSON.stringify(releases), { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await fetchRecentReleasesWithMeta("owner/repo", new Date("2026-08-28T00:00:00.000Z"));
+
+    expect(result.pagesFetched).toBe(2);
+    expect(result.releases).toHaveLength(GITHUB_PAGE_SIZE + 1);
+    expect(result.releases.filter((release) => release.tag_name === `v${GITHUB_PAGE_SIZE}`)).toHaveLength(1);
   });
 });

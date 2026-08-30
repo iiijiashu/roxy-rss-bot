@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   escapeXml,
+  feedContentFromMarkdown,
   normalizeSiteUrl,
   selectReportsForDate,
   stableGeneratedAt,
@@ -114,5 +115,14 @@ describe("selectReportsForDate", () => {
 
   it("preserves per-source reports for historical dates", () => {
     expect(selectReportsForDate(["ai-cli", "ai-web"])).toEqual(["ai-cli", "ai-web"]);
+  });
+});
+
+describe("feedContentFromMarkdown", () => {
+  it("renders the full report body instead of a title-only fallback", () => {
+    const content = feedContentFromMarkdown("# 日报\n\n发生了什么：完整正文。\n");
+    expect(content.summary).toContain("发生了什么");
+    expect(content.fullHtml).toContain("<h1>日报</h1>");
+    expect(content.fullHtml).toContain("完整正文");
   });
 });

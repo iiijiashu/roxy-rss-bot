@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -11,6 +12,8 @@ import {
   type EvidenceRecord,
 } from "../evidence.ts";
 import { validatePublication } from "../validate-publication.ts";
+import { feedContentFromMarkdown } from "../generate-manifest.ts";
+import { synthesisStructureSha256 } from "../evaluation-hash.ts";
 
 const roots: string[] = [];
 
@@ -87,7 +90,7 @@ function fixture(count = 10, status: "ok" | "degraded" = "degraded"): { root: st
     authority: "primary",
     url: `https://example.test/release-${index}`,
     title: `${labels[index]} official release`,
-    content: `${labels[index]} provides a verified agent API release.`,
+    content: `${labels[index]} provides a verified agent API release. ${topics[index]}`,
     category: "tool",
     freshness: "newly_published",
     visibility: "full_text",
@@ -97,13 +100,18 @@ function fixture(count = 10, status: "ok" | "degraded" = "degraded"): { root: st
   }));
   const events = groupEvidence(records);
   const selected = selectTopEvents(events, { maxEvents: count });
-  const developments = selected.map((event, index) => ({
-    event_id: event.id,
-    title: `${labels[index]} ${topics[index]}`,
-    summary: "官方材料确认了这项新的技术变化。",
-    why_it_matters: "这会影响开发者的实际接口选择与工程实现。",
-    source_ids: [event.primarySourceId],
-  }));
+  const developments = selected.map((event) => {
+    const record = records.find((candidate) => candidate.id === event.primarySourceId)!;
+    const label = record.title.split(" ")[0]!;
+    const topic = topics[Number(record.id.slice(1))]!;
+    return {
+      event_id: event.id,
+      title: `${label} ${topic}`,
+      summary: "官方材料确认了这项新的技术变化。",
+      why_it_matters: `这会影响开发者在${topic}中的接口选择与工程实现。`,
+      source_ids: [event.primarySourceId],
+    };
+  });
   const quality = validateSynthesis({ developments }, selected, records);
   fs.writeFileSync(
     path.join(digestDir, "digest.md"),
@@ -115,7 +123,8 @@ function fixture(count = 10, status: "ok" | "degraded" = "degraded"): { root: st
     observedAt,
     developments,
   });
-  writeJson(path.join(digestDir, "evidence.json"), {
+  const evidencePath = path.join(digestDir, "evidence.json");
+  writeJson(evidencePath, {
     schemaVersion: 2,
     observedAt,
     records,
@@ -142,6 +151,70 @@ function fixture(count = 10, status: "ok" | "degraded" = "degraded"): { root: st
     tasksFailed: 0,
     errors: {},
   });
+  writeJson(path.join(digestDir, "evaluation-report.json"), {
+    schemaVersion: 3,
+    date,
+    evidenceSha256: crypto.createHash("sha256").update(fs.readFileSync(evidencePath)).digest("hex"),
+    runDelayMs: 0,
+    targetCleanRuns: 3,
+    maxReplacementRuns: 2,
+    runsExecuted: 3,
+    cleanRunsCollected: 3,
+    replacementsUsed: 0,
+    passRate: 1,
+    passed: true,
+    acceptance: {
+      selectionIdentical: true,
+      selectionCountInRange: true,
+      requiredProvider: "agnes",
+      providerMatched: true,
+      outputsIdentical: false,
+      structureIdentical: true,
+      cleanRuns: true,
+      acceptableRuns: true,
+      recoveredRuns: 0,
+      firstPassRuns: 3,
+      normalizedRuns: 0,
+      boundedQualityRepairs: true,
+      boundedSynthesisAttempts: true,
+      atLeastOneFirstPass: true,
+      totalQualityRepairAttempts: 0,
+      health: "healthy",
+    },
+    selection: {
+      originalCount: count,
+      recomputedCount: count,
+      identical: true,
+      addedEventIds: [],
+      removedEventIds: [],
+    },
+    runs: Array.from({ length: 3 }, (_, index) => ({
+      run: index + 1,
+      qualityPassed: true,
+      firstPass: true,
+      qualityRepairAttempts: 0,
+      providerClean: true,
+      providerRecovered: false,
+      passed: true,
+      countedForAcceptance: true,
+      structureSha256: synthesisStructureSha256({ developments }),
+      developmentCount: count,
+      attempts: [{ chunk: 1, attempt: 1, state: "ok" }],
+      failedChecks: [],
+      deterministicNormalizations: [],
+      diagnostics: {
+        provider: "agnes",
+        diagnosticsAvailable: true,
+        diagnosticsValid: true,
+        requests: 1,
+        retryRequests: 0,
+        tasksResolved: 1,
+        tasksRetried: 0,
+        tasksFailed: 0,
+        errors: {},
+      },
+    })),
+  });
   writeJson(path.join(digestDir, "highlights.json"), {
     schemaVersion: 1,
     date,
@@ -152,7 +225,11 @@ function fixture(count = 10, status: "ok" | "degraded" = "degraded"): { root: st
     generated: `${date}T00:00:00.000Z`,
     dates: [{ date, reports: ["digest"] }],
   });
-  fs.writeFileSync(path.join(root, "feed.xml"), `<link>https://example.test/#${date}/digest</link>\n`);
+  const feedContent = feedContentFromMarkdown(fs.readFileSync(path.join(digestDir, "digest.md"), "utf-8"));
+  fs.writeFileSync(
+    path.join(root, "feed.xml"),
+    `<item><link>https://example.test/#${date}/digest</link><description>${feedContent.summary}</description><content:encoded>${feedContent.fullHtml}</content:encoded></item>\n`,
+  );
   return { root, date };
 }
 
@@ -167,6 +244,18 @@ describe("validatePublication", () => {
     });
   });
 
+  it("rejects credential-shaped text anywhere under the publishable digests directory", () => {
+    const { root, date } = fixture();
+    const credential = `sk-${"A1_b".repeat(8)}`;
+    writeJson(path.join(root, "digests", date, "input-state.json"), {
+      externalContent: `untrusted example ${credential}`,
+    });
+
+    expect(() => validatePublication(date, root)).toThrow(
+      "credential-shaped text remains in publishable digests",
+    );
+  });
+
   it("rejects fewer than ten developments instead of padding a weak digest", () => {
     const { root, date } = fixture(9);
     expect(() => validatePublication(date, root)).toThrow("developmentCount must be within 10..20");
@@ -179,10 +268,277 @@ describe("validatePublication", () => {
     "quality-report.json",
     "run-status.json",
     "llm-diagnostics.json",
+    "evaluation-report.json",
   ])("rejects a missing %s artifact", (fileName) => {
     const { root, date } = fixture();
     fs.rmSync(path.join(root, "digests", date, fileName));
     expect(() => validatePublication(date, root)).toThrow("missing required file");
+  });
+
+  it("rejects an evaluation report for a different evidence snapshot", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{ evidenceSha256: string }>(filePath);
+    report.evidenceSha256 = "0".repeat(64);
+    writeJson(filePath, report);
+    expect(() => validatePublication(date, root)).toThrow("does not match evidence.json");
+  });
+
+  it("rejects fewer than three counted clean evaluation runs", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{
+      targetCleanRuns: number;
+      runsExecuted: number;
+      cleanRunsCollected: number;
+      passRate: number;
+      runs: unknown[];
+    }>(filePath);
+    report.targetCleanRuns = 1;
+    report.runsExecuted = 1;
+    report.cleanRunsCollected = 1;
+    report.passRate = 1;
+    report.runs = report.runs.slice(0, 1);
+    writeJson(filePath, report);
+    expect(() => validatePublication(date, root)).toThrow("exactly 3 counted clean runs");
+  });
+
+  it("accepts two strictly classified provider replacements around three clean runs", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{
+      runsExecuted: number;
+      replacementsUsed: number;
+      acceptance: { recoveredRuns: number };
+      runs: Array<Record<string, unknown>>;
+    }>(filePath);
+    const clean = report.runs;
+    report.runs = [
+      {
+        ...clean[0],
+        run: 1,
+        qualityPassed: false,
+        providerClean: false,
+        providerRecovered: false,
+        passed: false,
+        countedForAcceptance: false,
+        replacementReason: "empty_response",
+        code: "empty_response",
+        developmentCount: 0,
+        attempts: [
+          {
+            chunk: 1,
+            attempt: 1,
+            state: "degraded",
+            reason: "request_or_parse_failed",
+            code: "empty_response",
+          },
+        ],
+        diagnostics: {
+          provider: "agnes",
+          diagnosticsAvailable: true,
+          diagnosticsValid: true,
+          requests: 1,
+          retryRequests: 0,
+          tasksResolved: 0,
+          tasksRetried: 0,
+          tasksFailed: 1,
+          errors: { empty_response: 1 },
+        },
+      },
+      { ...clean[0], run: 2 },
+      {
+        ...clean[1],
+        run: 3,
+        providerClean: false,
+        providerRecovered: true,
+        countedForAcceptance: false,
+        replacementReason: "provider_recovered",
+        attempts: [
+          {
+            chunk: 1,
+            attempt: 1,
+            state: "degraded",
+            reason: "request_or_parse_failed",
+            code: "output_limit",
+          },
+          { chunk: 1, attempt: 2, state: "ok" },
+        ],
+        diagnostics: {
+          provider: "agnes",
+          diagnosticsAvailable: true,
+          diagnosticsValid: true,
+          requests: 2,
+          retryRequests: 0,
+          tasksResolved: 1,
+          tasksRetried: 0,
+          tasksFailed: 1,
+          errors: { output_limit: 1 },
+        },
+      },
+      { ...clean[1], run: 4 },
+      { ...clean[2], run: 5 },
+    ];
+    report.runsExecuted = 5;
+    report.replacementsUsed = 2;
+    report.acceptance.recoveredRuns = 1;
+    (report.acceptance as Record<string, unknown>)["health"] = "degraded";
+    writeJson(filePath, report);
+
+    expect(validatePublication(date, root).coreReports).toEqual(["digest"]);
+  });
+
+  it("rejects an unclassified or forged replacement run", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{
+      runsExecuted: number;
+      replacementsUsed: number;
+      runs: Array<Record<string, unknown>>;
+    }>(filePath);
+    report.runs = [
+      {
+        ...report.runs[0],
+        run: 1,
+        countedForAcceptance: false,
+        replacementReason: "unknown_failure",
+      },
+      { ...report.runs[0], run: 2 },
+      { ...report.runs[1], run: 3 },
+      { ...report.runs[2], run: 4 },
+    ];
+    report.runsExecuted = 4;
+    report.replacementsUsed = 1;
+    writeJson(filePath, report);
+
+    expect(() => validatePublication(date, root)).toThrow("strictly classified replacement runs");
+  });
+
+  it("rejects a recoverable replacement whose provider diagnostics do not reconcile", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{
+      runsExecuted: number;
+      replacementsUsed: number;
+      runs: Array<Record<string, unknown>>;
+    }>(filePath);
+    report.runs = [
+      {
+        ...report.runs[0],
+        run: 1,
+        qualityPassed: false,
+        providerClean: false,
+        providerRecovered: false,
+        passed: false,
+        countedForAcceptance: false,
+        replacementReason: "empty_response",
+        code: "empty_response",
+        developmentCount: 0,
+        attempts: [
+          {
+            chunk: 1,
+            attempt: 1,
+            state: "degraded",
+            reason: "request_or_parse_failed",
+            code: "empty_response",
+          },
+        ],
+      },
+      { ...report.runs[0], run: 2 },
+      { ...report.runs[1], run: 3 },
+      { ...report.runs[2], run: 4 },
+    ];
+    report.runsExecuted = 4;
+    report.replacementsUsed = 1;
+    writeJson(filePath, report);
+
+    expect(() => validatePublication(date, root)).toThrow("strictly classified replacement runs");
+  });
+
+  it("recomputes the bounded-attempt gate instead of trusting its aggregate flag", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{
+      runs: Array<{
+        attempts: unknown[];
+        diagnostics: { requests: number; tasksResolved: number };
+      }>;
+    }>(filePath);
+    report.runs[0]!.attempts = Array.from({ length: 25 }, (_, index) => ({
+      chunk: index + 1,
+      attempt: 1,
+      state: "ok",
+    }));
+    report.runs[0]!.diagnostics.requests = 25;
+    report.runs[0]!.diagnostics.tasksResolved = 25;
+    writeJson(filePath, report);
+
+    expect(() => validatePublication(date, root)).toThrow("production acceptance policy");
+  });
+
+  it("rejects a formal evaluation without any first-pass clean run", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{
+      acceptance: { firstPassRuns: number; atLeastOneFirstPass: boolean };
+      runs: Array<{ firstPass: boolean }>;
+    }>(filePath);
+    report.runs.forEach((run) => {
+      run.firstPass = false;
+    });
+    report.acceptance.firstPassRuns = 0;
+    report.acceptance.atLeastOneFirstPass = false;
+    writeJson(filePath, report);
+
+    expect(() => validatePublication(date, root)).toThrow("production acceptance policy");
+  });
+
+  it("recomputes the per-run quality-repair limit instead of trusting the aggregate flag", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{
+      acceptance: { boundedQualityRepairs: boolean; totalQualityRepairAttempts: number };
+      runs: Array<{
+        qualityRepairAttempts: number;
+        attempts: Array<Record<string, unknown>>;
+        diagnostics: { requests: number; tasksResolved: number };
+      }>;
+    }>(filePath);
+    report.runs[0]!.qualityRepairAttempts = 3;
+    report.runs[0]!.attempts = [
+      { chunk: 1, attempt: 1, state: "degraded", reason: "quality_gate_failed" },
+      { chunk: 1, attempt: 2, state: "degraded", reason: "quality_gate_failed" },
+      { chunk: 1, attempt: 3, state: "degraded", reason: "quality_gate_failed" },
+      { chunk: 1, attempt: 4, state: "ok" },
+    ];
+    report.runs[0]!.diagnostics.requests = 4;
+    report.runs[0]!.diagnostics.tasksResolved = 4;
+    report.acceptance.boundedQualityRepairs = true;
+    report.acceptance.totalQualityRepairAttempts = 3;
+    writeJson(filePath, report);
+
+    expect(() => validatePublication(date, root)).toThrow("production acceptance policy");
+  });
+
+  it("binds the evaluated structure fingerprint to the published digest", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{ runs: Array<{ structureSha256: string }> }>(filePath);
+    report.runs.forEach((run) => {
+      run.structureSha256 = "b".repeat(64);
+    });
+    writeJson(filePath, report);
+
+    expect(() => validatePublication(date, root)).toThrow("published digest structure");
+  });
+
+  it("rejects an evaluation that did not pin the production provider", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{ acceptance: { requiredProvider: string | null } }>(filePath);
+    report.acceptance.requiredProvider = null;
+    writeJson(filePath, report);
+    expect(() => validatePublication(date, root)).toThrow("must pin the production provider");
   });
 
   it("rejects a quality report that omits a semantic gate", () => {
@@ -336,5 +692,19 @@ describe("validatePublication", () => {
       `<link>https://example.test/#${date}/digest</link>\n<link>https://example.test/#${date}/ai-hn</link>\n`,
     );
     expect(() => validatePublication(date, root)).toThrow("feed.xml exposes legacy per-source reports");
+  });
+
+  it("rejects a feed item whose body silently degraded to its title", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "feed.xml");
+    const feed = fs.readFileSync(filePath, "utf-8");
+    fs.writeFileSync(
+      filePath,
+      feed.replace(
+        /<content:encoded>[\s\S]*?<\/content:encoded>/u,
+        "<content:encoded><![CDATA[Roxy AI Daily]]></content:encoded>",
+      ),
+    );
+    expect(() => validatePublication(date, root)).toThrow("feed.xml content does not match digest.md");
   });
 });

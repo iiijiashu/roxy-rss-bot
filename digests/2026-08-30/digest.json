@@ -1,0 +1,189 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-30",
+  "observedAt": "2026-08-29T16:42:30.504Z",
+  "developments": [
+    {
+      "event_id": "event:66e9c3f4c66b2b6b",
+      "title": "Claude Code v2.1.251 增加模型切换钩子",
+      "summary": "Claude Code v2.1.251 新增用于模型切换控制和记录的 PreModelSwitch 与 PostModelSwitch 钩子。",
+      "why_it_matters": "开发者可在模型切换前后接入控制和记录流程。",
+      "source_ids": [
+        "github:anthropics/claude-code:release:v2.1.251"
+      ]
+    },
+    {
+      "event_id": "event:52d1675bb17ad1d2",
+      "title": "OpenClaw v2026.9.1-beta.1 增强网关重启恢复",
+      "summary": "该版本保留已接纳轮次，使可安全重启的运行跨网关重复重启继续交付最终响应。",
+      "why_it_matters": "网关运维人员可降低重复重启造成已接纳运行中断的风险。",
+      "source_ids": [
+        "github:openclaw/openclaw:release:v2026.9.1-beta.1"
+      ]
+    },
+    {
+      "event_id": "event:b105c1185b91b092",
+      "title": "OpenAI Codex 0.151.0 开放 MCP 结果处理",
+      "summary": "OpenAI Codex 0.151.0 允许扩展在 MCP 工具结果到达模型前检查或替换结果。",
+      "why_it_matters": "扩展开发者可在模型处理前调整 MCP 工具结果。",
+      "source_ids": [
+        "github:openai/codex:release:rust-v0.151.0"
+      ]
+    },
+    {
+      "event_id": "event:330bd118236fa59d",
+      "title": "OpenClaw 合并减少首次 Grok 搜索启动开销",
+      "summary": "OpenClaw 移除了首次 Grok 网络搜索前的宽泛 agent-runtime 导入，六例实测中的搜索用例由 58.08 秒降至 9.58 秒。",
+      "why_it_matters": "Grok 网络搜索用户可减少首次调用的启动等待和内存占用。",
+      "source_ids": [
+        "github:openclaw/openclaw:pr:132685:merged"
+      ]
+    },
+    {
+      "event_id": "event:775e2263e28fedde",
+      "title": "OpenClaw 支持同名原生会话接入",
+      "summary": "OpenClaw 将不同的同名原生会话接入同一智能体，并将标题快照存入 displayName。",
+      "why_it_matters": "这会影响同名原生会话的唯一标签和显示名称管理。",
+      "source_ids": [
+        "github:openclaw/openclaw:pr:132678:merged",
+        "github:openclaw/openclaw:issue:132677:closed"
+      ]
+    },
+    {
+      "event_id": "event:8dcf620b15c744db",
+      "title": "OpenClaw 修复会话命令执行权限收紧",
+      "summary": "OpenClaw 让单轮命令执行的收紧覆盖继续作用于已设置权限模式的会话。",
+      "why_it_matters": "这会影响已设置权限模式会话的单轮命令执行约束。",
+      "source_ids": [
+        "github:openclaw/openclaw:pr:132675:merged"
+      ]
+    },
+    {
+      "event_id": "event:e6ff42ad75567988",
+      "title": "NanoBot 定时任务来源元数据清理提案",
+      "summary": "该 PR 提议将定时任务来源元数据保存为可独立序列化的值，并排除实时运行时上下文块。",
+      "why_it_matters": "若合并，在包含引用或用户提及的上下文中创建提醒时可降低添加或触发时失败的风险。",
+      "source_ids": [
+        "github:HKUDS/nanobot:pr:5587:created",
+        "github:HKUDS/nanobot:issue:5582:created"
+      ]
+    },
+    {
+      "event_id": "event:31c24cd3121ae6cc",
+      "title": "WikiSkill 将智能体经验编译为持久知识库",
+      "summary": "WikiSkill 持续把执行经验汇入持久知识库供后续技能更新，并在多数模型—基准组合中优于无技能基线。",
+      "why_it_matters": "研究团队可把持久知识库作为多轮智能体技能更新的经验复用层。",
+      "source_ids": [
+        "arxiv:2608.27454v1"
+      ]
+    },
+    {
+      "event_id": "event:96a9ef1f68ec4a96",
+      "title": "OpenClaw 后台工作器目标崩溃修复提案",
+      "summary": "该 PR 提议在缺少浏览器上下文 ID 时分离相应的后台工作器目标。",
+      "why_it_matters": "若合并，运维人员可降低后台工作器导致网关退出的风险。",
+      "source_ids": [
+        "github:openclaw/openclaw:pr:132419:created"
+      ]
+    },
+    {
+      "event_id": "event:97fb117907e7d64e",
+      "title": "AI 模型安全扫描器明确判断覆盖率评测",
+      "summary": "论文比较三种扫描器在 135 个有标签家族上的明确安全判断覆盖率。",
+      "why_it_matters": "结果表明安全扫描器评测应区分判断准确性与判断可用性。",
+      "source_ids": [
+        "arxiv:2608.27424v1"
+      ]
+    },
+    {
+      "event_id": "event:d134c8f3e98a6690",
+      "title": "用户报告 Codex Terra Medium 缓存 token 重复处理消耗配额",
+      "summary": "用户报告 gpt-5.6-terra 中等推理任务中大量已缓存上下文被重复处理，消耗了 5 小时配额的 33%。",
+      "why_it_matters": "若该问题可复现，长上下文和多轮工具调用任务需关注 5 小时配额消耗风险。",
+      "source_ids": [
+        "github:openai/codex:issue:41369:created"
+      ]
+    },
+    {
+      "event_id": "event:f1bdcdd657c71c1a",
+      "title": "论文提出多哈希嵌入缩减 GNN ID 表规模",
+      "summary": "论文以多哈希 ID 嵌入作为主要节点表示，将 GNN 好友推荐系统的 ID 嵌入表规模缩减超过 98%，同时保持排序质量。",
+      "why_it_matters": "该方法可降低生产级社交图中的 ID 嵌入表内存占用。",
+      "source_ids": [
+        "arxiv:2608.27413v1"
+      ]
+    },
+    {
+      "event_id": "event:b03798f160251644",
+      "title": "OpenAI Codex 合并保留绑定采集期间的缓存工具",
+      "summary": "OpenAI Codex 在绑定采集期间保留缓存的工具目录，以减少并发等待窗口里的工具遗漏。",
+      "why_it_matters": "多 MCP 服务器用户可减少工具遗漏和不必要的服务器启动。",
+      "source_ids": [
+        "github:openai/codex:pr:41336:merged"
+      ]
+    },
+    {
+      "event_id": "event:c2008f9c18a7e988",
+      "title": "Claude Code Agent SDK 中 PreToolUse 退出 2 拦截被静默绕过",
+      "summary": "用户报告 Claude Code Agent SDK 中 PreToolUse 钩子计算的退出码 2 拒绝未阻止工具调用，且无错误提示。",
+      "why_it_matters": "使用 Agent SDK 且依赖 PreToolUse 进行安全守护的项目可能面临工具调用绕过风险。",
+      "source_ids": [
+        "github:anthropics/claude-code:issue:90564:created"
+      ]
+    },
+    {
+      "event_id": "event:374036aaf7d9638d",
+      "title": "用户报告 Codex 代码审查触发安全警告",
+      "summary": "有付费用户报告 Codex 在常规代码审查中频繁显示网络安全警告，Trusted Access 申请页面提交后仍提示重试。",
+      "why_it_matters": "若该反馈可复现，自动化代码审查流程可能因误报警告而中断。",
+      "source_ids": [
+        "github:openai/codex:issue:41466:created"
+      ]
+    },
+    {
+      "event_id": "event:c4ace9f215298ae9",
+      "title": "用户报告 Windows 下 PowerShell 命令执行存在嵌套引号损坏",
+      "summary": "用户在三天会话记录中分别统计到 26，15 和 209 次具有相同嵌套引号损坏特征的 exec_command 失败。",
+      "why_it_matters": "开发者执行复杂 PowerShell 命令时可能因引号解析故障而失败。",
+      "source_ids": [
+        "github:openai/codex:issue:41534:created"
+      ]
+    },
+    {
+      "event_id": "event:2eaf3bf620bca1c0",
+      "title": "NanoBot 保留窗格组自定义标题",
+      "summary": "NanoBot 在删除活动窗格时保留窗格组自定义标题，并优先切换至同组内其他窗格。",
+      "why_it_matters": "用户删除活动窗格后仍可保留命名分组，并在可能时停留于同组剩余窗格。",
+      "source_ids": [
+        "github:HKUDS/nanobot:pr:5591:merged"
+      ]
+    },
+    {
+      "event_id": "event:80367f99bfefc66a",
+      "title": "NanoBot 提议优化大型 JSON 工具结果预览",
+      "summary": "NanoBot 提议优先展示受限数量的根级标量字段，并以结构形状概括大型 JSON 中的嵌套容器。",
+      "why_it_matters": "若合并，开发者可在有界预览中看到关键根级状态字段。",
+      "source_ids": [
+        "github:HKUDS/nanobot:pr:5590:created"
+      ]
+    },
+    {
+      "event_id": "event:0af0d550fab29ff8",
+      "title": "用户反馈 Cowork 个人市场无法更新",
+      "summary": "用户报告 Cowork 个人 GitHub 市场克隆静默失败，运行时仍提供陈旧版本。",
+      "why_it_matters": "若该反馈可复现，开发者可能无法获取个人市场的最新插件版本。",
+      "source_ids": [
+        "github:anthropics/claude-code:issue:90602:created"
+      ]
+    },
+    {
+      "event_id": "event:209f608df8dd7402",
+      "title": "用户报告 Claude Code 降级至 Opus 4.8",
+      "summary": "用户报告在本地评估用的安全培训仓库中使用 Claude Code 时，系统从请求的版本降级到 Opus 4.8。",
+      "why_it_matters": "若该报告可复现，指定模型版本的任务可能意外使用更旧的模型，影响预期行为。",
+      "source_ids": [
+        "github:anthropics/claude-code:issue:90598:created"
+      ]
+    }
+  ]
+}

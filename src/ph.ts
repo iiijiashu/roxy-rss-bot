@@ -5,7 +5,7 @@
  * then filter locally for AI-related topics.
  */
 
-import { fetchWithTimeout } from "./http.ts";
+import { discardResponseBody, fetchWithTimeout, readResponseJsonWithTimeout } from "./http.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -137,11 +137,12 @@ export async function fetchPhData(): Promise<PhData> {
     });
 
     if (!resp.ok) {
+      await discardResponseBody(resp);
       console.error(`  [ph] HTTP ${resp.status}`);
       return { products: [], fetchSuccess: false };
     }
 
-    const json = (await resp.json()) as PhResponse;
+    const json = await readResponseJsonWithTimeout<PhResponse>(resp);
 
     if (json.errors?.length) {
       console.error(`  [ph] API errors: ${json.errors.map((e) => e.message).join("; ")}`);

@@ -5,7 +5,7 @@
  * HF Hub API, returning a mapped subset of fields.
  */
 
-import { fetchWithTimeout } from "./http.ts";
+import { discardResponseBody, fetchWithTimeout, readResponseJsonWithTimeout } from "./http.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -68,11 +68,12 @@ export async function fetchHfData(): Promise<HfData> {
     });
 
     if (!resp.ok) {
+      await discardResponseBody(resp);
       console.error(`  [hf] HTTP ${resp.status}`);
       return { models: [], fetchSuccess: false };
     }
 
-    const raw = (await resp.json()) as HfApiModel[];
+    const raw = await readResponseJsonWithTimeout<HfApiModel[]>(resp);
 
     const models: HfModel[] = raw.map((m) => ({
       id: m.id,

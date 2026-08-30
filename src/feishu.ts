@@ -14,7 +14,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { NOTIFY_LABELS } from "./i18n.ts";
 import type { Highlights } from "./notify.ts";
-import { fetchWithTimeout } from "./http.ts";
+import { discardResponseBody, fetchWithTimeout, readResponseTextWithTimeout } from "./http.ts";
 
 const PAGES_URL_DEFAULT = "https://duanyytop.github.io/agents-radar";
 
@@ -42,9 +42,10 @@ async function sendToOneWebhook(webhookUrl: string, title: string, content: stri
     }),
   });
   if (!res.ok) {
-    const body = await res.text();
+    const body = await readResponseTextWithTimeout(res, undefined, 64 * 1024);
     throw new Error(`Feishu API ${res.status}: ${body}`);
   }
+  await discardResponseBody(res);
 }
 
 async function sendFeishu(title: string, content: string): Promise<void> {

@@ -323,6 +323,55 @@ describe("trusted web dates", () => {
     expect(state.anthropic.urls[url]?.status).toBe("accepted");
   });
 
+  it("fetches article pages with bounded concurrency and preserves sitemap order", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-08-29T10:00:00.000Z"));
+    const urls = Array.from(
+      { length: 6 },
+      (_, index) => `https://www.anthropic.com/news/release-${index + 1}`,
+    );
+    const sitemap = `<urlset>${urls
+      .map((url) => `<url><loc>${url}</loc><lastmod>2026-08-29</lastmod></url>`)
+      .join("")}</urlset>`;
+    const pageResolvers: Array<() => void> = [];
+    let active = 0;
+    let maximumActive = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockImplementation(async (input: string | URL | Request) => {
+        if (String(input).endsWith("/sitemap.xml")) return new Response(sitemap, { status: 200 });
+        return new Promise<Response>((resolve) => {
+          active++;
+          maximumActive = Math.max(maximumActive, active);
+          pageResolvers.push(() => {
+            active--;
+            resolve(
+              new Response(
+                `<html><head><title>${String(input)}</title><script type="application/ld+json">{"@type":"Article","datePublished":"2026-08-29T09:00:00Z"}</script></head><main>Official release.</main></html>`,
+                { status: 200 },
+              ),
+            );
+          });
+        });
+      }),
+    );
+
+    const pending = fetchSiteContent("anthropic", emptyState());
+    await vi.advanceTimersByTimeAsync(600);
+    expect(pageResolvers).toHaveLength(3);
+    expect(maximumActive).toBe(3);
+
+    pageResolvers.splice(0, 3).forEach((resolve) => resolve());
+    await vi.advanceTimersByTimeAsync(900);
+    expect(pageResolvers).toHaveLength(3);
+    pageResolvers.splice(0, 3).forEach((resolve) => resolve());
+    await vi.runAllTimersAsync();
+
+    const result = await pending;
+    expect(maximumActive).toBe(3);
+    expect(result.newItems.map((item) => item.url)).toEqual(urls);
+  });
+
   it("cancels a chunked response as soon as its body exceeds the byte cap", async () => {
     let cancelled = false;
     const body = new ReadableStream<Uint8Array>({

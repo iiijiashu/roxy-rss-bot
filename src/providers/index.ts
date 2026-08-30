@@ -5,7 +5,7 @@
  *   import { createProvider, type LlmProvider } from "./providers/index.ts";
  */
 
-export type { LlmProvider, LlmProviderDiagnostics, ProviderFactory } from "./types.ts";
+export type { LlmCallOptions, LlmProvider, LlmProviderDiagnostics, ProviderFactory } from "./types.ts";
 export { OpenAICompatibleProvider } from "./openai-compatible.ts";
 export { AnthropicProvider } from "./anthropic.ts";
 export { OpenAIProvider } from "./openai.ts";

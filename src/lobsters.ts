@@ -2,7 +2,7 @@
  * Lobste.rs AI stories fetched via tag-based JSON endpoints (e.g., /t/ai.json).
  */
 
-import { fetchWithTimeout } from "./http.ts";
+import { discardResponseBody, fetchWithTimeout, readResponseJsonWithTimeout } from "./http.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -65,11 +65,12 @@ export async function fetchLobstersData(): Promise<LobstersData> {
           });
 
           if (!resp.ok) {
+            await discardResponseBody(resp);
             console.error(`  [lobsters] ${tagUrl}: HTTP ${resp.status}`);
             return;
           }
 
-          const raw = (await resp.json()) as LobstersApiStory[];
+          const raw = await readResponseJsonWithTimeout<LobstersApiStory[]>(resp);
           for (const s of raw) {
             if (!seen.has(s.short_id)) {
               seen.set(s.short_id, {
