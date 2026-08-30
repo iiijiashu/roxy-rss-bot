@@ -13,12 +13,14 @@ import {
   type QualityReport,
 } from "./evidence.ts";
 import {
+  EVALUATION_NORMALIZATION_CODES,
   FORMAL_EVALUATION_CLEAN_RUNS,
   MAX_EVALUATION_REPLACEMENT_RUNS,
   MAX_EVALUATION_SYNTHESIS_ATTEMPTS,
   MAX_QUALITY_REPAIR_ATTEMPTS_PER_RUN,
   MAX_TOTAL_QUALITY_REPAIR_ATTEMPTS,
   MIN_FORMAL_FIRST_PASS_RUNS,
+  isEvaluationRepairNormalization,
 } from "./evaluation-policy.ts";
 import { canonicalOutputSha256, synthesisStructureSha256 } from "./evaluation-hash.ts";
 import {
@@ -64,25 +66,6 @@ type RecoverableProviderFailureCode =
   | "timeout"
   | "transport";
 type ReplacementReason = "provider_recovered" | RecoverableProviderFailureCode;
-const SAFE_NORMALIZATION_CODES = new Set([
-  "canonical_fields",
-  "summary_lifecycle",
-  "summary_scoped_hint",
-  "summary_style",
-  "summary_ui_term",
-  "title_bounded",
-  "title_lifecycle",
-  "title_scope",
-  "title_spacing",
-  "title_ui_term",
-  "why_evidence_alignment",
-  "why_scoped_hint",
-  "why_it_matters_ui_term",
-  "why_it_matters_lifecycle",
-  "why_style",
-]);
-const SEMANTIC_REPAIR_NORMALIZATION_CODES = new Set(["summary_scoped_hint", "why_scoped_hint"]);
-
 interface ReplayEvidenceArtifact {
   schemaVersion: 2;
   records: EvidenceRecord[];
@@ -269,7 +252,7 @@ function remapNormalizations(chunk: number, labels: readonly string[]): string[]
   return labels
     .flatMap((label) => {
       const match = label.match(/^(\d+):([a-z_]+)$/u);
-      if (!match || !SAFE_NORMALIZATION_CODES.has(match[2]!)) return [];
+      if (!match || !EVALUATION_NORMALIZATION_CODES.has(match[2]!)) return [];
       const localIndex = Number(match[1]);
       if (
         !Number.isSafeInteger(localIndex) ||
@@ -384,10 +367,7 @@ function runNormalizations(attempts: SafeAttempt[]): string[] {
 }
 
 function attemptIncludesSemanticRepair(attempt: SafeAttempt): boolean {
-  return (attempt.normalizationsApplied ?? []).some((label) => {
-    const code = label.match(/^\d+:([a-z_]+)$/u)?.[1];
-    return code !== undefined && SEMANTIC_REPAIR_NORMALIZATION_CODES.has(code);
-  });
+  return (attempt.normalizationsApplied ?? []).some(isEvaluationRepairNormalization);
 }
 
 function qualityRepairAttemptCount(attempts: SafeAttempt[]): number {

@@ -332,7 +332,47 @@ describe("daily frozen-evidence evaluation", () => {
     expect(report.passed).toBe(true);
   });
 
-  it("hard-stops and does not count a run that reaches three quality failures", async () => {
+  it("counts punctuation normalization as a repair instead of first-pass output", async () => {
+    const { rootDir } = fixture();
+    const baseProvider = successfulProvider("agnes");
+    const punctuationProvider: LlmProvider = {
+      ...baseProvider,
+      async call(prompt, maxTokens, options) {
+        const parsed = JSON.parse(await baseProvider.call(prompt, maxTokens, options)) as {
+          developments: Array<Record<string, string>>;
+        };
+        const first = parsed.developments.find((development) =>
+          development["title"]?.startsWith("ExampleModel1 "),
+        );
+        if (first) first["summary"] = first["summary"]!.replace("，", "；");
+        return JSON.stringify(parsed);
+      },
+    };
+
+    const report = await evaluateDailyReplay({
+      date: DATE,
+      runs: 1,
+      rootDir,
+      providerFactory: () => punctuationProvider,
+    });
+
+    expect(report.runs[0]).toMatchObject({
+      qualityPassed: true,
+      firstPass: false,
+      qualityRepairAttempts: 1,
+      deterministicNormalizations: expect.arrayContaining([
+        expect.stringMatching(/^\d+:summary_punctuation$/u),
+      ]),
+      passed: true,
+    });
+    expect(report.acceptance).toMatchObject({
+      firstPassRuns: 0,
+      normalizedRuns: 1,
+      totalQualityRepairAttempts: 1,
+    });
+  });
+
+  it("does not count a quality-valid run that exceeds the formal repair cap", async () => {
     const { rootDir } = fixture();
 
     const report = await evaluateDailyReplay({
@@ -343,8 +383,9 @@ describe("daily frozen-evidence evaluation", () => {
     });
 
     expect(report.runs[0]).toMatchObject({
-      qualityPassed: false,
+      qualityPassed: true,
       qualityRepairAttempts: 3,
+      passed: false,
       countedForAcceptance: false,
     });
     expect(report.cleanRunsCollected).toBe(0);
@@ -368,7 +409,7 @@ describe("daily frozen-evidence evaluation", () => {
     expect(report.passed).toBe(false);
   });
 
-  it("reports deterministic UI-term normalization separately from model retries", async () => {
+  it("does not silently normalize invalid UI terminology into a clean run", async () => {
     const { rootDir } = fixture();
     const baseProvider = successfulProvider("agnes");
     const normalizingProvider: LlmProvider = {
@@ -390,20 +431,15 @@ describe("daily frozen-evidence evaluation", () => {
     });
 
     expect(report.runs[0]).toMatchObject({
-      passed: true,
-      firstPass: true,
-      deterministicNormalizations: expect.arrayContaining([
-        "0:summary_ui_term",
-        "2:summary_ui_term",
-        "4:summary_ui_term",
-        "6:summary_ui_term",
-        "8:summary_ui_term",
-      ]),
+      passed: false,
+      firstPass: false,
+      deterministicNormalizations: [],
     });
-    expect(report.acceptance.normalizedRuns).toBe(1);
+    expect(report.cleanRunsCollected).toBe(0);
+    expect(report.acceptance.normalizedRuns).toBe(0);
   });
 
-  it("treats an evidence-scoped semantic field as first-pass canonical output", async () => {
+  it("does not replace a failed semantic field with a stored canonical answer", async () => {
     const permissionRecord: EvidenceRecord = {
       ...record(1),
       id: "github:openclaw/openclaw:pr:132675:merged",
@@ -459,15 +495,16 @@ describe("daily frozen-evidence evaluation", () => {
     });
 
     expect(report.runs[0]).toMatchObject({
-      qualityPassed: true,
-      firstPass: true,
-      qualityRepairAttempts: 0,
-      deterministicNormalizations: ["0:canonical_fields"],
+      qualityPassed: false,
+      firstPass: false,
+      qualityRepairAttempts: 3,
+      deterministicNormalizations: [],
     });
-    expect(report.acceptance.normalizedRuns).toBe(1);
+    expect(report.cleanRunsCollected).toBe(0);
+    expect(report.acceptance.normalizedRuns).toBe(0);
   });
 
-  it("treats an evidence-scoped lifecycle field as first-pass canonical output", async () => {
+  it("does not replace an invalid lifecycle field with a stored canonical answer", async () => {
     const issueRecord: EvidenceRecord = {
       ...record(1),
       id: "github:anthropics/claude-code:issue:90602:created",
@@ -530,12 +567,13 @@ describe("daily frozen-evidence evaluation", () => {
     });
 
     expect(report.runs[0]).toMatchObject({
-      qualityPassed: true,
-      firstPass: true,
-      qualityRepairAttempts: 0,
-      deterministicNormalizations: ["0:canonical_fields"],
+      qualityPassed: false,
+      firstPass: false,
+      qualityRepairAttempts: 3,
+      deterministicNormalizations: [],
     });
-    expect(report.acceptance.normalizedRuns).toBe(1);
+    expect(report.cleanRunsCollected).toBe(0);
+    expect(report.acceptance.normalizedRuns).toBe(0);
   });
 
   it("uses a fully reconciled provider recovery as a replacement and still collects a clean run", async () => {

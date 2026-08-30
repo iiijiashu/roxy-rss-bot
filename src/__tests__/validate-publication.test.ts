@@ -320,6 +320,7 @@ describe("validatePublication", () => {
         qualityPassed: false,
         providerClean: false,
         providerRecovered: false,
+        firstPass: false,
         passed: false,
         countedForAcceptance: false,
         replacementReason: "empty_response",
@@ -352,6 +353,7 @@ describe("validatePublication", () => {
         run: 3,
         providerClean: false,
         providerRecovered: true,
+        firstPass: false,
         countedForAcceptance: false,
         replacementReason: "provider_recovered",
         attempts: [
@@ -491,6 +493,137 @@ describe("validatePublication", () => {
     writeJson(filePath, report);
 
     expect(() => validatePublication(date, root)).toThrow("production acceptance policy");
+  });
+
+  it("rejects a report that marks stored-answer replacement as first-pass", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{
+      runs: Array<{
+        attempts: Array<{ state: string; normalizationsApplied?: string[] }>;
+      }>;
+    }>(filePath);
+    const firstOkAttempt = report.runs[0]!.attempts.find((attempt) => attempt.state === "ok");
+    expect(firstOkAttempt).toBeDefined();
+    firstOkAttempt!.normalizationsApplied = ["0:canonical_fields"];
+    writeJson(filePath, report);
+
+    expect(() => validatePublication(date, root)).toThrow("stored-answer normalization");
+  });
+
+  it("rejects an ok attempt that also claims a quality-gate failure", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{
+      acceptance: { totalQualityRepairAttempts: number };
+      runs: Array<{
+        qualityRepairAttempts: number;
+        attempts: Array<{ state: string; reason?: string }>;
+      }>;
+    }>(filePath);
+    report.runs[0]!.attempts[0]!.reason = "quality_gate_failed";
+    report.runs[0]!.qualityRepairAttempts = 1;
+    report.acceptance.totalQualityRepairAttempts = 1;
+    writeJson(filePath, report);
+
+    expect(() => validatePublication(date, root)).toThrow("strictly classified evaluation attempts");
+  });
+
+  it("rejects a counted clean run that contains a provider-failure attempt", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{
+      acceptance: { firstPassRuns: number };
+      runs: Array<{
+        firstPass: boolean;
+        attempts: Array<{ state: string; reason?: string; code?: string }>;
+      }>;
+    }>(filePath);
+    const attempt = report.runs[0]!.attempts[0]!;
+    attempt.state = "degraded";
+    attempt.reason = "request_or_parse_failed";
+    attempt.code = "transport";
+    report.runs[0]!.firstPass = false;
+    report.acceptance.firstPassRuns = 2;
+    writeJson(filePath, report);
+
+    expect(() => validatePublication(date, root)).toThrow("strictly classified replacement runs");
+  });
+
+  it("recomputes punctuation normalization aggregates from attempts", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{
+      acceptance: {
+        firstPassRuns: number;
+        normalizedRuns: number;
+        totalQualityRepairAttempts: number;
+      };
+      runs: Array<{
+        firstPass: boolean;
+        qualityRepairAttempts: number;
+        deterministicNormalizations: string[];
+        attempts: Array<{ state: string; normalizationsApplied?: string[] }>;
+      }>;
+    }>(filePath);
+    report.runs[0]!.attempts[0]!.normalizationsApplied = ["0:summary_punctuation"];
+    report.runs[0]!.firstPass = false;
+    report.runs[0]!.qualityRepairAttempts = 1;
+    report.acceptance.firstPassRuns = 2;
+    report.acceptance.totalQualityRepairAttempts = 1;
+    writeJson(filePath, report);
+
+    expect(() => validatePublication(date, root)).toThrow("normalization aggregates");
+
+    report.runs[0]!.deterministicNormalizations = ["0:summary_punctuation"];
+    report.acceptance.normalizedRuns = 1;
+    writeJson(filePath, report);
+    expect(() => validatePublication(date, root)).not.toThrow();
+  });
+
+  it("accepts evaluator-compatible deduplicated and sorted normalization aggregates", () => {
+    const { root, date } = fixture();
+    const filePath = path.join(root, "digests", date, "evaluation-report.json");
+    const report = readJson<{
+      acceptance: {
+        firstPassRuns: number;
+        normalizedRuns: number;
+        totalQualityRepairAttempts: number;
+      };
+      runs: Array<{
+        firstPass: boolean;
+        qualityRepairAttempts: number;
+        deterministicNormalizations: string[];
+        attempts: Array<Record<string, unknown>>;
+        diagnostics: { requests: number; tasksResolved: number };
+      }>;
+    }>(filePath);
+    report.runs[0]!.attempts = [
+      {
+        chunk: 1,
+        attempt: 1,
+        state: "degraded",
+        reason: "quality_gate_failed",
+        normalizationsApplied: ["2:summary_punctuation"],
+      },
+      {
+        chunk: 1,
+        attempt: 2,
+        state: "ok",
+        normalizationsApplied: ["10:summary_punctuation", "2:summary_punctuation"],
+      },
+    ];
+    report.runs[0]!.firstPass = false;
+    report.runs[0]!.qualityRepairAttempts = 2;
+    report.runs[0]!.deterministicNormalizations = ["10:summary_punctuation", "2:summary_punctuation"];
+    report.runs[0]!.diagnostics.requests = 2;
+    report.runs[0]!.diagnostics.tasksResolved = 2;
+    report.acceptance.firstPassRuns = 2;
+    report.acceptance.normalizedRuns = 1;
+    report.acceptance.totalQualityRepairAttempts = 2;
+    writeJson(filePath, report);
+
+    expect(() => validatePublication(date, root)).not.toThrow();
   });
 
   it("recomputes the per-run quality-repair limit instead of trusting the aggregate flag", () => {

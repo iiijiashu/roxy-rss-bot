@@ -6,7 +6,6 @@ import {
   MAX_DAILY_DEVELOPMENTS,
   renderChineseDigest,
   selectTopEvents,
-  synthesisPositiveFields,
   synthesisSourceIds,
   titleSimilarity,
   validateSynthesis,
@@ -1685,40 +1684,6 @@ describe("synthesis quality gate", () => {
     }
   });
 
-  it("does not derive new citation-scoped fields from lookalike records in other repositories", () => {
-    const records: EvidenceRecord[] = [
-      evidence({
-        id: "github:other/project:issue:1:created",
-        sourceType: "github_issue",
-        title: "PreToolUse deny silently unenforced under the Agent SDK",
-        content:
-          "The hook fires and computes the correct exit 2 deny verdict, but the real tool call succeeds anyway.",
-        metadata: { repo: "other/project", kind: "issue", activity: "created", state: "open" },
-      }),
-      evidence({
-        id: "github:other/project:issue:2:created",
-        sourceType: "github_issue",
-        title: "Claude Code demotes to Opus 4.8",
-        content: "A local security training repository reports that Claude Code demotes to Opus 4.8.",
-        metadata: { repo: "other/project", kind: "issue", activity: "created", state: "open" },
-      }),
-      evidence({
-        id: "github:other/project:issue:3:created",
-        sourceType: "github_issue",
-        title: "Abusive warning about cybersecurity for routine code reviews",
-        content:
-          "Paid customer here. Almost every single code review ends with a cybersecurity warning. " +
-          "I filled three times, it says success, nothing then. Going back says to try again.",
-        metadata: { repo: "other/project", kind: "issue", activity: "created", state: "open" },
-      }),
-    ];
-
-    for (const record of records) {
-      const event = groupEvidence([record])[0]!;
-      expect(synthesisPositiveFields(event, [record])).toBeUndefined();
-    }
-  });
-
   it("binds reported counts to their evidence entities instead of accepting a free number bag", () => {
     const { records, events } = oneEvent(
       evidence({
@@ -2255,7 +2220,7 @@ describe("synthesis quality gate", () => {
     expect(prompt).toContain('"repo":"org/project"');
   });
 
-  it("adds concise evidence-specific constraints instead of relying on an irrelevant global trap list", () => {
+  it("keeps event-specific facts only in the raw evidence payload", () => {
     const record = evidence({
       title: "Gateway restart recovery and scanner benchmark",
       content:
@@ -2267,15 +2232,35 @@ describe("synthesis quality gate", () => {
       Record<string, unknown>
     >;
 
-    expect(prompt).toContain("SCOPED_RULES:");
-    expect(prompt).toContain("可安全重启");
-    expect(prompt).toContain("135 个有标签家族");
-    expect(prompt).toContain("判断准确性与判断可用性");
+    expect(prompt).not.toContain("SCOPED_RULES:");
+    expect(prompt).not.toContain("可安全重启");
+    expect(prompt).not.toContain("135 个有标签家族");
+    expect(prompt).not.toContain("不得写成准确率");
     expect(payload[0]).not.toHaveProperty("constraints");
-    expect(prompt).toContain("逐条遵守 constraints");
+    expect(prompt).toContain("restart-safe runs deliver their final response");
+    expect(prompt).toContain("all 135 labeled families (100%)");
+    expect(prompt).not.toContain("逐条遵守 constraints");
   });
 
-  it("adds a positive scoped skeleton for the NanoBot cron origin-metadata proposal", () => {
+  it("does not place event-specific finished answers in the synthesis prompt", () => {
+    const record = evidence({
+      id: "github:openclaw/openclaw:release:v2026.9.1-beta.1",
+      sourceType: "github_release",
+      sourceName: "GitHub",
+      url: "https://github.com/openclaw/openclaw/releases/tag/v2026.9.1-beta.1",
+      title: "OpenClaw v2026.9.1-beta.1",
+      content:
+        "Gateway restart recovery preserves admitted turns across repeated Gateway restarts so restart-safe runs continue through each checkpoint and deliver their final response.",
+      metadata: { repo: "openclaw/openclaw", release_tag: "v2026.9.1-beta.1" },
+    });
+    const prompt = buildSynthesisPrompt(groupEvidence([record]), [record]);
+
+    expect(prompt).not.toContain("正向骨架：title 写");
+    expect(prompt).not.toContain("OpenClaw v2026.9.1-beta.1 增强网关重启恢复");
+    expect(prompt).not.toContain("网关运维人员可降低重复重启造成已接纳运行中断的风险");
+  });
+
+  it("does not inject a NanoBot-specific correction into the base prompt", () => {
     const record = evidence({
       sourceType: "github",
       sourceName: "GitHub",
@@ -2293,13 +2278,13 @@ describe("synthesis quality gate", () => {
     });
     const prompt = buildSynthesisPrompt(groupEvidence([record]), [record]);
 
-    expect(prompt).toContain("NanoBot 定时任务来源元数据清理提案");
-    expect(prompt).toContain("保存为可独立序列化的值，并排除实时运行时上下文块");
-    expect(prompt).toContain("引用或提及上下文创建的提醒可降低添加或触发时失败的风险");
-    expect(prompt).toContain("添加时 JSON 序列化 TypeError 与触发时运行时上下文块规范化失败");
+    expect(prompt).not.toContain("NanoBot 定时任务来源元数据清理提案");
+    expect(prompt).not.toContain("这是未合并 PR");
+    expect(prompt).not.toContain("添加时是 JSON 序列化失败，触发时是上下文块规范化失败");
+    expect(prompt).toContain("At add time json.dumps can raise TypeError");
   });
 
-  it("adds and accepts focused release skeletons for model-switch hooks and restart recovery", () => {
+  it("does not inject release-specific translations or scope answers", () => {
     const claude = evidence({
       id: "github:anthropics/claude-code:release:v2.1.251",
       sourceType: "github_release",
@@ -2324,10 +2309,11 @@ describe("synthesis quality gate", () => {
     const openclawEvents = groupEvidence([openclaw]);
     const prompt = buildSynthesisPrompt([...claudeEvents, ...openclawEvents], [claude, openclaw]);
 
-    expect(prompt).toContain("Claude Code v2.1.251 增加模型切换钩子");
-    expect(prompt).toContain("只保留模型切换这一核心变化，不写部署");
-    expect(prompt).toContain("OpenClaw v2026.9.1-beta.1 增强网关重启恢复");
-    expect(prompt).toContain("不得扩大为全部任务、全部运行或部署保证");
+    expect(prompt).not.toContain("Claude Code v2.1.251 增加模型切换钩子");
+    expect(prompt).not.toContain("PreModelSwitch/PostModelSwitch 是模型切换钩子");
+    expect(prompt).not.toContain("OpenClaw v2026.9.1-beta.1 增强网关重启恢复");
+    expect(prompt).not.toContain("不得扩大为所有任务、多轮对话或部署保证");
+    expect(prompt).toContain("Added PreModelSwitch and PostModelSwitch hook events");
 
     const claudeResult: SynthesizedDevelopment = {
       event_id: claudeEvents[0]!.id,
@@ -2351,7 +2337,7 @@ describe("synthesis quality gate", () => {
     ).toEqual([]);
   });
 
-  it("adds and accepts focused merged skeletons for session adoption and exec tightening", () => {
+  it("does not inject merged-event-specific answer fragments", () => {
     const sessions = evidence({
       id: "github:openclaw/openclaw:pr:132678:merged",
       sourceType: "github_pr",
@@ -2378,10 +2364,11 @@ describe("synthesis quality gate", () => {
     const permissionEvents = groupEvidence([permissions]);
     const prompt = buildSynthesisPrompt([...sessionEvents, ...permissionEvents], [sessions, permissions]);
 
-    expect(prompt).toContain("OpenClaw 支持同名原生会话接入");
-    expect(prompt).toContain("唯一标签和显示名称管理");
-    expect(prompt).toContain("OpenClaw 修复会话命令执行权限收紧");
-    expect(prompt).toContain("单轮命令执行约束");
+    expect(prompt).not.toContain("OpenClaw 支持同名原生会话接入");
+    expect(prompt).not.toContain("不同但标题相同的原生会话");
+    expect(prompt).not.toContain("OpenClaw 修复会话命令执行权限收紧");
+    expect(prompt).not.toContain("不得写成会话权限模式丢失");
+    expect(prompt).toContain("Distinct native sessions with matching titles");
 
     const sessionResult: SynthesizedDevelopment = {
       event_id: sessionEvents[0]!.id,
@@ -2405,7 +2392,7 @@ describe("synthesis quality gate", () => {
     ).toEqual([]);
   });
 
-  it("adds and accepts focused skeletons for Codex MCP results and Grok startup", () => {
+  it("does not inject MCP or startup-specific answer fragments", () => {
     const codex = evidence({
       id: "github:openai/codex:release:rust-v0.151.0",
       sourceType: "github_release",
@@ -2431,10 +2418,11 @@ describe("synthesis quality gate", () => {
     const grokEvents = groupEvidence([grok]);
     const prompt = buildSynthesisPrompt([...codexEvents, ...grokEvents], [codex, grok]);
 
-    expect(prompt).toContain("OpenAI Codex 0.151.0 开放 MCP 结果处理");
-    expect(prompt).toContain("不得混入同一发布的其他改动或前一批专名");
-    expect(prompt).toContain("OpenClaw 减少首次 Grok 搜索启动开销");
-    expect(prompt).toContain("宽泛 agent-runtime 导入");
+    expect(prompt).not.toContain("OpenAI Codex 0.151.0 开放 MCP 结果处理");
+    expect(prompt).not.toContain("MCP 结果到达模型前检查或替换");
+    expect(prompt).not.toContain("OpenClaw 减少首次 Grok 搜索启动开销");
+    expect(prompt).not.toContain("不得写成移除懒加载模块");
+    expect(prompt).toContain("Extensions can now inspect or replace MCP tool results");
 
     const codexResult: SynthesizedDevelopment = {
       event_id: codexEvents[0]!.id,
@@ -2461,7 +2449,7 @@ describe("synthesis quality gate", () => {
     expect(Buffer.byteLength(fixedPrompt, "utf8")).toBeLessThan(6_000);
   });
 
-  it("gives duplicate-title session adoption a positive scoped wording", () => {
+  it("does not translate duplicate-title session facts outside the evidence", () => {
     const record = evidence({
       title: "Adopt native sessions with duplicate titles",
       content:
@@ -2470,12 +2458,13 @@ describe("synthesis quality gate", () => {
     });
     const prompt = buildSynthesisPrompt(groupEvidence([record]), [record]);
 
-    expect(prompt).toContain("将不同的同名原生会话接入同一 OpenClaw 智能体");
-    expect(prompt).toContain("将标题快照存入 displayName");
-    expect(prompt).toContain("label 保持唯一");
+    expect(prompt).not.toContain("不同但标题相同的原生会话");
+    expect(prompt).not.toContain("displayName 保存标题快照");
+    expect(prompt).not.toContain("label 保持唯一");
+    expect(prompt).toContain("distinct native sessions with matching titles");
   });
 
-  it("gives an open worker-target event a positive lifecycle and role skeleton", () => {
+  it("does not inject a worker-target correction into the base prompt", () => {
     const record = evidence({
       id: "github:org/project:pr:42:created",
       sourceType: "github_pr",
@@ -2487,10 +2476,11 @@ describe("synthesis quality gate", () => {
     });
     const prompt = buildSynthesisPrompt(groupEvidence([record]), [record]);
 
-    expect(prompt).toContain("后台工作器目标崩溃修复提案");
-    expect(prompt).toContain("该 PR 提议");
-    expect(prompt).toContain("若合并，运维人员可降低后台工作器导致网关退出的风险");
-    expect(prompt).toContain("Operator/Operators 译为“运维人员”");
+    expect(prompt).not.toContain("后台工作器目标崩溃修复提案");
+    expect(prompt).not.toContain("这是未合并 PR");
+    expect(prompt).not.toContain("对象是缺少浏览器上下文 ID 的后台工作器目标");
+    expect(prompt).not.toContain("Operator/Operators 译为“运维人员”");
+    expect(prompt).toContain("shared worker target without a browser context ID");
   });
 
   it("accepts the scoped worker and scanner positive skeletons without weakening their gates", () => {

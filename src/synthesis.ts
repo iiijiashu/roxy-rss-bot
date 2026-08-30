@@ -1,8 +1,5 @@
 import {
   buildSynthesisPrompt,
-  githubLifecycleState,
-  qualifyUnmergedGithubActionClauses,
-  synthesisPositiveFields,
   synthesisSourceIds,
   validateSynthesis,
   type EvidenceRecord,
@@ -98,9 +95,6 @@ function safeQualityFailureSummary(quality: QualityReport): string {
       /^development \d+: lifecycle language /u.test(violation) ||
       /^development \d+: thin issue impact must remain conditional$/u.test(violation) ||
       /^development \d+: duplicate title conflict$/u.test(violation) ||
-      /^development \d+: unsupported inference \(ungrounded semantic term [\p{Script=Han}]+\)$/u.test(
-        violation,
-      ) ||
       /^development \d+: (?:ticket-template title|title (?:exceeds|introduces)|summary (?:exceeds|declares)|summary contains|summary must|why_it_matters (?:exceeds|must|lacks|ends)|malformed (?:conditional phrase|pull-request reference)|noncanonical |untranslated English action|bare English phrase|missing CJK and Latin spacing)/u.test(
         violation,
       ) ||
@@ -209,348 +203,8 @@ function safeInferenceLabels(quality: QualityReport): string[] {
   return safeIndexedInferenceLabels(quality).map(({ label }) => label);
 }
 
-function terminologyCorrections(inferenceLabels: readonly string[]): string[] {
-  const labels = new Set(inferenceLabels);
-  return [
-    ...(labels.has("session adoption mistranslation")
-      ? ["session adoption 必须改写为“接入会话”或“采用会话机制”，不得用“采纳会话”。"]
-      : []),
-    ...(labels.has("snapshot verb mistranslation")
-      ? [
-          "snapshot 作动词时必须写“将标题快照存入 displayName”或“把标题保存到 displayName”，不得写“快照标题到”。",
-        ]
-      : []),
-    ...(labels.has("binding capture mistranslation")
-      ? ["binding capture 必须改写为“采集绑定信息”或“绑定信息采集阶段”，不得写“绑定捕获”。"]
-      : []),
-    ...(labels.has("oversized mistranslation")
-      ? ["oversized JSON 必须改写为“大型 JSON”或“超大 JSON”，不得用“大幅 JSON”。"]
-      : []),
-    ...(labels.has("UI dissolution mistranslation")
-      ? ["UI 分组的 dissolve 必须按语境改写为“解散、折叠或取消分组”，不得用“溶解”。"]
-      : []),
-    ...(labels.has("session displayName uniqueness contradiction")
-      ? ["同名原生标题可以重复保存到 displayName；唯一的是可寻址 label，不得把唯一性转移给 displayName。"]
-      : []),
-    ...(labels.has("native-thread identity overclaim")
-      ? [
-          "同名会话修复依靠稳定的 source identity 与分离的 displayName/label 语义，不得声称通过“采用原生线程区分”来消除冲突。",
-        ]
-      : []),
-    ...(labels.has("hook-gateway feature conflation")
-      ? ["模型切换钩子与 Claude apps 网关的费用限制是不同功能，不得把网关场景写成钩子能力的适用前提或效果。"]
-      : []),
-    ...(labels.has("binding-capture capability overclaim")
-      ? ["该变更只写为在绑定信息采集阶段保留并重新检查 MCP 工具缓存，不得声称它新增了多服务器并发连接能力。"]
-      : []),
-    ...(labels.has("hook enforcement mistranslation")
-      ? [
-          "必须区分钩子是否运行与拒绝结果是否生效：写“钩子已运行，但退出码 2 的拒绝信号被忽略”，不得写“钩子未执行拒绝”。",
-        ]
-      : []),
-    ...(labels.has("absolute workflow failure")
-      ? [
-          "只描述 evidence 中明确受影响的命令或操作；不得扩大为核心工作流完全无法运行，尤其不能忽略 evidence 里的可用回退路径。",
-        ]
-      : []),
-    ...(labels.has("multi-entity universal coverage conflation")
-      ? [
-          "只属于单一工具的覆盖数量或比例必须明确归给该工具，不得分摊给工具列表中的其他工具；无法简洁保留各工具数值时，只写“比较覆盖率与失败恢复能力”。",
-        ]
-      : []),
-    ...(labels.has("ungrounded semantic term 免费")
-      ? ["证据若写 paid customer，必须写“付费用户”，不得改写为免费用户或免费工具。"]
-      : []),
-    ...(labels.has("ungrounded semantic term 误删")
-      ? ["普通删除窗格不得写成“误删”；只描述删除后分组标题或导航如何变化。"]
-      : []),
-    ...(labels.has("ungrounded semantic term 重复解析")
-      ? ["只写 evidence 支持的预览字段可见性，不得推断模型会重复解析工具结果。"]
-      : []),
-    ...(labels.has("numeric entity binding mismatch")
-      ? ["每个数字必须保留 evidence 中与它直接绑定的实体；不能把家族数写成工件数，不确定时删除数字。"]
-      : []),
-    ...(labels.has("component metric scope expansion")
-      ? ["局部组件指标必须保持原作用域；ID 嵌入表大小不得扩大为整个模型或系统内存。"]
-      : []),
-    ...(labels.has("unestablished hosted timeout scope") || labels.has("invented configuration dependency")
-      ? ["evidence 未确立托管超时根因或明确没有新配置时，删除部署范围、配置依赖和确定因果。"]
-      : []),
-    ...(labels.has("security training outcome extrapolation")
-      ? ["安全训练中的模型降级只写实际使用版本偏离请求，不得推导评估结果或训练偏差。"]
-      : []),
-    ...(labels.has("restart-safe scope expansion")
-      ? ["重启恢复的影响必须限定为已接纳的 restart-safe 运行，不得扩大成所有任务或多轮对话的连续性。"]
-      : []),
-    ...(labels.has("MCP result-interference extrapolation")
-      ? ["MCP 结果扩展只写到达模型前可检查或替换，不得推导无关结果会干扰模型决策。"]
-      : []),
-    ...(labels.has("session-container scope inversion")
-      ? ["同名会话场景是把不同原生会话接入同一智能体，不得写成向同一会话引入多个会话。"]
-      : []),
-    ...(labels.has("cache coverage contradiction")
-      ? ["证据明确是大量已缓存上下文被重复处理，不得改写为缓存未覆盖；直接描述长序列调用和保留上下文。"]
-      : []),
-    ...(labels.has("cache issue model-switch extrapolation")
-      ? ["该用户报告没有模型切换证据；why 只保留长上下文、多轮工具调用和五小时配额风险。"]
-      : []),
-    ...(labels.has("lazy-import scope mistranslation")
-      ? ["只写移除宽泛 agent-runtime 导入，不得声称移除了懒加载模块。"]
-      : []),
-    ...(labels.has("permission mode-target inversion")
-      ? ["丢失的是单轮命令执行收紧覆盖，不是会话权限模式；标题和摘要必须保留 mode 与 override 的关系。"]
-      : []),
-    ...(labels.has("cron failure-stage conflation")
-      ? ["添加时是 JSON 序列化 TypeError，触发时是上下文块规范化失败；不得把两个阶段都写成 TypeError。"]
-      : []),
-    ...(labels.has("catalog completeness guarantee")
-      ? ["只写减少并发等待或缓存过期窗口里的工具遗漏，不得保证全局工具目录完整。"]
-      : []),
-    ...(labels.has("pane-session entity substitution")
-      ? ["删除对象必须保持为活动窗格，不得改写为活跃会话。"]
-      : []),
-    ...(labels.has("worker-target scope loss")
-      ? ["缺少浏览器上下文 ID 的对象必须保留为 Worker 或 Worklet 目标，不得扩大成 Chrome 本身。"]
-      : []),
-    ...(labels.has("benchmark adoption extrapolation")
-      ? ["论文 why 必须写证据中的评测发现或决策价值，不得预测评测社区采纳后的变化。"]
-      : []),
-    ...(labels.has("release sibling scope drift")
-      ? ["标题、摘要和 why 只保留一个核心范围；删除同一发布中的 Codex runtime、TUI 权限等兄弟改动。"]
-      : []),
-    ...(labels.has("percentage denominator scope loss")
-      ? ["百分比必须保留直接分母：ModelAudit 的 100% 只属于 135 个有标签家族，不是 145 个总家族。"]
-      : []),
-    ...(labels.has("scanner decision coverage-as-accuracy")
-      ? ["明确安全判断覆盖率不得写成判定准确率；准确性与判断可用性必须分开。"]
-      : []),
-    ...(labels.has("scanner coverage unit conflation")
-      ? ["明确判断覆盖率的统计单位是有标签样本家族，不得写成 170 个制品上的覆盖率。"]
-      : []),
-    ...(labels.has("non-comparable timing delta")
-      ? ["不得把不同执行阶段的耗时写成前后对比；只比较 evidence 明确给出的同一搜索用例总耗时。"]
-      : []),
-    ...(labels.has("baseline qualifier loss")
-      ? ["无技能基线收益必须保留“多数模型—基准组合”限定，不得写成所有设置都提升。"]
-      : []),
-    ...(labels.has("multi-day count collapsed")
-      ? ["分日统计必须保留每一天的 26、15 和 209 次，不得把最后一天写成总数。"]
-      : []),
-    ...(labels.has("bounded preview completeness overclaim")
-      ? ["有界预览只优先展示受限数量的根级标量字段，不得声称字段更完整。"]
-      : []),
-    ...(labels.has("startup-restart mistranslation") ? ["startup 译为“启动”，不得写成“重启”。"] : []),
-    ...(labels.has("foreground subagent mistranslation")
-      ? ["foreground subagent 必须译为“前台子智能体”，不得写成“前台中台”。"]
-      : []),
-    ...(labels.has("multi-method metric attribution")
-      ? ["超过 98% 的 ID 嵌入表缩减只归因于多哈希 ID 嵌入；时序邻居采样属于另一项采样复杂度优化。"]
-      : []),
-    ...(labels.has("trusted-access response overstatement")
-      ? ["来源只说明申请页面提交后无后续并再次提示重试，不得写成三次均未获回复。"]
-      : []),
-    ...(labels.has("trusted-access workaround overstatement")
-      ? ["Trusted Access 申请流程在来源中未成功，不得把手动申请写成可继续使用的解决办法。"]
-      : []),
-    ...(labels.has("security-training domain mistranslation")
-      ? ["security training 必须译为“安全培训”，不得改写为“编程训练”。"]
-      : []),
-    ...(labels.has("model downgrade config-or-retry advice")
-      ? ["来源没有配置或重试能够解决降级的证据；why 只写指定模型任务意外使用旧版本的风险。"]
-      : []),
-    ...(labels.has("guaranteed outcome claim")
-      ? [
-          "若 SCOPED_RULES 为该 development 提供正向 why 骨架，必须逐字使用该 why；否则改写为“这会影响【evidence 中的具体对象】的【具体流程或风险】。”title、summary 和 why 均不得使用确保、保证、始终、不会、不再、将保留或得到保障，也不得换用同义结果承诺。",
-        ]
-      : []),
-    ...(labels.has("subjective adequacy claim")
-      ? ["删除“合理范围”等主观判断，只保留证据中的实测时间或直接变化。"]
-      : []),
-  ];
-}
-
-function normalizeCjkLatinSpacing(value: string): string {
-  return value
-    .replace(/([\p{Script=Han}])\s+(?=[\p{Script=Han}])/gu, "$1")
-    .replace(/([\p{Script=Han}])([A-Za-z])/gu, "$1 $2")
-    .replace(/([A-Za-z])([\p{Script=Han}])/gu, "$1 $2")
-    .replace(/([\p{Script=Han}])(\d)/gu, "$1 $2")
-    .replace(/(\d)([\p{Script=Han}])/gu, "$1 $2")
-    .replace(/%([\p{Script=Han}])/gu, "% $1")
-    .replace(/([，。；：！？])\s+/gu, "$1")
-    .replace(/[ \t]{2,}/gu, " ")
-    .trim();
-}
-
-function escapedRegex(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
-}
-
-function normalizeUiTerms(value: string, evidenceCorpus = ""): string {
-  let normalized = value
-    .replace(/@(?:mentions?\b|提及)/giu, "用户提及")
-    .replace(/\bbug\b/giu, "缺陷")
-    .replace(/缺陷\s+([\p{Script=Han}])/gu, "缺陷$1")
-    .replace(/([\p{Script=Han}])\s+用户提及/gu, "$1用户提及")
-    .replace(/用户提及\s+([\p{Script=Han}])/gu, "用户提及$1")
-    .replace(/单\s+Agent\s*任务/gu, "单智能体任务")
-    .replace(/\s*reasoning effort:\s*medium/giu, "推理强度为中等")
-    .replace(/耗尽\s+(\d+(?:\.\d+)?)%\s+(\d+\s*小时配额)/gu, "消耗 $2的 $1%")
-    .replace(/使用安全门禁项目的开发者/gu, "依赖安全门禁的项目开发者");
-  if (/\badmitted turns?\b/iu.test(evidenceCorpus)) {
-    normalized = normalized.replace(/安全对话/gu, "已接纳轮次");
-  }
-  if (/\bOpenAI Codex\b/iu.test(evidenceCorpus)) {
-    normalized = normalized.replace(/用户报告\s+Code\s+在/gu, "用户报告 Codex 在");
-  }
-  if (/extensions? can (?:now )?inspect or replace MCP tool results?/iu.test(evidenceCorpus)) {
-    normalized = normalized.replace(
-      /^OpenAI Codex 0\.151\.0 新增 MCP 结果预置$/u,
-      "OpenAI Codex 0.151.0 开放 MCP 结果处理",
-    );
-  }
-  if (/\bPaid customer here\b/iu.test(evidenceCorpus)) {
-    normalized = normalized
-      .replace(/^付费用户在/u, "有付费用户报告其在")
-      .replace(/^付费用户报告/u, "有付费用户报告");
-  }
-  if (
-    /\bPaid customer\b/iu.test(evidenceCorpus) &&
-    /This content can't be shown/iu.test(evidenceCorpus) &&
-    /cybersecurity warning/iu.test(evidenceCorpus)
-  ) {
-    normalized = normalized.replace(/网络安全警告弹窗/gu, "网络安全警告提示");
-  }
-  if (/\boversized JSON\b/iu.test(evidenceCorpus)) {
-    normalized = normalized.replace(/\boversized\s+JSON\b/giu, "大型 JSON");
-  }
-  if (/foreground subagent's tool calls and results/iu.test(evidenceCorpus)) {
-    normalized = normalized.replace(/前台中台/gu, "前台子智能体");
-  }
-  if (/PreModelSwitch.{0,80}PostModelSwitch.{0,80}hook events/iu.test(evidenceCorpus)) {
-    normalized = normalized.replace(/模型切换回调/gu, "模型切换钩子");
-  }
-  if (/PreToolUse.{0,160}(?:exit code\s*2|exit\s*2)/isu.test(evidenceCorpus)) {
-    normalized = normalized
-      .replace(/\bexit code\s*2\b/giu, "退出码 2")
-      .replace(/\bexit\s*2\b/giu, "退出码 2")
-      .replace(/\bexit\b/giu, "退出")
-      .replace(/\bhooks?\b/giu, "钩子");
-  }
-  if (/nested[- ]quote corruption/iu.test(evidenceCorpus) && /\bexec_command\b/iu.test(evidenceCorpus)) {
-    normalized = normalized.replace(/\bexec\s+command\b/giu, "命令执行").replace(/\bexec\b/giu, "命令执行");
-  }
-  if (
-    /nested[- ]quote corruption/iu.test(evidenceCorpus) &&
-    /\b(?:PowerShell|pwsh)\b/iu.test(evidenceCorpus)
-  ) {
-    normalized = normalized
-      .replace(/Windows 下命令执行/gu, "Windows 下 PowerShell 命令执行")
-      .replace(/执行复杂命令/gu, "执行复杂 PowerShell 命令");
-  }
-  if (/\brestart-safe runs?\b/iu.test(evidenceCorpus)) {
-    normalized = normalized
-      .replace(/restart-safe\s*任务/giu, "可安全重启的运行")
-      .replace(/restart-safe/giu, "可安全重启");
-  }
-  if (
-    /\bpane groups?\b/iu.test(evidenceCorpus) &&
-    /(?:custom title|named pane groups?)/iu.test(evidenceCorpus)
-  ) {
-    normalized = normalized
-      .replace(/面板组重命名丢失问题/gu, "窗格组自定义标题丢失问题")
-      .replace(/面板组/gu, "窗格组")
-      .replace(/面板/gu, "窗格");
-  }
-  if (/\borigin metadata\b/iu.test(evidenceCorpus)) {
-    normalized = normalized
-      .replace(/原信息/gu, "来源元数据")
-      .replace(/引用或提及上下文创建的提醒可降低/gu, "在包含引用或用户提及的上下文中创建提醒时可降低")
-      .replace(
-        /针对引用或用户提及上下文创建定时任务的提醒可降低/gu,
-        "在包含引用或用户提及的上下文中创建提醒时可降低",
-      );
-  }
-  if (
-    /\bOpenClaw\b/iu.test(evidenceCorpus) &&
-    /worker targets? no longer crash the gateway|worker.{0,40}without a browser context ID/iu.test(
-      evidenceCorpus,
-    )
-  ) {
-    normalized = normalized.replace(/^后台工作器目标崩溃修复提案$/u, "OpenClaw 后台工作器目标崩溃修复提案");
-  }
-  if (/\bOperators\b/iu.test(evidenceCorpus) && /attached Chrome profile/iu.test(evidenceCorpus)) {
-    normalized = normalized
-      .replace(/浏览器操作符/gu, "浏览器运维人员")
-      .replace(/\bOperators?\b/giu, "运维人员");
-  }
-  const execToolCallCount = evidenceCorpus.match(/\bexec tool calls?\s*\|\s*(\d+)\b/iu)?.[1];
-  if (execToolCallCount) {
-    normalized = normalized.replace(
-      new RegExp(`${escapedRegex(execToolCallCount)}\\s*轮执行`, "gu"),
-      `${execToolCallCount} 次命令执行调用`,
-    );
-  }
-  if (/\bmoded sessions?\b|permission modes?/iu.test(evidenceCorpus)) {
-    normalized = normalized.replace(/模式化会话/gu, "已设置权限模式的会话");
-  }
-  if (/experience.{0,80}scattered|fragmented/iu.test(evidenceCorpus)) {
-    normalized = normalized
-      .replace(/解决(.{0,36}经验碎片化)/gu, "缓解$1")
-      .replace(/智能体团队/gu, "智能体系统");
-  }
-  if (/catalog.{0,80}(?:published|expire)|published.{0,80}catalog/iu.test(evidenceCorpus)) {
-    normalized = normalized
-      .replace(/已在等待期间发布的服务/gu, "等待期间发布的工具目录")
-      .replace(/提升多服务器环境稳定性/gu, "减少工具遗漏和不必要的服务器启动");
-  }
-  if (/represent nested containers by shape only/iu.test(evidenceCorpus)) {
-    normalized = normalized.replace(/隐藏嵌套容器结构/gu, "以结构形状概括嵌套容器");
-  }
-  if (/personal GitHub marketplace|personal marketplace/iu.test(evidenceCorpus)) {
-    normalized = normalized
-      .replace(/个人\s+GitHub\s+marketplace/giu, "GitHub 个人市场")
-      .replace(/准确版本信息/gu, "更新后的个人市场内容");
-  }
-  if (/security training/iu.test(evidenceCorpus) && /demot(?:e|ed|es|ing)/iu.test(evidenceCorpus)) {
-    normalized = normalized
-      .replace(/避免训练偏差/gu, "减少意外模型降级对安全训练输出的影响")
-      .replace(/\bopus\s+4\.8\b/giu, "Opus 4.8");
-  }
-  if (/hack attempt|cybersecurity requests?/iu.test(evidenceCorpus)) {
-    normalized = normalized.replace(/将常规操作误判为。/gu, "将常规代码审查误判为网络安全攻击请求。");
-  }
-  const versionRange = normalized.match(/\b(v?\d+(?:\.\d+){1,3})\s*至\s*(v?\d+(?:\.\d+){1,3})\b/iu);
-  if (versionRange) {
-    const left = versionRange[1]!;
-    const right = versionRange[2]!;
-    const explicitRange = new RegExp(
-      `${escapedRegex(left)}\\s*(?:-|–|—|to|through|至|到)\\s*${escapedRegex(right)}`,
-      "iu",
-    );
-    if (!explicitRange.test(evidenceCorpus)) {
-      normalized = normalized.replace(versionRange[0], `${left} 和 ${right}`);
-    }
-  }
-  return normalized;
-}
-
-function normalizeSummaryStyle(value: string): string {
-  const spaced = normalizeCjkLatinSpacing(value)
-    .replace(/([\p{Script=Han}])(\d+(?:\.\d+)?%)/gu, "$1 $2")
-    .replace(/,(?=\D|$)/gu, "，")
-    .replace(/([A-Za-z][A-Za-z0-9._+-]*)、(?=[A-Za-z][A-Za-z0-9._+-]*)/gu, "$1，")
-    .replace(/，{2,}/gu, "，")
-    .replace(/\s+$/u, "");
-  return spaced.endsWith("。") ? spaced : `${spaced}。`;
-}
-
-function normalizeWhyStyle(value: string): string {
-  const normalized = normalizeCjkLatinSpacing(value)
-    .replace(/,(?=\D|$)/gu, "，")
-    .replace(/[，\s]+$/u, "");
-  return normalized.endsWith("。") ? normalized : `${normalized}。`;
-}
+const GENERIC_INFERENCE_REWRITE =
+  "删除失败字段中未被当前 event evidence 支持的推断、错误翻译、实体或分母错配、范围扩张和绝对因果，按原始 evidence 从零改写；不得用同义表达规避质量门。";
 
 function safeMechanicalCorrectionDetails(quality: QualityReport): string[] {
   return quality.violations
@@ -903,154 +557,7 @@ function withValidatedSummaryPunctuation(
   };
 }
 
-function eventGithubLifecycleState(event: EventCandidate, records: EvidenceRecord[]) {
-  const sourceIds = new Set(event.sourceIds);
-  return githubLifecycleState(records.filter((record) => sourceIds.has(record.id)));
-}
-
-function normalizeUnmergedPullRequestLanguage(
-  value: string,
-  event: EventCandidate,
-  records: EvidenceRecord[],
-  field: "title" | "summary" | "why_it_matters",
-): string {
-  const state = eventGithubLifecycleState(event, records);
-  if (state !== "open" && state !== "closed_unmerged") return value;
-  let normalized = value
-    .replace(/已(?:经)?合并(?:了)?/gu, "尚未合并")
-    .replace(
-      /已(?:经)?(修复|新增|增加|添加|引入|更新|移除|删除|实现|支持|防止|解决|消除|修正|处理|根治|改进|优化|调整|部署|上线|启用|发布|交付|推出|完成|开发(?!者)|落地)(?:了)?/gu,
-      "拟$1",
-    )
-    .replace(
-      /(修复|新增|增加|添加|引入|更新|移除|删除|实现|支持|防止|解决|消除|修正|处理|根治|改进|优化|调整|部署|上线|启用|发布|交付|推出|完成|开发(?!者)|合并|落地)了/gu,
-      "尝试$1",
-    );
-  if (field === "why_it_matters" && state === "open") {
-    normalized = normalized
-      .replace(/^(?:若|如|一旦)[^，,。]{0,24}(?:合并|落地|采纳|实施)[，,]\s*/u, "若合并，")
-      .replace(/^若合并，[\s]*(?:若|如|一旦)[^，,。]{0,24}(?:合并|落地|采纳|实施)[，,]\s*/u, "若合并，")
-      .replace(
-        /^若合并，((?:该|这)(?:项)?(?:修复|提案|方案|提议|改动|变更))?(?:若|如|一旦)[^，,。]{0,16}(?:合并|落地|采纳|实施)\s*/u,
-        "若合并，$1",
-      );
-  }
-  if (field === "title" || field === "summary") {
-    normalized = qualifyUnmergedGithubActionClauses(normalized);
-  }
-  if (
-    field === "why_it_matters" &&
-    state === "open" &&
-    !/^(?:若合并|如落地|一旦采纳)[，,]/u.test(normalized)
-  ) {
-    normalized = `若合并，${normalized}`;
-  }
-  if (
-    field === "summary" &&
-    state === "closed_unmerged" &&
-    !(/关闭/u.test(normalized) && /未合并/u.test(normalized))
-  ) {
-    normalized = `${normalized.replace(/。+$/u, "")}，现已关闭且未合并`;
-  }
-  return normalized;
-}
-
 function withTrustedSourceIds(
-  candidate: unknown,
-  events: EventCandidate[],
-  records: EvidenceRecord[],
-): { candidate: unknown; normalizationsApplied: string[] } {
-  const normalizationsApplied: string[] = [];
-  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
-    return { candidate, normalizationsApplied };
-  }
-  const root = candidate as Record<string, unknown>;
-  if (!Array.isArray(root["developments"])) return { candidate, normalizationsApplied };
-  const normalizedCandidate = {
-    ...root,
-    developments: root["developments"].map((development, index) => {
-      const event = events[index];
-      if (
-        !event ||
-        !development ||
-        typeof development !== "object" ||
-        Array.isArray(development) ||
-        (development as Record<string, unknown>)["event_id"] !== event.id
-      ) {
-        return development;
-      }
-      const normalizedFields: Record<string, string> = {};
-      for (const field of ["title", "summary", "why_it_matters"] as const) {
-        const value = (development as Record<string, unknown>)[field];
-        if (typeof value !== "string") continue;
-        const lifecycleSafeValue = normalizeUnmergedPullRequestLanguage(value, event, records, field);
-        if (lifecycleSafeValue !== value) normalizationsApplied.push(`${index}:${field}_lifecycle`);
-        const evidenceCorpus = event.sourceIds
-          .map((sourceId) => records.find((record) => record.id === sourceId))
-          .filter(Boolean)
-          .map((record) => `${record!.title}\n${record!.content}`)
-          .join("\n");
-        const uiTermSafeValue = normalizeUiTerms(lifecycleSafeValue, evidenceCorpus);
-        if (uiTermSafeValue !== lifecycleSafeValue) {
-          normalizationsApplied.push(`${index}:${field}_ui_term`);
-        }
-        if (field === "summary") {
-          const normalized = normalizeSummaryStyle(uiTermSafeValue);
-          if (normalized !== uiTermSafeValue) normalizationsApplied.push(`${index}:summary_style`);
-          normalizedFields[field] = normalized;
-          continue;
-        }
-        if (field === "why_it_matters") {
-          const normalized = normalizeWhyStyle(uiTermSafeValue);
-          if (normalized !== uiTermSafeValue) normalizationsApplied.push(`${index}:why_style`);
-          normalizedFields[field] = normalized;
-          continue;
-        }
-        const normalized = normalizeCjkLatinSpacing(uiTermSafeValue);
-        if (normalized !== uiTermSafeValue) normalizationsApplied.push(`${index}:title_spacing`);
-        normalizedFields[field] = normalized;
-      }
-      const finalizedFields = { ...normalizedFields };
-      if (typeof finalizedFields["title"] === "string" && typeof finalizedFields["summary"] === "string") {
-        const scopeSafeTitle = finalizedFields["title"]
-          .replace(
-            /与成本统计/gu,
-            /(?:成本|费用|配额|缓存命中)/u.test(finalizedFields["summary"]) ? "与成本统计" : "",
-          )
-          .replace(
-            /与安装可靠性/gu,
-            /(?:安装|Node|RPM|Linux)/iu.test(finalizedFields["summary"]) ? "与安装可靠性" : "",
-          );
-        if (scopeSafeTitle !== finalizedFields["title"]) {
-          normalizationsApplied.push(`${index}:title_scope`);
-          finalizedFields["title"] = scopeSafeTitle;
-        }
-      }
-      if (
-        typeof finalizedFields["title"] === "string" &&
-        typeof finalizedFields["why_it_matters"] === "string" &&
-        /自定义标题/u.test(finalizedFields["title"])
-      ) {
-        const alignedWhy = finalizedFields["why_it_matters"].replace(
-          /用户删除活动窗格后可保留原会话上下文，避免跳至无关对话。/u,
-          "用户删除窗格后仍可识别原有命名分组，避免自定义标题丢失。",
-        );
-        if (alignedWhy !== finalizedFields["why_it_matters"]) {
-          normalizationsApplied.push(`${index}:why_evidence_alignment`);
-          finalizedFields["why_it_matters"] = alignedWhy;
-        }
-      }
-      return {
-        ...(development as Record<string, unknown>),
-        ...finalizedFields,
-        source_ids: synthesisSourceIds(event, records),
-      };
-    }),
-  };
-  return { candidate: normalizedCandidate, normalizationsApplied };
-}
-
-function withScopedCanonicalFields(
   candidate: unknown,
   events: EventCandidate[],
   records: EvidenceRecord[],
@@ -1059,36 +566,30 @@ function withScopedCanonicalFields(
     return { candidate, normalizationsApplied: [] };
   }
   const root = candidate as Record<string, unknown>;
-  if (!Array.isArray(root["developments"])) return { candidate, normalizationsApplied: [] };
-
-  const normalizationsApplied: string[] = [];
-  const developments = root["developments"].map((development, index) => {
-    const event = events[index];
-    if (
-      !event ||
-      !development ||
-      typeof development !== "object" ||
-      Array.isArray(development) ||
-      (development as Record<string, unknown>)["event_id"] !== event.id
-    ) {
-      return development;
-    }
-    const fields = synthesisPositiveFields(event, records);
-    if (!fields) return development;
-    const record = development as Record<string, unknown>;
-    if (
-      record["title"] === fields.title &&
-      record["summary"] === fields.summary &&
-      record["why_it_matters"] === fields.why_it_matters
-    ) {
-      return development;
-    }
-    normalizationsApplied.push(`${index}:canonical_fields`);
-    return { ...record, ...fields };
-  });
+  if (!Array.isArray(root["developments"])) {
+    return { candidate, normalizationsApplied: [] };
+  }
   return {
-    candidate: normalizationsApplied.length > 0 ? { ...root, developments } : candidate,
-    normalizationsApplied,
+    candidate: {
+      ...root,
+      developments: root["developments"].map((development, index) => {
+        const event = events[index];
+        if (
+          !event ||
+          !development ||
+          typeof development !== "object" ||
+          Array.isArray(development) ||
+          (development as Record<string, unknown>)["event_id"] !== event.id
+        ) {
+          return development;
+        }
+        return {
+          ...(development as Record<string, unknown>),
+          source_ids: synthesisSourceIds(event, records),
+        };
+      }),
+    },
+    normalizationsApplied: [],
   };
 }
 
@@ -1116,148 +617,6 @@ function withLockedDevelopments(
   return {
     ...root,
     developments: root["developments"].map((development, index) => locked.get(index) ?? development),
-  };
-}
-
-function withScopedSummaryHints(
-  candidate: unknown,
-  quality: QualityReport,
-  events: EventCandidate[],
-  records: EvidenceRecord[],
-): { candidate: unknown; normalizationsApplied: string[] } {
-  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
-    return { candidate, normalizationsApplied: [] };
-  }
-  const root = candidate as Record<string, unknown>;
-  if (!Array.isArray(root["developments"])) return { candidate, normalizationsApplied: [] };
-  const repairIndexes = new Set([
-    ...safeEditorialLabels(quality).flatMap((label) => {
-      const match = label.match(
-        /^(\d+):(?:summary_too_many_actions|summary_too_many_facts|summary_declares_many_facts)$/u,
-      );
-      return match ? [Number(match[1])] : [];
-    }),
-    ...safeIndexedInferenceLabels(quality).flatMap(({ index, label }) =>
-      [
-        "release sibling scope drift",
-        "scanner decision coverage-as-accuracy",
-        "scanner coverage unit conflation",
-        "non-comparable timing delta",
-        "baseline qualifier loss",
-        "multi-day count collapsed",
-        "guaranteed outcome claim",
-        "multi-method metric attribution",
-        "trusted-access response overstatement",
-        "security-training domain mistranslation",
-      ].includes(label)
-        ? [index]
-        : [],
-    ),
-  ]);
-  if (repairIndexes.size === 0) return { candidate, normalizationsApplied: [] };
-
-  const normalizationsApplied: string[] = [];
-  const developments = root["developments"].map((development, index) => {
-    if (!repairIndexes.has(index) || !events[index]) return development;
-    const fields = synthesisPositiveFields(events[index], records);
-    if (!fields || !development || typeof development !== "object" || Array.isArray(development)) {
-      return development;
-    }
-    const record = development as Record<string, unknown>;
-    if (record["summary"] === fields.summary) return development;
-    normalizationsApplied.push(`${index}:summary_scoped_hint`);
-    return { ...record, summary: fields.summary };
-  });
-  return {
-    candidate: normalizationsApplied.length > 0 ? { ...root, developments } : candidate,
-    normalizationsApplied,
-  };
-}
-
-function withScopedTitleHints(
-  candidate: unknown,
-  quality: QualityReport,
-  events: EventCandidate[],
-  records: EvidenceRecord[],
-): { candidate: unknown; normalizationsApplied: string[] } {
-  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
-    return { candidate, normalizationsApplied: [] };
-  }
-  const root = candidate as Record<string, unknown>;
-  if (!Array.isArray(root["developments"])) return { candidate, normalizationsApplied: [] };
-  const repairIndexes = new Set(
-    safeEditorialLabels(quality).flatMap((label) => {
-      const match = label.match(/^(\d+):title_too_long$/u);
-      return match ? [Number(match[1])] : [];
-    }),
-  );
-  if (repairIndexes.size === 0) return { candidate, normalizationsApplied: [] };
-
-  const normalizationsApplied: string[] = [];
-  const developments = root["developments"].map((development, index) => {
-    if (!repairIndexes.has(index) || !events[index]) return development;
-    const fields = synthesisPositiveFields(events[index], records);
-    if (!fields || !development || typeof development !== "object" || Array.isArray(development)) {
-      return development;
-    }
-    const record = development as Record<string, unknown>;
-    if (record["title"] === fields.title) return development;
-    normalizationsApplied.push(`${index}:title_scoped_hint`);
-    return { ...record, title: fields.title };
-  });
-  return {
-    candidate: normalizationsApplied.length > 0 ? { ...root, developments } : candidate,
-    normalizationsApplied,
-  };
-}
-
-function withScopedLifecycleHints(
-  candidate: unknown,
-  quality: QualityReport,
-  events: EventCandidate[],
-  records: EvidenceRecord[],
-): { candidate: unknown; normalizationsApplied: string[] } {
-  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
-    return { candidate, normalizationsApplied: [] };
-  }
-  const root = candidate as Record<string, unknown>;
-  if (!Array.isArray(root["developments"])) return { candidate, normalizationsApplied: [] };
-  const repairIndexes = new Set([
-    ...whyImpactRepairIndexes(safeEditorialLabels(quality)),
-    ...quality.violations.flatMap((violation) => {
-      const match = violation.match(/^development (\d+): (?:thin )?issue impact must remain conditional$/u);
-      return match ? [Number(match[1])] : [];
-    }),
-    ...safeIndexedInferenceLabels(quality).flatMap(({ index, label }) =>
-      [
-        "guaranteed outcome claim",
-        "baseline qualifier loss",
-        "bounded preview completeness overclaim",
-        "cache issue model-switch extrapolation",
-        "trusted-access workaround overstatement",
-        "model downgrade config-or-retry advice",
-      ].includes(label)
-        ? [index]
-        : [],
-    ),
-  ]);
-  if (repairIndexes.size === 0) return { candidate, normalizationsApplied: [] };
-
-  const normalizationsApplied: string[] = [];
-  const developments = root["developments"].map((development, index) => {
-    if (!repairIndexes.has(index) || !events[index]) return development;
-    const fields = synthesisPositiveFields(events[index], records);
-    if (!fields || !development || typeof development !== "object" || Array.isArray(development)) {
-      return development;
-    }
-    const record = development as Record<string, unknown>;
-    if (record["why_it_matters"] === fields.why_it_matters) return development;
-    normalizationsApplied.push(`${index}:why_scoped_hint`);
-    return { ...record, why_it_matters: fields.why_it_matters };
-  });
-  return {
-    candidate: normalizationsApplied.length > 0 ? { ...root, developments } : candidate,
-    normalizationsApplied,
   };
 }
 
@@ -1384,6 +743,27 @@ function canUseLabeledInferenceOnlyRepair(
   );
 }
 
+function canUseFinalEditorialQualityRepair(
+  qualityFailureCount: number,
+  quality: QualityReport,
+  hasSurgicalRepair: boolean,
+): boolean {
+  if (
+    qualityFailureCount !== 3 ||
+    !hasSurgicalRepair ||
+    safeInferenceLabels(quality).length > 0 ||
+    quality.developmentCount !== quality.eligibleEventCount
+  ) {
+    return false;
+  }
+  const failedChecks = quality.checks.filter((check) => !check.passed).map((check) => check.name);
+  return (
+    failedChecks.length === 1 &&
+    failedChecks[0] === "editorial_style" &&
+    safeEditorialLabels(quality).length > 0
+  );
+}
+
 function qualityCorrection(quality: QualityReport, events: EventCandidate[]): string {
   const mechanicalDetails = safeMechanicalCorrectionDetails(quality);
   const lexicalDetails = safeLexicalCorrectionDetails(quality);
@@ -1391,7 +771,6 @@ function qualityCorrection(quality: QualityReport, events: EventCandidate[]): st
   const editorialFactDetails = safeEditorialFactDetails(quality);
   const danglingWhyDetails = safeDanglingWhyDetails(quality);
   const untranslatedActionDetails = safeUntranslatedActionDetails(quality);
-  const inferenceLabels = safeInferenceLabels(quality);
   const editorialLabels = safeEditorialLabels(quality);
   const summaryRepairIndexes = summaryStructureRepairIndexes(editorialLabels);
   const impactRepairIndexes = whyImpactRepairIndexes(editorialLabels);
@@ -1454,7 +833,6 @@ function qualityCorrection(quality: QualityReport, events: EventCandidate[]): st
             ? [
                 "以下摘要命中了超过两个动作词：",
                 ...editorialActionDetails,
-                "若 SCOPED_RULES 为该 development 提供正向 summary 骨架，必须逐字使用该 summary；否则从零重写。",
                 "必须从零重写对应 summary，最多保留两项最核心且有证据的动作事实；其余命中词及其从句必须删除，不得只改其他字段或用同义动作规避计数。",
               ]
             : []),
@@ -1497,15 +875,7 @@ function qualityCorrection(quality: QualityReport, events: EventCandidate[]): st
         ]
       : []),
     ...(quality.checks.some((check) => check.name === "unsupported_inference" && !check.passed)
-      ? [
-          "必须删除无证据推断：单条 issue/PR 只能写用户报告、反馈或提议，不能写揭示/暴露普遍问题、从根源解决、确保/始终/终于/不会/不再/将保留/得到保障、显著改善、公司排名、路线图或即将发布；session adoption 不得译为“采纳会话”，binding capture 不得译为“绑定捕获”，oversized 不得译为“大幅”；能耗、日志清洗、多图、缓存原因、命令注入、跨平台和重构等语义必须在该条 evidence 原文中出现。",
-          ...(inferenceLabels.length > 0
-            ? [
-                `本轮命中的固定推断类别：${JSON.stringify(inferenceLabels)}。逐项修正对应推断或术语，不得换成另一个绝对、保证性或错误直译说法。`,
-                ...terminologyCorrections(inferenceLabels),
-              ]
-            : []),
-        ]
+      ? [GENERIC_INFERENCE_REWRITE]
       : []),
     ...(quality.checks.some((check) => check.name === "duplicate_ratio" && !check.passed)
       ? ["标题必须突出各自事件独有的项目、版本或功能，不得让不同 developments 使用近重复模板标题。"]
@@ -1553,7 +923,6 @@ function surgicalQualityCorrection(
     safeUntranslatedActionDetails(quality),
     activeIndexes,
   );
-  const inferenceLabels = safeInferenceLabels(quality);
   const editorialLabels = remapEditorialLabels(safeEditorialLabels(quality), activeIndexes);
   const summaryRepairIndexes = summaryStructureRepairIndexes(editorialLabels);
   const impactRepairIndexes = whyImpactRepairIndexes(editorialLabels);
@@ -1620,7 +989,7 @@ function surgicalQualityCorrection(
             : []),
           ...(editorialActionDetails.length > 0
             ? [
-                `动作计数命中：${JSON.stringify(editorialActionDetails)}。若 SCOPED_RULES 为该 development 提供正向 summary 骨架，必须逐字使用该 summary；否则从零重写。最多保留两项最核心且有证据的动作事实；其余命中词及其从句必须删除，不得只改其他字段或用同义动作规避计数。`,
+                `动作计数命中：${JSON.stringify(editorialActionDetails)}。必须从零重写对应 summary，最多保留两项最核心且有证据的动作事实；其余命中词及其从句必须删除，不得只改其他字段或用同义动作规避计数。`,
               ]
             : []),
           ...(editorialFactDetails.length > 0
@@ -1646,17 +1015,7 @@ function surgicalQualityCorrection(
     ...(failedChecks.includes("duplicate_ratio")
       ? ["标题必须突出当前事件独有的产品、版本或功能，不得复用已锁定标题模板。"]
       : []),
-    ...(failedChecks.includes("unsupported_inference")
-      ? [
-          "删除无 evidence 支持的泛化、保证、根治、终于、不会、不再、将保留、显著改善、公司排名、路线图和即将发布推断；session adoption 不得译为“采纳会话”，binding capture 不得译为“绑定捕获”，oversized 不得译为“大幅”；issue 只写报告/反馈，PR 只写提议或已验证的合并状态。",
-          ...(inferenceLabels.length > 0
-            ? [
-                `固定推断类别：${JSON.stringify(inferenceLabels)}。逐项修正，不能换成同义推断或错误直译。`,
-                ...terminologyCorrections(inferenceLabels),
-              ]
-            : []),
-        ]
-      : []),
+    ...(failedChecks.includes("unsupported_inference") ? [GENERIC_INFERENCE_REWRITE] : []),
     "不要解释，不要 Markdown fence，也不要复述 evidence。",
     "",
   ].join("\n");
@@ -1703,21 +1062,22 @@ function stickyInferenceCorrection(
   const globalToLocal = activeIndexes
     ? new Map(activeIndexes.map((globalIndex, localIndex) => [globalIndex, localIndex]))
     : undefined;
-  const indexed = [...bans.entries()]
-    .flatMap(([globalIndex, labels]) => {
-      const localIndex = globalToLocal ? globalToLocal.get(globalIndex) : globalIndex;
-      if (localIndex === undefined || labels.size === 0) return [];
-      return [{ localIndex, labels: [...labels].sort() }];
-    })
-    .sort((left, right) => left.localIndex - right.localIndex)
+  const indexes = [
+    ...new Set(
+      [...bans.entries()].flatMap(([globalIndex, labels]) => {
+        const localIndex = globalToLocal ? globalToLocal.get(globalIndex) : globalIndex;
+        return localIndex === undefined || labels.size === 0 ? [] : [localIndex];
+      }),
+    ),
+  ]
+    .sort((left, right) => left - right)
     .slice(0, 32);
-  if (indexed.length === 0) return "";
-  const labels = [...new Set(indexed.flatMap((entry) => entry.labels))];
+  if (indexes.length === 0) return "";
   return [
     "",
     "持续关系禁令：这些当前条目曾命中的受支持推断类别不得在后续修复中重新出现：",
-    ...indexed.map((entry) => `development ${entry.localIndex}: ${entry.labels.join(",")}`),
-    ...terminologyCorrections(labels),
+    ...indexes.map((index) => `development ${index}`),
+    GENERIC_INFERENCE_REWRITE,
     "只修正当前失败字段，同时保持这些已确认的实体、范围、条件和措辞边界。",
     "",
   ].join("\n");
@@ -1830,14 +1190,11 @@ export async function synthesizeWithQualityGate(
       correction = appendCorrection(correction, INVALID_JSON_CORRECTION);
       continue;
     }
+    requestOrParseFailureCount = 0;
 
-    const canonicalCandidate = withScopedCanonicalFields(candidate, activeEvents, records);
-    const trustedCandidate = withTrustedSourceIds(canonicalCandidate.candidate, activeEvents, records);
+    const trustedCandidate = withTrustedSourceIds(candidate, activeEvents, records);
     candidate = trustedCandidate.candidate;
-    const rawNormalizations = [
-      ...canonicalCandidate.normalizationsApplied,
-      ...trustedCandidate.normalizationsApplied,
-    ];
+    const rawNormalizations = trustedCandidate.normalizationsApplied;
     const normalizationsApplied = activeIndexes
       ? remapActiveNormalizationLabels(rawNormalizations, activeIndexes)
       : rawNormalizations;
@@ -1856,36 +1213,6 @@ export async function synthesizeWithQualityGate(
     });
     if (quality.status !== "pass") {
       const normalized = withValidatedSummaryPunctuation(candidate, quality);
-      if (normalized.normalizationsApplied.length > 0) {
-        candidate = normalized.candidate;
-        normalizationsApplied.push(...normalized.normalizationsApplied);
-        quality = validateSynthesis(candidate, events, records, {
-          reservedTitles: dependencies.reservedTitles,
-        });
-      }
-    }
-    if (quality.status !== "pass") {
-      const normalized = withScopedSummaryHints(candidate, quality, events, records);
-      if (normalized.normalizationsApplied.length > 0) {
-        candidate = normalized.candidate;
-        normalizationsApplied.push(...normalized.normalizationsApplied);
-        quality = validateSynthesis(candidate, events, records, {
-          reservedTitles: dependencies.reservedTitles,
-        });
-      }
-    }
-    if (quality.status !== "pass") {
-      const normalized = withScopedTitleHints(candidate, quality, events, records);
-      if (normalized.normalizationsApplied.length > 0) {
-        candidate = normalized.candidate;
-        normalizationsApplied.push(...normalized.normalizationsApplied);
-        quality = validateSynthesis(candidate, events, records, {
-          reservedTitles: dependencies.reservedTitles,
-        });
-      }
-    }
-    if (quality.status !== "pass") {
-      const normalized = withScopedLifecycleHints(candidate, quality, events, records);
       if (normalized.normalizationsApplied.length > 0) {
         candidate = normalized.candidate;
         normalizationsApplied.push(...normalized.normalizationsApplied);
@@ -1965,6 +1292,7 @@ export async function synthesizeWithQualityGate(
       (qualityFailureCount === 1 ||
         canUseBoundedSecondQualityRepair(qualityFailureCount, quality, bestDevelopmentCount) ||
         canUseLabeledInferenceOnlyRepair(qualityFailureCount, quality, priorInferenceLabels) ||
+        canUseFinalEditorialQualityRepair(qualityFailureCount, quality, hasSurgicalRepair) ||
         (qualityFailureCount === 2 && hasSurgicalRepair))
     ) {
       correction = hasSurgicalRepair

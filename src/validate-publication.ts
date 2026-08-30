@@ -17,12 +17,16 @@ import {
 import { toCstDateStr } from "./date.ts";
 import { feedContentFromMarkdown } from "./generate-manifest.ts";
 import {
+  EVALUATION_NORMALIZATION_CODES,
   FORMAL_EVALUATION_CLEAN_RUNS,
   MAX_EVALUATION_REPLACEMENT_RUNS,
   MAX_EVALUATION_SYNTHESIS_ATTEMPTS,
   MAX_QUALITY_REPAIR_ATTEMPTS_PER_RUN,
   MAX_TOTAL_QUALITY_REPAIR_ATTEMPTS,
   MIN_FORMAL_FIRST_PASS_RUNS,
+  evaluationNormalizationCode,
+  isEvaluationRepairNormalization,
+  isForbiddenStoredAnswerNormalization,
 } from "./evaluation-policy.ts";
 import { synthesisStructureSha256 } from "./evaluation-hash.ts";
 import { credentialShapedTextFiles } from "./redaction.ts";
@@ -177,6 +181,7 @@ interface EvaluationShape {
     acceptableRuns: boolean;
     recoveredRuns: number;
     firstPassRuns: number;
+    normalizedRuns: number;
     boundedQualityRepairs: boolean;
     boundedSynthesisAttempts: boolean;
     atLeastOneFirstPass: boolean;
@@ -189,6 +194,7 @@ interface EvaluationShape {
     qualityPassed: boolean;
     firstPass: boolean;
     qualityRepairAttempts: number;
+    deterministicNormalizations: string[];
     providerClean: boolean;
     providerRecovered: boolean;
     passed: boolean;
@@ -197,7 +203,12 @@ interface EvaluationShape {
     code?: string;
     structureSha256?: string;
     developmentCount: number;
-    attempts: Array<{ reason?: string; code?: string }>;
+    attempts: Array<{
+      state?: string;
+      reason?: string;
+      code?: string;
+      normalizationsApplied?: string[];
+    }>;
     diagnostics: {
       provider: string;
       diagnosticsAvailable?: boolean;
@@ -210,6 +221,53 @@ interface EvaluationShape {
       errors?: Record<string, number>;
     };
   }>;
+}
+
+type EvaluationAttempt = EvaluationShape["runs"][number]["attempts"][number];
+
+function evaluationAttemptNormalizations(attempt: EvaluationAttempt): string[] | undefined {
+  if (attempt.normalizationsApplied === undefined) return [];
+  if (
+    !Array.isArray(attempt.normalizationsApplied) ||
+    attempt.normalizationsApplied.some((label) => typeof label !== "string")
+  ) {
+    return undefined;
+  }
+  return attempt.normalizationsApplied;
+}
+
+function evaluationAttemptHasRepair(attempt: EvaluationAttempt): boolean {
+  return evaluationAttemptNormalizations(attempt)?.some(isEvaluationRepairNormalization) === true;
+}
+
+function evaluationRunNormalizations(run: EvaluationShape["runs"][number]): string[] | undefined {
+  const labels = run.attempts.map(evaluationAttemptNormalizations);
+  return labels.some((value) => value === undefined)
+    ? undefined
+    : [...new Set(labels.flatMap((value) => value!))].sort();
+}
+
+function evaluationAttemptIsWellClassified(attempt: EvaluationAttempt): boolean {
+  if (attempt.state === "ok") {
+    return attempt.reason === undefined && attempt.code === undefined;
+  }
+  if (attempt.state !== "degraded") return false;
+  if (attempt.reason === "quality_gate_failed") return attempt.code === undefined;
+  return (
+    attempt.reason === "request_or_parse_failed" &&
+    typeof attempt.code === "string" &&
+    attempt.code.length > 0
+  );
+}
+
+function evaluationRunRepairCount(run: EvaluationShape["runs"][number]): number {
+  return run.attempts.filter(
+    (attempt) => attempt.reason === "quality_gate_failed" || evaluationAttemptHasRepair(attempt),
+  ).length;
+}
+
+function evaluationRunIsFirstPass(run: EvaluationShape["runs"][number]): boolean {
+  return run.attempts.every((attempt) => attempt.state === "ok" && !evaluationAttemptHasRepair(attempt));
 }
 
 interface ReplayProvenanceShape {
@@ -547,6 +605,7 @@ export function validatePublication(date: string, root = "."): PublicationValida
         run.passed !== true ||
         run.replacementReason !== undefined ||
         !Array.isArray(run.attempts) ||
+        run.attempts.some((attempt) => attempt.reason === "request_or_parse_failed") ||
         !evaluationDiagnosticsReconcile(run, []) ||
         !Number.isInteger(run.developmentCount) ||
         run.developmentCount < MIN_DAILY_DEVELOPMENTS ||
@@ -608,6 +667,32 @@ export function validatePublication(date: string, root = "."): PublicationValida
       throw new Error("evaluation-report.json requires strictly classified replacement runs");
     }
     if (
+      evaluation.runs.some((run) =>
+        run.attempts.some((attempt) => !evaluationAttemptIsWellClassified(attempt)),
+      )
+    ) {
+      throw new Error("evaluation-report.json requires strictly classified evaluation attempts");
+    }
+    const recomputedRunNormalizations = evaluation.runs.map(evaluationRunNormalizations);
+    const evaluationNormalizations = recomputedRunNormalizations.flatMap((labels) => labels ?? []);
+    if (evaluationNormalizations.some(isForbiddenStoredAnswerNormalization)) {
+      throw new Error("evaluation-report.json contains a forbidden stored-answer normalization");
+    }
+    if (
+      recomputedRunNormalizations.some((labels) => labels === undefined) ||
+      evaluation.runs.some(
+        (run, index) =>
+          !Array.isArray(run.deterministicNormalizations) ||
+          run.deterministicNormalizations.some((label) => typeof label !== "string") ||
+          JSON.stringify(run.deterministicNormalizations) !==
+            JSON.stringify(recomputedRunNormalizations[index]),
+      ) ||
+      evaluation.acceptance.normalizedRuns !==
+        countedRuns.filter((run) => (evaluationRunNormalizations(run)?.length ?? 0) > 0).length
+    ) {
+      throw new Error("evaluation-report.json has inconsistent normalization aggregates");
+    }
+    if (
       evaluation.acceptance.selectionIdentical !== true ||
       evaluation.acceptance.selectionCountInRange !== true ||
       evaluation.acceptance.providerMatched !== true ||
@@ -618,7 +703,7 @@ export function validatePublication(date: string, root = "."): PublicationValida
       evaluation.acceptance.boundedSynthesisAttempts !== true ||
       evaluation.acceptance.atLeastOneFirstPass !== true ||
       evaluation.acceptance.firstPassRuns < MIN_FORMAL_FIRST_PASS_RUNS ||
-      evaluation.acceptance.firstPassRuns !== countedRuns.filter((run) => run.firstPass === true).length ||
+      evaluation.acceptance.firstPassRuns !== countedRuns.filter(evaluationRunIsFirstPass).length ||
       evaluation.acceptance.totalQualityRepairAttempts !==
         evaluation.runs.reduce((total, run) => total + run.qualityRepairAttempts, 0) ||
       evaluation.acceptance.totalQualityRepairAttempts > MAX_TOTAL_QUALITY_REPAIR_ATTEMPTS ||
@@ -630,8 +715,18 @@ export function validatePublication(date: string, root = "."): PublicationValida
           !Number.isInteger(run.qualityRepairAttempts) ||
           run.qualityRepairAttempts < 0 ||
           run.qualityRepairAttempts > MAX_QUALITY_REPAIR_ATTEMPTS_PER_RUN ||
-          run.qualityRepairAttempts !==
-            run.attempts.filter((attempt) => attempt.reason === "quality_gate_failed").length,
+          run.firstPass !== evaluationRunIsFirstPass(run) ||
+          run.qualityRepairAttempts !== evaluationRunRepairCount(run) ||
+          run.attempts.some((attempt) => {
+            const labels = evaluationAttemptNormalizations(attempt);
+            return (
+              labels === undefined ||
+              labels.some((label) => {
+                const code = evaluationNormalizationCode(label);
+                return code === undefined || !EVALUATION_NORMALIZATION_CODES.has(code);
+              })
+            );
+          }),
       ) ||
       evaluation.selection.identical !== true ||
       evaluation.selection.addedEventIds.length !== 0 ||
