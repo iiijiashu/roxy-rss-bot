@@ -1,0 +1,9 @@
+{
+  "provider": "agnes",
+  "requests": 12,
+  "retryRequests": 0,
+  "tasksResolved": 12,
+  "tasksRetried": 0,
+  "tasksFailed": 0,
+  "errors": {}
+}

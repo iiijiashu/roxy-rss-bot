@@ -37,10 +37,18 @@ jobs:
           AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
           AGNES_MODEL: agnes-2.5-flash
           AGNES_BATCH_WINDOW_MS: "25"
-          AGNES_REQUEST_BUDGET: "3"
+          AGNES_MAX_BATCH_TASKS: "4"
+          AGNES_MAX_BATCH_INPUT_BYTES: "180000"
+          AGNES_MAX_BATCH_OUTPUT_TOKENS: "18000"
+          AGNES_REQUEST_BUDGET: "8"
+          AGNES_RETRY_BUDGET: "2"
+          AGNES_MAX_TASK_ATTEMPTS: "3"
+          AGNES_MAX_IN_FLIGHT: "2"
+          AGNES_TIMEOUT_MS: "180000"
           LLM_PROVIDER: agnes
           LLM_MAX_TOKENS: "4000"
-          LLM_CONCURRENCY: "64"
+          LLM_CONCURRENCY: "8"
+          HTTP_TIMEOUT_MS: "20000"
           PAGES_URL: https://${{ github.repository_owner }}.github.io/roxy-rss-bot
         run: |
           pnpm monthly

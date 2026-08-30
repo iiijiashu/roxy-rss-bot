@@ -51,6 +51,17 @@ describe("buildMessage", () => {
     expect(msg).not.toContain("HN Community");
   });
 
+  it("renders the evidence-first digest as one Chinese report", () => {
+    const msg = buildMessage("2026-08-29", ["digest"], BASE_URL, {
+      zh: { digest: ["第一条已验证进展"] },
+      en: {},
+    });
+    expect(msg).toContain(`${BASE_URL}/#2026-08-29/digest`);
+    expect(msg).toContain("每日高价值进展");
+    expect(msg).toContain("◦ 第一条已验证进展");
+    expect(msg).not.toContain("digest-en");
+  });
+
   it("includes Web UI and RSS links", () => {
     const msg = buildMessage("2026-03-09", ["ai-cli"], BASE_URL);
     expect(msg).toContain("🌐 Web UI");

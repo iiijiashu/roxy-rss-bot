@@ -5,7 +5,7 @@
  */
 
 import OpenAI from "openai";
-import type { LlmProvider } from "./types.ts";
+import type { LlmCallOptions, LlmProvider } from "./types.ts";
 
 export abstract class OpenAICompatibleProvider implements LlmProvider {
   abstract readonly name: string;
@@ -20,10 +20,13 @@ export abstract class OpenAICompatibleProvider implements LlmProvider {
     });
   }
 
-  async call(prompt: string, maxTokens: number): Promise<string> {
+  async call(prompt: string, maxTokens: number, options?: LlmCallOptions): Promise<string> {
     const response = await this.client.chat.completions.create({
       model: this.model,
       max_completion_tokens: maxTokens,
+      ...(options?.responseFormat === "json_object"
+        ? { response_format: { type: "json_object" as const } }
+        : {}),
       messages: [{ role: "user", content: prompt }],
     });
     const text = response.choices[0]?.message?.content;

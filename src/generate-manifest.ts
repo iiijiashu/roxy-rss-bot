@@ -9,6 +9,8 @@ const FEED_PATH = "feed.xml";
 const DEFAULT_SITE_URL = "https://duanyytop.github.io/agents-radar";
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const REPORT_FILES = [
+  "digest",
+  "ai-daily",
   "ai-cli",
   "ai-cli-en",
   "ai-agents",
@@ -44,13 +46,29 @@ interface Manifest {
   dates: DateEntry[];
 }
 
-interface ReportContent {
+export interface ReportContent {
   summary: string;
   fullHtml: string;
 }
 
+function reportLabel(report: string): string {
+  return REPORT_LABELS[report] ?? report;
+}
+
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+export function stableGeneratedAt(entries: DateEntry[]): Date {
+  const newestDate = entries[0]?.date;
+  return newestDate ? new Date(`${newestDate}T00:00:00.000Z`) : new Date(0);
+}
+
+/** Expose only the canonical daily artifact when a date contains legacy files too. */
+export function selectReportsForDate(available: readonly string[]): string[] {
+  if (available.includes("digest")) return ["digest"];
+  if (available.includes("ai-daily")) return ["ai-daily"];
+  return [...available];
+}
 
 export function toRfc822(date: Date): string {
   return (
@@ -76,36 +94,23 @@ export function normalizeSiteUrl(raw = DEFAULT_SITE_URL): string {
   return parsed.href.replace(/\/+$/, "");
 }
 
-async function getReportContent(date: string, report: string): Promise<ReportContent> {
+export function feedContentFromMarkdown(markdown: string): ReportContent {
+  const html = marked.parse(markdown, { async: false }) as string;
+  const textOnly = html
+    .replace(/<[^>]+>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const summary = textOnly.length > 500 ? textOnly.slice(0, 500) + "..." : textOnly;
+  const safeHtml = html.replace(/]]>/g, "]]]]><![CDATA[");
+  return {
+    summary: escapeXml(summary),
+    fullHtml: `<![CDATA[${safeHtml}]]>`,
+  };
+}
+
+function getReportContent(date: string, report: string): ReportContent {
   const filePath = path.join(DIGESTS_DIR, date, `${report}.md`);
-
-  try {
-    const markdown = fs.readFileSync(filePath, "utf-8");
-    const html = await marked.parse(markdown, { async: false });
-
-    // Extract summary text from original HTML (before CDATA escape)
-    const textOnly = html
-      .replace(/<[^>]+>/g, "")
-      .replace(/\s+/g, " ")
-      .trim();
-    const summary = textOnly.length > 500 ? textOnly.slice(0, 500) + "..." : textOnly;
-
-    // Escape CDATA end marker to prevent injection
-    const safeHtml = html.replace(/]]>/g, "]]]]><![CDATA[");
-
-    return {
-      summary: escapeXml(summary), // Plain text, XML-escaped, no CDATA
-      fullHtml: `<![CDATA[${safeHtml}]]>`, // HTML in CDATA, no escaping needed
-    };
-  } catch {
-    // Fallback to title-only content on any error
-    const label = REPORT_LABELS[report] ?? report;
-    const title = `${label} ${date}`;
-    return {
-      summary: escapeXml(title),
-      fullHtml: `<![CDATA[${escapeXml(title)}]]>`,
-    };
-  }
+  return feedContentFromMarkdown(fs.readFileSync(filePath, "utf-8"));
 }
 
 async function main(): Promise<void> {
@@ -116,13 +121,15 @@ async function main(): Promise<void> {
     .sort()
     .reverse()
     .map((date) => {
-      const reports = REPORT_FILES.filter((r) => fs.existsSync(path.join(DIGESTS_DIR, date, `${r}.md`)));
+      const available = REPORT_FILES.filter((r) => fs.existsSync(path.join(DIGESTS_DIR, date, `${r}.md`)));
+      const reports = selectReportsForDate(available);
       return { date, reports };
     })
     .filter((e) => e.reports.length > 0);
 
+  const generatedAt = stableGeneratedAt(entries);
   const manifest: Manifest = {
-    generated: new Date().toISOString(),
+    generated: generatedAt.toISOString(),
     dates: entries,
   };
 
@@ -139,16 +146,16 @@ async function main(): Promise<void> {
     }
   }
 
-  const buildDate = toRfc822(new Date());
+  const buildDate = toRfc822(generatedAt);
 
   const itemXmlChunks: string[] = [];
   for (const { date, report } of feedItems) {
-    const label = REPORT_LABELS[report] ?? report;
+    const label = reportLabel(report);
     const title = `${label} ${date}`;
     const link = `${siteUrl}/#${date}/${report}`;
     const parts = date.split("-").map(Number);
     const pubDate = toRfc822(new Date(Date.UTC(parts[0]!, parts[1]! - 1, parts[2]!)));
-    const content = await getReportContent(date, report);
+    const content = getReportContent(date, report);
     itemXmlChunks.push(
       [
         "    <item>",

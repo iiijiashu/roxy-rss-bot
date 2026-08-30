@@ -5,6 +5,8 @@
  * then filter locally for AI-related topics.
  */
 
+import { discardResponseBody, fetchWithTimeout, readResponseJsonWithTimeout } from "./http.ts";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -117,7 +119,7 @@ export async function fetchPhData(): Promise<PhData> {
   const twoDaysAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
 
   try {
-    const resp = await fetch(API_URL, {
+    const resp = await fetchWithTimeout(API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -135,11 +137,12 @@ export async function fetchPhData(): Promise<PhData> {
     });
 
     if (!resp.ok) {
+      await discardResponseBody(resp);
       console.error(`  [ph] HTTP ${resp.status}`);
       return { products: [], fetchSuccess: false };
     }
 
-    const json = (await resp.json()) as PhResponse;
+    const json = await readResponseJsonWithTimeout<PhResponse>(resp);
 
     if (json.errors?.length) {
       console.error(`  [ph] API errors: ${json.errors.map((e) => e.message).join("; ")}`);

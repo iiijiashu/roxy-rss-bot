@@ -14,6 +14,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { NOTIFY_LABELS } from "./i18n.ts";
 import type { ReportHighlights } from "./prompts-data.ts";
+import { discardResponseBody, fetchWithTimeout, readResponseTextWithTimeout } from "./http.ts";
 
 export interface Highlights {
   zh: ReportHighlights;
@@ -30,7 +31,7 @@ async function sendTelegram(text: string): Promise<void> {
   const BOT_TOKEN = process.env["TELEGRAM_BOT_TOKEN"] ?? "";
   const CHAT_ID = process.env["TELEGRAM_CHAT_ID"] || "@agents_radar";
   const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-  const res = await fetch(url, {
+  const res = await fetchWithTimeout(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -41,9 +42,10 @@ async function sendTelegram(text: string): Promise<void> {
     }),
   });
   if (!res.ok) {
-    const body = await res.text();
+    const body = await readResponseTextWithTimeout(res, undefined, 64 * 1024);
     throw new Error(`Telegram API ${res.status}: ${body}`);
   }
+  await discardResponseBody(res);
 }
 
 export function buildMessage(

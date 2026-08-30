@@ -1,0 +1,466 @@
+{
+  "schemaVersion": 3,
+  "date": "2026-08-30",
+  "evidenceSha256": "329de9f58905a0173bf75d3c8694dcf23fc1e2333949b69ffb743227a6671a8d",
+  "runDelayMs": 0,
+  "targetCleanRuns": 3,
+  "maxReplacementRuns": 2,
+  "runsExecuted": 3,
+  "cleanRunsCollected": 3,
+  "replacementsUsed": 0,
+  "passRate": 1,
+  "passed": true,
+  "acceptance": {
+    "selectionIdentical": true,
+    "selectionCountInRange": true,
+    "requiredProvider": "agnes",
+    "providerMatched": true,
+    "outputsIdentical": false,
+    "structureIdentical": true,
+    "cleanRuns": true,
+    "acceptableRuns": true,
+    "recoveredRuns": 0,
+    "firstPassRuns": 1,
+    "normalizedRuns": 3,
+    "boundedQualityRepairs": true,
+    "boundedSynthesisAttempts": true,
+    "atLeastOneFirstPass": true,
+    "totalQualityRepairAttempts": 3,
+    "health": "healthy"
+  },
+  "selection": {
+    "originalCount": 20,
+    "recomputedCount": 20,
+    "identical": true,
+    "addedEventIds": [],
+    "removedEventIds": []
+  },
+  "runs": [
+    {
+      "run": 1,
+      "qualityPassed": true,
+      "firstPass": false,
+      "qualityRepairAttempts": 2,
+      "providerClean": true,
+      "providerRecovered": false,
+      "passed": true,
+      "countedForAcceptance": true,
+      "outputSha256": "88f1fa1ecee3065925ef574c80dfd81c9eb6e9f25c3779a3e1f128fed1976d3b",
+      "structureSha256": "16eb6960b923e763d2a6448dba4c723145b6b5e95a33916d4335cbeb531d0cf0",
+      "attempts": [
+        {
+          "chunk": 1,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "1:canonical_fields",
+            "0:summary_style"
+          ]
+        },
+        {
+          "chunk": 2,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "3:canonical_fields"
+          ]
+        },
+        {
+          "chunk": 3,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": []
+        },
+        {
+          "chunk": 4,
+          "attempt": 1,
+          "state": "degraded",
+          "reason": "quality_gate_failed",
+          "failedChecks": [
+            "unsupported_inference"
+          ],
+          "developmentCount": 2,
+          "eligibleEventCount": 2,
+          "mechanicalTokenShapes": [],
+          "lexicalTokens": [],
+          "inferenceLabels": [
+            "cron failure-stage conflation"
+          ],
+          "editorialLabels": [],
+          "normalizationsApplied": [
+            "6:summary_ui_term",
+            "6:why_it_matters_ui_term"
+          ]
+        },
+        {
+          "chunk": 4,
+          "attempt": 2,
+          "state": "degraded",
+          "reason": "quality_gate_failed",
+          "failedChecks": [
+            "unsupported_inference"
+          ],
+          "developmentCount": 2,
+          "eligibleEventCount": 2,
+          "mechanicalTokenShapes": [],
+          "lexicalTokens": [],
+          "inferenceLabels": [
+            "cron failure-stage conflation"
+          ],
+          "editorialLabels": [],
+          "normalizationsApplied": [
+            "6:why_it_matters_ui_term"
+          ]
+        },
+        {
+          "chunk": 4,
+          "attempt": 3,
+          "state": "ok",
+          "normalizationsApplied": []
+        },
+        {
+          "chunk": 5,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "8:canonical_fields",
+            "9:canonical_fields"
+          ]
+        },
+        {
+          "chunk": 6,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "10:canonical_fields",
+            "11:canonical_fields"
+          ]
+        },
+        {
+          "chunk": 7,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "13:summary_ui_term"
+          ]
+        },
+        {
+          "chunk": 8,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "14:canonical_fields",
+            "15:canonical_fields"
+          ]
+        },
+        {
+          "chunk": 9,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": []
+        },
+        {
+          "chunk": 10,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": []
+        }
+      ],
+      "failedChecks": [],
+      "developmentCount": 20,
+      "deterministicNormalizations": [
+        "0:summary_style",
+        "10:canonical_fields",
+        "11:canonical_fields",
+        "13:summary_ui_term",
+        "14:canonical_fields",
+        "15:canonical_fields",
+        "1:canonical_fields",
+        "3:canonical_fields",
+        "6:summary_ui_term",
+        "6:why_it_matters_ui_term",
+        "8:canonical_fields",
+        "9:canonical_fields"
+      ],
+      "diagnostics": {
+        "provider": "agnes",
+        "requests": 12,
+        "retryRequests": 0,
+        "tasksResolved": 12,
+        "tasksRetried": 0,
+        "tasksFailed": 0,
+        "errors": {},
+        "diagnosticsAvailable": true,
+        "diagnosticsValid": true
+      }
+    },
+    {
+      "run": 2,
+      "qualityPassed": true,
+      "firstPass": true,
+      "qualityRepairAttempts": 0,
+      "providerClean": true,
+      "providerRecovered": false,
+      "passed": true,
+      "countedForAcceptance": true,
+      "outputSha256": "46d9c1f2d1a9092975c42116821242ce0f78722db5dfc8995e7cb9875be4a2eb",
+      "structureSha256": "16eb6960b923e763d2a6448dba4c723145b6b5e95a33916d4335cbeb531d0cf0",
+      "attempts": [
+        {
+          "chunk": 1,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "1:canonical_fields"
+          ]
+        },
+        {
+          "chunk": 2,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": []
+        },
+        {
+          "chunk": 3,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": []
+        },
+        {
+          "chunk": 4,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "6:why_it_matters_ui_term"
+          ]
+        },
+        {
+          "chunk": 5,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "8:canonical_fields",
+            "9:canonical_fields"
+          ]
+        },
+        {
+          "chunk": 6,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": []
+        },
+        {
+          "chunk": 7,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "12:canonical_fields",
+            "13:title_spacing",
+            "13:summary_ui_term",
+            "13:summary_style",
+            "13:why_style"
+          ]
+        },
+        {
+          "chunk": 8,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "14:canonical_fields",
+            "15:canonical_fields"
+          ]
+        },
+        {
+          "chunk": 9,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "16:canonical_fields",
+            "17:canonical_fields"
+          ]
+        },
+        {
+          "chunk": 10,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "18:canonical_fields",
+            "19:canonical_fields"
+          ]
+        }
+      ],
+      "failedChecks": [],
+      "developmentCount": 20,
+      "deterministicNormalizations": [
+        "12:canonical_fields",
+        "13:summary_style",
+        "13:summary_ui_term",
+        "13:title_spacing",
+        "13:why_style",
+        "14:canonical_fields",
+        "15:canonical_fields",
+        "16:canonical_fields",
+        "17:canonical_fields",
+        "18:canonical_fields",
+        "19:canonical_fields",
+        "1:canonical_fields",
+        "6:why_it_matters_ui_term",
+        "8:canonical_fields",
+        "9:canonical_fields"
+      ],
+      "diagnostics": {
+        "provider": "agnes",
+        "requests": 10,
+        "retryRequests": 0,
+        "tasksResolved": 10,
+        "tasksRetried": 0,
+        "tasksFailed": 0,
+        "errors": {},
+        "diagnosticsAvailable": true,
+        "diagnosticsValid": true
+      }
+    },
+    {
+      "run": 3,
+      "qualityPassed": true,
+      "firstPass": false,
+      "qualityRepairAttempts": 1,
+      "providerClean": true,
+      "providerRecovered": false,
+      "passed": true,
+      "countedForAcceptance": true,
+      "outputSha256": "f5f2fc71e70c67ee00f99fb581f5529d20d71c2ccd578d0ce523f6a6cf5c017a",
+      "structureSha256": "16eb6960b923e763d2a6448dba4c723145b6b5e95a33916d4335cbeb531d0cf0",
+      "attempts": [
+        {
+          "chunk": 1,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": []
+        },
+        {
+          "chunk": 2,
+          "attempt": 1,
+          "state": "degraded",
+          "reason": "quality_gate_failed",
+          "failedChecks": [
+            "development_count"
+          ],
+          "developmentCount": 1,
+          "eligibleEventCount": 2,
+          "mechanicalTokenShapes": [],
+          "lexicalTokens": [],
+          "inferenceLabels": [],
+          "editorialLabels": [],
+          "normalizationsApplied": []
+        },
+        {
+          "chunk": 2,
+          "attempt": 2,
+          "state": "ok",
+          "normalizationsApplied": [
+            "3:canonical_fields",
+            "2:summary_style",
+            "2:why_style"
+          ]
+        },
+        {
+          "chunk": 3,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": []
+        },
+        {
+          "chunk": 4,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "6:summary_ui_term",
+            "6:why_it_matters_ui_term"
+          ]
+        },
+        {
+          "chunk": 5,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "8:canonical_fields",
+            "9:canonical_fields"
+          ]
+        },
+        {
+          "chunk": 6,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "10:canonical_fields",
+            "11:canonical_fields"
+          ]
+        },
+        {
+          "chunk": 7,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "12:canonical_fields",
+            "13:title_spacing",
+            "13:summary_style"
+          ]
+        },
+        {
+          "chunk": 8,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "15:canonical_fields"
+          ]
+        },
+        {
+          "chunk": 9,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": [
+            "16:canonical_fields",
+            "17:canonical_fields"
+          ]
+        },
+        {
+          "chunk": 10,
+          "attempt": 1,
+          "state": "ok",
+          "normalizationsApplied": []
+        }
+      ],
+      "failedChecks": [],
+      "developmentCount": 20,
+      "deterministicNormalizations": [
+        "10:canonical_fields",
+        "11:canonical_fields",
+        "12:canonical_fields",
+        "13:summary_style",
+        "13:title_spacing",
+        "15:canonical_fields",
+        "16:canonical_fields",
+        "17:canonical_fields",
+        "2:summary_style",
+        "2:why_style",
+        "3:canonical_fields",
+        "6:summary_ui_term",
+        "6:why_it_matters_ui_term",
+        "8:canonical_fields",
+        "9:canonical_fields"
+      ],
+      "diagnostics": {
+        "provider": "agnes",
+        "requests": 11,
+        "retryRequests": 0,
+        "tasksResolved": 11,
+        "tasksRetried": 0,
+        "tasksFailed": 0,
+        "errors": {},
+        "diagnosticsAvailable": true,
+        "diagnosticsValid": true
+      }
+    }
+  ]
+}

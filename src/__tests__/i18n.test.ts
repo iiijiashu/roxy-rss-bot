@@ -139,7 +139,16 @@ describe("ISSUE_LABELS", () => {
 
 describe("NOTIFY_LABELS", () => {
   it("covers all report types", () => {
-    const expected = ["ai-cli", "ai-agents", "ai-web", "ai-trending", "ai-hn", "ai-weekly", "ai-monthly"];
+    const expected = [
+      "digest",
+      "ai-cli",
+      "ai-agents",
+      "ai-web",
+      "ai-trending",
+      "ai-hn",
+      "ai-weekly",
+      "ai-monthly",
+    ];
     for (const key of expected) {
       expect(NOTIFY_LABELS[key]).toBeDefined();
       expect(NOTIFY_LABELS[key]!.zh).toBeTruthy();

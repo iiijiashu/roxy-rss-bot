@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-08-30",
+  "status": "degraded",
+  "components": [
+    {
+      "component": "artifact/digest",
+      "state": "ok"
+    },
+    {
+      "component": "quality",
+      "state": "ok"
+    },
+    {
+      "component": "source/frozen-replay",
+      "state": "ok"
+    },
+    {
+      "component": "state/network-fetch",
+      "state": "skipped",
+      "code": "frozen_replay"
+    },
+    {
+      "component": "synthesis/zh/chunk-1/attempt-1",
+      "state": "ok"
+    },
+    {
+      "component": "synthesis/zh/chunk-10/attempt-1",
+      "state": "ok"
+    },
+    {
+      "component": "synthesis/zh/chunk-2/attempt-1",
+      "state": "ok"
+    },
+    {
+      "component": "synthesis/zh/chunk-3/attempt-1",
+      "state": "ok"
+    },
+    {
+      "component": "synthesis/zh/chunk-4/attempt-1",
+      "state": "ok"
+    },
+    {
+      "component": "synthesis/zh/chunk-5/attempt-1",
+      "state": "ok"
+    },
+    {
+      "component": "synthesis/zh/chunk-6/attempt-1",
+      "state": "ok"
+    },
+    {
+      "component": "synthesis/zh/chunk-7/attempt-1",
+      "state": "degraded",
+      "code": "quality_gate_failed"
+    },
+    {
+      "component": "synthesis/zh/chunk-7/attempt-2",
+      "state": "degraded",
+      "code": "quality_gate_failed"
+    },
+    {
+      "component": "synthesis/zh/chunk-7/attempt-3",
+      "state": "ok"
+    },
+    {
+      "component": "synthesis/zh/chunk-8/attempt-1",
+      "state": "ok"
+    },
+    {
+      "component": "synthesis/zh/chunk-9/attempt-1",
+      "state": "ok"
+    }
+  ]
+}
