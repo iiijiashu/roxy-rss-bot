@@ -2,8 +2,6 @@
  * Dev.to AI articles fetched via the Forem API.
  */
 
-import { discardResponseBody, fetchWithTimeout, readResponseJsonWithTimeout } from "./http.ts";
-
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -70,17 +68,16 @@ export async function fetchDevtoData(): Promise<DevtoData> {
             top: "1", // top articles from the past 1 day
           });
 
-          const resp = await fetchWithTimeout(`${API_URL}?${params}`, {
+          const resp = await fetch(`${API_URL}?${params}`, {
             headers: { "User-Agent": "agents-radar/1.0" },
           });
 
           if (!resp.ok) {
-            await discardResponseBody(resp);
             console.error(`  [devto] "${tag}": HTTP ${resp.status}`);
             return;
           }
 
-          const raw = await readResponseJsonWithTimeout<DevtoApiArticle[]>(resp);
+          const raw = (await resp.json()) as DevtoApiArticle[];
           for (const a of raw) {
             if (!seen.has(a.id)) {
               seen.set(a.id, {

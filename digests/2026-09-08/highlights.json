@@ -1,0 +1,22 @@
+{
+  "zh": {
+    "ai-hn": [
+      "GPT-6 Astra发布，HN获2266分超2000评论",
+      "Anthropic将费马大定理形式化证明推向AI",
+      "Qwen 3.8 27B开源，Cerebras达1500 tok/s",
+      "vLLM在AMD GPU上实现投机解码提速",
+      "Trail of Bits推Coop隔离VM运行AI CLI",
+      "Engrim本地SQLite引擎存AI CLI上下文"
+    ]
+  },
+  "en": {
+    "ai-hn": [
+      "GPT-6 Astra released, 2266 points, 2069 comments",
+      "Anthropic formalizes proof of Fermat's Last Theorem",
+      "Qwen 3.8 27B on Cerebras hits 1500 tok/s speed",
+      "vLLM speculative decoding speeds up AMD GPUs",
+      "Trail of Bits launches isolated VM for AI CLIs",
+      "Engrim adds local SQLite memory to AI CLIs"
+    ]
+  }
+}

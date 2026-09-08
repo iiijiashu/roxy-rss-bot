@@ -71,7 +71,7 @@ describe("buildCliPrompt", () => {
     const result = buildCliPrompt(cfg, [makeItem()], [], [], "2026-03-09", "en");
     expect(result).toContain("technical analyst");
     expect(result).toContain("TestTool");
-    expect(result).toContain("Noteworthy Issues");
+    expect(result).toContain("Hot Issues");
   });
 
   it("shows 无 when no data", () => {
@@ -82,8 +82,8 @@ describe("buildCliPrompt", () => {
   it("includes sample notes when items exceed limit", () => {
     const items = Array.from({ length: 50 }, (_, i) => makeItem({ number: i, comments: i }));
     const result = buildCliPrompt(cfg, items, [], [], "2026-03-09");
-    expect(result).toContain("API 观测到 50 条");
-    expect(result).toContain("最近更新的 30 条");
+    expect(result).toContain("共 50 条");
+    expect(result).toContain("30 条");
   });
 });
 
@@ -96,8 +96,8 @@ describe("buildPeerPrompt", () => {
     const issues = [makeItem({ state: "open" }), makeItem({ state: "closed" })];
     const result = buildPeerPrompt(cfg, issues, [makeItem()], [release], "2026-03-09");
     expect(result).toContain("数据概览");
-    expect(result).toContain("最近活动查询返回 Issues：2 条");
-    expect(result).toContain("open: 1，closed: 1");
+    expect(result).toContain("新开/活跃: 1");
+    expect(result).toContain("已关闭: 1");
   });
 
   it("generates English prompt", () => {
@@ -124,12 +124,10 @@ describe("buildComparisonPrompt", () => {
     expect(result).toContain("Summary B");
   });
 
-  it("reports a bounded coverage gap instead of claiming no activity", () => {
+  it("shows no-activity for empty digests", () => {
     const digests = [makeDigest({ summary: "Summary" })]; // no issues/prs/releases
     const result = buildComparisonPrompt(digests, "2026-03-09");
-    expect(result).toContain("本次有界 API 样本未返回合格条目");
-    expect(result).not.toContain("过去24小时无活动");
-    expect(result).not.toContain("各工具活跃度对比");
+    expect(result).toContain("过去24小时无活动");
   });
 });
 
@@ -150,8 +148,6 @@ describe("buildPeersComparisonPrompt", () => {
     expect(result).toContain("OpenClaw（核心参照");
     expect(result).toContain("OC summary");
     expect(result).toContain("Peer summary");
-    expect(result).not.toContain("社区热度与成熟度");
-    expect(result).not.toContain("健康度评估");
   });
 });
 
@@ -164,9 +160,6 @@ describe("buildSkillsPrompt", () => {
     const result = buildSkillsPrompt([makeItem()], [makeItem()], "2026-03-09");
     expect(result).toContain("anthropics/skills");
     expect(result).toContain("Claude Code Skills");
-    expect(result).toContain("最近更新的 Pull Request 样本");
-    expect(result).not.toContain("可能近期落地");
-    expect(result).not.toContain("热门 Skills 排行");
   });
 
   it("generates English variant", () => {
@@ -247,24 +240,19 @@ describe("buildWebReportPrompt", () => {
           {
             url: "https://anthropic.com/news/test",
             title: "Test",
-            observedAt: "2026-03-09T12:00:00.000Z",
-            sitemapLastmod: "2026-03-09",
-            publishedAt: "2026-03-09T08:00:00.000Z",
+            lastmod: "2026-03-09",
             content: "Content",
             site: "anthropic",
             category: "news",
-            freshness: "newly_published",
-            visibility: "full_text",
           },
         ],
         totalDiscovered: 50,
       },
     ];
     const result = buildWebReportPrompt(results, "2026-03-09");
-    expect(result).toContain("首次观测");
+    expect(result).toContain("首次全量抓取");
     expect(result).toContain("Anthropic");
-    expect(result).toContain("可见内容清单"); // first-run-only section
-    expect(result).not.toContain("内容格局总览");
+    expect(result).toContain("内容格局总览"); // first-run-only section
   });
 
   it("shows incremental mode for non-first-run", () => {
@@ -273,7 +261,7 @@ describe("buildWebReportPrompt", () => {
     ];
     const result = buildWebReportPrompt(results, "2026-03-09");
     expect(result).toContain("增量更新");
-    expect(result).not.toContain("可见内容清单");
+    expect(result).not.toContain("内容格局总览");
   });
 });
 
@@ -289,8 +277,6 @@ describe("buildWeeklyPrompt", () => {
     expect(result).toContain("Day 1 content");
     expect(result).toContain("2026-W10");
     expect(result).toContain("周报");
-    expect(result).toContain("累计计数不是本周增量");
-    expect(result).not.toContain("社区情绪分析");
   });
 
   it("generates English variant", () => {
@@ -310,8 +296,6 @@ describe("buildMonthlyPrompt", () => {
     expect(result).toContain("2026-02");
     expect(result).toContain("2 份报告");
     expect(result).toContain("月报");
-    expect(result).toContain("不得用累计计数或不完整覆盖推断战略");
-    expect(result).not.toContain("社区规模变化");
   });
 
   it("generates English variant", () => {

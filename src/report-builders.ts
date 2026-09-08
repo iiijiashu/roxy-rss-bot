@@ -46,16 +46,14 @@ export function buildCliReportContent(
     })
     .join("\n\n");
 
-  const comparisonSection = comparison.trim()
-    ? `## ${CLI_REPORT.comparison[lang]}\n\n${comparison}\n\n---\n\n`
-    : "";
-
   return (
     title +
     meta +
     `${repoLinks}\n\n` +
     `---\n\n` +
-    comparisonSection +
+    `## ${CLI_REPORT.comparison[lang]}\n\n` +
+    comparison +
+    `\n\n---\n\n` +
     `## ${CLI_REPORT.detail[lang]}\n\n` +
     toolSections +
     footer
@@ -103,10 +101,6 @@ export function buildOpenclawReportContent(
       ? `> Issues: ${issues.length} | PRs: ${prs.length} | Projects covered: ${1 + openclawPeers.length} | Generated: ${utcStr} UTC\n\n`
       : `> Issues: ${issues.length} | PRs: ${prs.length} | 覆盖项目: ${1 + openclawPeers.length} 个 | 生成时间: ${utcStr} UTC\n\n`;
 
-  const comparisonSection = peersComparison.trim()
-    ? `\n\n---\n\n## ${OPENCLAW_REPORT.comparison[lang]}\n\n${peersComparison}`
-    : "";
-
   return (
     title +
     meta +
@@ -114,7 +108,9 @@ export function buildOpenclawReportContent(
     `---\n\n` +
     `## ${OPENCLAW_REPORT.deepDive[lang]}\n\n` +
     openclawSummary +
-    comparisonSection +
+    `\n\n---\n\n` +
+    `## ${OPENCLAW_REPORT.comparison[lang]}\n\n` +
+    peersComparison +
     `\n\n---\n\n` +
     `## ${OPENCLAW_REPORT.peers[lang]}\n\n` +
     peerDetailSections +

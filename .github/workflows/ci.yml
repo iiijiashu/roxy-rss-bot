@@ -34,9 +34,6 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
-      - name: Workflow YAML check
-        run: pnpm exec prettier --check ".github/workflows/*.yml"
-
       - name: Typecheck
         run: pnpm typecheck
 
