@@ -1,0 +1,72 @@
+{
+  "zh": {
+    "ai-hn": [
+      "OpenAI声称解决千禧年数学难题",
+      "DeepMind发布高分辨率DNA图谱",
+      "ChatGPT Images 2.5发布",
+      "数学家警告AI耗尽式挖掘数学问题",
+      "Mercury 2.5语言模型发布",
+      "Agent留言板事件登顶HN热度榜"
+    ],
+    "ai-arxiv": [
+      "提出长度可外推的循环模型方法",
+      "分析注意力Sink现象的根本原因",
+      "多领域中期训练配比优化研究",
+      "预训练质量与SFT效果关系发现",
+      "Agent程序化图结构管理执行流程",
+      "博弈论方法优化长期记忆管理"
+    ],
+    "ai-hf": [
+      "Qwen3.8-27B获14407赞671万下载",
+      "MiniMax-H3视频生成模型获5051赞",
+      "GLM-5.3-Flash下载超82万",
+      "LTX-2.5扩散视频模型受关注",
+      "MiniCPM5-2B轻量模型适合边缘",
+      "GLM-5.3系列新晋HF热门榜"
+    ],
+    "ai-community": [
+      "反思AI是否削弱开发问题解决力",
+      "AI Agent本质仍是条件逻辑",
+      "AI时代系统设计依然关键",
+      "Agent攻击与加固实战演示",
+      "测试AI Agent的Token消耗与JSON-RPC",
+      "讨论重试逻辑Bug与编码成本"
+    ]
+  },
+  "en": {
+    "ai-hn": [
+      "OpenAI claims to solve Navier-Stokes Millennium Prize",
+      "DeepMind releases high-res AlphaGenome Atlas",
+      "ChatGPT Images 2.5 draws community attention",
+      "Mathematician warns AI is mining open problems",
+      "Mercury 2.5 language model launches",
+      "Agent message board tops HN hot list"
+    ],
+    "ai-arxiv": [
+      "Length-extrapolatable recurrent models proposed",
+      "Attention sinks caused by self-concentration not RoPE",
+      "Per-domain coverage optima in mid-training study",
+      "Pretraining quality vs SFT performance analyzed",
+      "Procedural graphs for agent execution management",
+      "Game theory approach to long-horizon memory",
+      "SAE Scientist Bench evaluates agent research ability",
+      "TANGO vision-language-action model for contact-rich tasks"
+    ],
+    "ai-hf": [
+      "Qwen3.8-27B leads with 14407 likes and 6.7M downloads",
+      "MiniMax-H3 video model garners 5051 likes",
+      "GLM-5.3-Flash surpasses 826K downloads",
+      "LTX-2.5 diffusion video model gains traction",
+      "MiniCPM5-2B targets edge device deployment",
+      "GLM-5.3 series new on HF trending榜"
+    ],
+    "ai-community": [
+      "Debate on whether AI makes developers lazier",
+      "Most agents are just wrapped conditional logic",
+      "System design skills remain critical in AI era",
+      "10-minute agent attack and hardening demo",
+      "MCP server token consumption and JSON-RPC bugs",
+      "Discussion on rising AI coding costs"
+    ]
+  }
+}
