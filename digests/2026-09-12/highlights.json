@@ -1,0 +1,101 @@
+{
+  "zh": {
+    "ai-cli": [
+      "Claude Code与OpenAI Codex向自主代理化转型",
+      "多文件与项目级代码理解成社区高频诉求",
+      "工具调用插件生态成为竞争焦点",
+      "安全与权限模型成CLI工具核心议题",
+      "代理化趋势不可逆，需关注安全模型成熟度"
+    ],
+    "ai-agents": [
+      "OpenClaw保持智能体框架核心参照地位",
+      "NanoBot聚焦轻量级边缘部署场景",
+      "MCP/A2A协议形成行业共识推动互操作性",
+      "长期记忆与跨会话上下文成技术焦点",
+      "边缘智能体需求激增，隐私保护驱动发展",
+      "安全治理从可选项变为智能体必选项"
+    ],
+    "ai-hn": [
+      "GPT-6架构深度分析引技术圈高度关注",
+      "Cognition SWE-2编程基准得分达92.8",
+      "OpenAI论文含Lean 4形式化证明引热议",
+      "数学AI对齐问题获HN高分769讨论759条",
+      "AI攻击RubyGems事件引发安全社区反响",
+      "多个无AI镜像站获HN社区大量支持"
+    ],
+    "ai-arxiv": [
+      "MoE模型在重复数据上过拟合被系统剖析",
+      "位置编码必要性遭Transformer研究挑战",
+      "多层干预揭示LLMs知识提取内部机制",
+      "ORCH组织原则证明集体智能超越个体能力",
+      "多步转移前瞻RL算法显著降低样本复杂度",
+      "形式化验证结合AI推动可信AI研究前沿"
+    ],
+    "ai-hf": [
+      "Qwen3.8-27B获14769赞下载量超756万",
+      "MiniMax-H3视频生成模型下载近500万",
+      "GLM-5.3-Flash下载量突破117万大关",
+      "DeepSeek-V4.1-Flash周涨1813赞入榜前5",
+      "社区量化活动活跃GGUF版下载超60万",
+      "MiniCPM5-2B成边缘设备本地部署优选"
+    ],
+    "ai-community": [
+      "Nexpath评测AI提示词质量层提升编码安全",
+      "AI生成测试可能削弱代理修复能力",
+      "AI推理痕迹多为后验合理化引发反思",
+      "OpenAI Agents API护栏实践指南发布",
+      "MCP与A2A协议边界成架构讨论热点",
+      "开发者从尝鲜转向生产级工程化思考"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Claude Code and OpenAI Codex shifting to agentic",
+      "Multi-file context understanding top community ask",
+      "Tool invocation and plugin ecosystems key differentiator",
+      "Safety and permission models become core CLI议题",
+      "Agentic transformation irreversible trend",
+      "Focus on toolchain integration and safety maturity"
+    ],
+    "ai-agents": [
+      "OpenClaw leads as core agent framework reference",
+      "NanoBot targets lightweight edge deployment scenarios",
+      "MCP/A2A protocols forming industry consensus",
+      "Long-term memory and cross-session context key focus",
+      "Edge agent demand surges driven by privacy needs",
+      "Safety governance now mandatory for agents"
+    ],
+    "ai-hn": [
+      "GPT-6 architecture analysis draws high attention",
+      "Cognition SWE-2 scores 92.8 on Terminal-Bench",
+      "OpenAI paper includes Lean 4 formal proof",
+      "Math AI alignment hits 769 score on HN",
+      "OpenAI agents attack on RubyGems sparks debate",
+      "No-AI HN mirror sites gain significant traction"
+    ],
+    "ai-arxiv": [
+      "MoE overfitting on repeated data systematically analyzed",
+      "Positional encoding necessity challenged in Transformers",
+      "Layerwise intervention reveals LLM knowledge retrieval",
+      "ORCH proves organizational structure boosts collective intelligence",
+      "Multi-step transition lookahead RL reduces sample complexity",
+      "Formal verification combined with AI advances trustworthy research"
+    ],
+    "ai-hf": [
+      "Qwen3.8-27B hits 14769 likes with 7.5M downloads",
+      "MiniMax-H3 video model reaches nearly 5M downloads",
+      "GLM-5.3-Flash crosses 1.17M download milestone",
+      "DeepSeek-V4.1-Flash gains 1813 likes this week",
+      "Community quantization activity surges past 600K",
+      "MiniCPM5-2B ideal for edge device local deployment"
+    ],
+    "ai-community": [
+      "Nexpath evaluates AI prompt quality layer for safety",
+      "AI-generated tests may degrade coding agents performance",
+      "AI reasoning traces often post-hoc rationalization",
+      "OpenAI Agents API guardrails ship in 1 day guide",
+      "MCP vs A2A protocol boundaries spark architecture debate",
+      "Community shifts from experimentation to production engineering"
+    ]
+  }
+}
