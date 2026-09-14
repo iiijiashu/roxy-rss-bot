@@ -91,26 +91,83 @@ describe("AgnesProvider batching", () => {
     await expect(provider.call("json task", 100)).resolves.toBe('{"headline":"important"}');
   });
 
-  it("rejects only an omitted task while preserving returned task results", async () => {
+  it("retries only omitted tasks while preserving returned task results", async () => {
     const create = await getCreateMock();
-    create.mockImplementationOnce(async (...args: unknown[]) => {
-      const [first] = submittedTasks(args);
-      return {
-        choices: [
-          {
-            message: {
-              content: JSON.stringify({ results: [{ id: first?.id, content: "first result" }] }),
+    create
+      .mockImplementationOnce(async (...args: unknown[]) => {
+        const [first] = submittedTasks(args);
+        return {
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({ results: [{ id: first?.id, content: "first result" }] }),
+              },
             },
-          },
-        ],
-      };
+          ],
+        };
+      })
+      .mockImplementationOnce(async (...args: unknown[]) => {
+        const [second] = submittedTasks(args);
+        return {
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({ results: [{ id: second?.id, content: "second result" }] }),
+              },
+            },
+          ],
+        };
+      });
+
+    const provider = new AgnesProvider({ apiKey: "test", batchWindowMs: 1, requestBudget: 2 });
+    await expect(Promise.all([provider.call("first", 100), provider.call("second", 100)])).resolves.toEqual([
+      "first result",
+      "second result",
+    ]);
+
+    expect(create).toHaveBeenCalledTimes(2);
+    expect(submittedTasks(create.mock.calls[1] ?? [])).toEqual([
+      expect.objectContaining({ prompt: "second", maxTokens: 100 }),
+    ]);
+  });
+
+  it("retries one malformed batch response once", async () => {
+    const create = await getCreateMock();
+    create
+      .mockResolvedValueOnce({
+        choices: [{ message: { content: '{"results":[' } }],
+      })
+      .mockImplementationOnce(async (...args: unknown[]) => {
+        const tasks = submittedTasks(args);
+        return {
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({
+                  results: tasks.map((task) => ({ id: task.id, content: "recovered" })),
+                }),
+              },
+            },
+          ],
+        };
+      });
+
+    const provider = new AgnesProvider({ apiKey: "test", batchWindowMs: 1, requestBudget: 2 });
+    await expect(provider.call("retry malformed response", 100)).resolves.toBe("recovered");
+    expect(create).toHaveBeenCalledTimes(2);
+  });
+
+  it("rejects after one malformed-response recovery attempt", async () => {
+    const create = await getCreateMock();
+    create.mockResolvedValue({
+      choices: [{ message: { content: '{"results":[' } }],
     });
 
-    const provider = new AgnesProvider({ apiKey: "test", batchWindowMs: 1, requestBudget: 1 });
-    const results = await Promise.allSettled([provider.call("first", 100), provider.call("second", 100)]);
-
-    expect(results[0]).toEqual({ status: "fulfilled", value: "first result" });
-    expect(results[1]).toMatchObject({ status: "rejected" });
+    const provider = new AgnesProvider({ apiKey: "test", batchWindowMs: 1, requestBudget: 2 });
+    await expect(provider.call("still malformed", 100)).rejects.toThrow(
+      "Agnes batch response was invalid JSON",
+    );
+    expect(create).toHaveBeenCalledTimes(2);
   });
 
   it("enforces the real provider-request budget", async () => {
