@@ -235,7 +235,7 @@ export class AgnesProvider implements LlmProvider {
     });
   }
 
-  private async sendBatch(tasks: PendingTask[]): Promise<void> {
+  private async sendBatch(tasks: PendingTask[], allowRecovery = true): Promise<void> {
     if (this.providerRequests >= this.requestBudget) {
       const error = new Error(
         `AGNES_REQUEST_BUDGET exhausted after ${this.providerRequests} provider requests`,
@@ -268,7 +268,19 @@ export class AgnesProvider implements LlmProvider {
       const raw = response.choices[0]?.message?.content;
       if (!raw) throw new Error("Agnes returned an empty batch response");
 
-      const envelope = parseBatchEnvelope(raw);
+      let envelope: BatchEnvelope;
+      try {
+        envelope = parseBatchEnvelope(raw);
+      } catch (error) {
+        if (allowRecovery) {
+          const message = error instanceof Error ? error.message : "Agnes batch response could not be parsed";
+          console.warn(`[agnes] ${message}; retrying ${tasks.length} affected task(s) once`);
+          await this.sendBatch(tasks, false);
+          return;
+        }
+        throw error;
+      }
+
       const expected = new Set(tasks.map((task) => task.id));
       const byId = new Map<string, string>();
       for (const result of envelope.results) {
@@ -280,10 +292,25 @@ export class AgnesProvider implements LlmProvider {
         byId.set(result.id, content);
       }
 
+      const missing: PendingTask[] = [];
       for (const task of tasks) {
         const content = byId.get(task.id);
         if (content) task.resolve(content);
-        else task.reject(new Error(`Agnes batch response omitted task ${task.id}`));
+        else missing.push(task);
+      }
+
+      if (missing.length > 0) {
+        if (allowRecovery) {
+          console.warn(
+            `[agnes] Batch response omitted ${missing.length}/${tasks.length} task(s); ` +
+              "retrying omitted tasks once",
+          );
+          await this.sendBatch(missing, false);
+        } else {
+          for (const task of missing) {
+            task.reject(new Error(`Agnes batch response omitted task ${task.id}`));
+          }
+        }
       }
     } catch (error) {
       const safeError =
