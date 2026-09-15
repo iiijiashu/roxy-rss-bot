@@ -216,6 +216,44 @@ Open source coding agents dominated discussion today with several major releases
     expect(result["ai-cli"]).toEqual(["Codex：Codex added safer parallel review and recovery."]);
   });
 
+  it("filters prefixed no-update/no-release status variants but keeps explanatory follow-ups", () => {
+    const zh = extractReportHighlights(
+      {
+        "ai-cli": `# CLI report\n\n- 今日无新 PR 更新。\n- 今天无新版本发布。\n- Codex 修复并发审查中的任务恢复问题。`,
+      },
+      "zh",
+    );
+    const en = extractReportHighlights(
+      {
+        "ai-cli": `# CLI report\n\n- None. No new releases were published today.\n- No new releases today. Users should monitor PR #2849 for the next security fix.`,
+      },
+      "en",
+    );
+
+    expect(zh["ai-cli"]).toEqual(["Codex 修复并发审查中的任务恢复问题。"]);
+    expect(en["ai-cli"]).toHaveLength(1);
+    expect(en["ai-cli"]?.[0]).toContain("Users should monitor PR #2849");
+    expect(en["ai-cli"]?.[0]).toMatch(/…$/u);
+  });
+
+  it("filters localized generation-failure status messages with warning prefixes", () => {
+    const zh = extractReportHighlights(
+      {
+        "ai-cli": `# CLI report\n\n⚠️ 摘要生成失败。\n⚠️ Skills 摘要生成失败。\n⚠️ 趋势报告生成失败。`,
+      },
+      "zh",
+    );
+    const en = extractReportHighlights(
+      {
+        "ai-cli": `# CLI report\n\n⚠️ Summary generation failed.\n⚠️ Skills summary generation failed.\n⚠️ Trending report generation failed.`,
+      },
+      "en",
+    );
+
+    expect(zh["ai-cli"]).toBeUndefined();
+    expect(en["ai-cli"]).toBeUndefined();
+  });
+
   it("deduplicates repeated highlights", () => {
     const result = extractReportHighlights(
       {
@@ -230,4 +268,83 @@ Open source coding agents dominated discussion today with several major releases
 
     expect(result["ai-cli"]).toEqual(["Claude Code 发布 v2.0。", "Codex 新增并行审查能力。"]);
   });
+
+  it("does not merge distinct findings that collide after display truncation", () => {
+    const shared = "Agnes 3.0 发布后社区反馈集中在确定性高亮与请求预算的边界";
+    const result = extractReportHighlights(
+      {
+        probe: `- ${shared}，A 组报告解析失败。\n- ${shared}，B 组报告出现重复条目。`,
+      },
+      "zh",
+      6,
+    );
+
+    const items = result.probe ?? [];
+    expect(items).toHaveLength(2);
+    expect(items[0]).not.toBe(items[1]);
+    expect(items.every((item) => Array.from(item).length <= 30)).toBe(true);
+  });
+
+  it("rejects a single table column whose label superficially combines subject and detail words", () => {
+    const result = extractReportHighlights(
+      {
+        probe: `| 项目摘要 |\n| --- |\n| Agnes 3.0 新增确定性高亮 |`,
+      },
+      "zh",
+    );
+
+    expect(result.probe).toBeUndefined();
+  });
+
+  it("filters formatted warning-only failure bullets but keeps explanatory failure findings", () => {
+    const result = extractReportHighlights(
+      {
+        probe: `- **⚠️ 摘要生成失败。**\n- 趋势报告生成失败。根因是 Agnes 3.0 限流，恢复策略需要调整。`,
+      },
+      "zh",
+    );
+
+    expect(result.probe).toEqual(["趋势报告生成失败。根因是 Agnes 3.0 限流，恢复策…"]);
+  });
+
+  it("keeps inline-code pipes inside Markdown table detail cells", () => {
+    const result = extractReportHighlights(
+      {
+        probe: `| 项目 | 简要说明 |\n| --- | --- |\n| GPT-5 | 支持 \`a|b\` 两种模式，并新增稳定恢复。 |`,
+      },
+      "zh",
+    );
+
+    expect(result.probe).toEqual(["GPT-5：支持 a|b 两种模式，并新增稳定恢复。"]);
+  });
+
+  it("filters pure status lines with arbitrary leading status emoji", () => {
+    const result = extractReportHighlights(
+      {
+        probe: `# Status\n\n❌ No new releases today.\n⚠ No activity in the last 24 hours.\n🔴 No updates.`,
+      },
+      "en",
+    );
+
+    expect(result.probe).toBeUndefined();
+  });
+
+  it("truncates at grapheme boundaries", () => {
+    const family = "👨‍👩‍👧‍👦";
+    const result = extractReportHighlights(
+      {
+        probe: `- ${"中".repeat(27)}${family}这是第一条完整信息。\n- ${"文".repeat(27)}e\u0301这是第二条完整信息。`,
+      },
+      "zh",
+    );
+
+    const items = result.probe ?? [];
+    expect(items).toHaveLength(2);
+    expect(items.every((item) => !/\u200D$|\p{M}$/u.test(item.replace(/…$/u, "")))).toBe(true);
+    expect(items.every((item) => highlightGraphemeCount(item) <= 30)).toBe(true);
+  });
 });
+
+function highlightGraphemeCount(text: string): number {
+  return Array.from(new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(text)).length;
+}
