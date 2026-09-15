@@ -3,7 +3,7 @@
 [English](./README.md) | 中文
 
 > **Roxy 部署版。** 本分支每天北京时间 08:20 运行，通过 GitHub Pages
-> 发布 Markdown、网页和 RSS；模型使用 Agnes 2.5 Flash，仓库跟踪范围压缩为
+> 发布 Markdown、网页和 RSS；模型使用 Agnes 3.0 Flash，仓库跟踪范围压缩为
 > 4 个。默认不发布 Issues、不发送聊天通知，周报和月报仅允许手动运行。
 > 生成报告保存在 `digest-output` 发布分支，使受保护的 `main` 仍只接受 PR；
 > 下方详细章节也保留了部分上游可选能力的说明。

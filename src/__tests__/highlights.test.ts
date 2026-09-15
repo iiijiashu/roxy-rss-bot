@@ -343,6 +343,50 @@ Open source coding agents dominated discussion today with several major releases
     expect(items.every((item) => !/\u200D$|\p{M}$/u.test(item.replace(/…$/u, "")))).toBe(true);
     expect(items.every((item) => highlightGraphemeCount(item) <= 30)).toBe(true);
   });
+
+  it("filters English no-content status sentences with suffixes", () => {
+    const result = extractReportHighlights(
+      {
+        probe: `# Web\n\nNo new content detected, skipping report.\n(metadata-only, no content to analyze.)`,
+      },
+      "en",
+    );
+
+    expect(result.probe).toBeUndefined();
+  });
+
+  it("skips source-count metadata without hiding normal OpenAI findings", () => {
+    const result = extractReportHighlights(
+      {
+        probe: `- Anthropic: [anthropic.com](https://www.anthropic.com) — 0 new articles\n- OpenAI: [openai.com](https://openai.com) — 12 new articles\n- OpenAI: released a new agent runtime with safer recovery.`,
+      },
+      "en",
+    );
+
+    expect(result.probe).toEqual(["OpenAI: released a new agent runtime with safer recovery."]);
+  });
+
+  it("skips relevance-screening tables including excluded repositories", () => {
+    const result = extractReportHighlights(
+      {
+        probe: `| 项目 | 判定 | 说明 |\n| :--- | :--- | :--- |\n| codecrafters-io/build-your-own-x | ❌ 排除 | 通用编程学习资源，非 AI 特定 |\n| OpenClaw | ✅ 保留 | AI Agent 项目 |\n\n| 项目 | Stars | 简要说明 |\n| --- | ---: | --- |\n| OpenClaw | 12000 | 新增安全插件隔离和任务恢复。 |`,
+      },
+      "zh",
+    );
+
+    expect(result.probe).toEqual(["OpenClaw：新增安全插件隔离和任务恢复。"]);
+  });
+
+  it("skips pictograph-prefixed link-only lines and metadata status lines", () => {
+    const result = extractReportHighlights(
+      {
+        probe: `📎 [Release 详情](https://example.com/release) | [PR #123](https://example.com/pr)\n- 📎 [Repository](https://example.com/repo)\n**Status:** OPEN | **Comments:** 2\n状态：已关闭\nActual finding: new recovery logic shipped successfully.`,
+      },
+      "en",
+    );
+
+    expect(result.probe).toEqual(["Actual finding: new recovery logic shipped successfully."]);
+  });
 });
 
 function highlightGraphemeCount(text: string): number {

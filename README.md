@@ -3,7 +3,7 @@
 English | [中文](./README.zh.md)
 
 > **Roxy deployment profile.** This fork runs at 08:20 China Standard Time,
-> publishes Markdown, Web, and RSS through GitHub Pages, and uses Agnes 2.5 Flash
+> publishes Markdown, Web, and RSS through GitHub Pages, and uses Agnes 3.0 Flash
 > with a compact four-repository watchlist. Issue publishing and chat
 > notifications are disabled; weekly and monthly rollups are manual-only. The
 > detailed sections below also document optional upstream capabilities. Generated
