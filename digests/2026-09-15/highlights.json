@@ -1,0 +1,118 @@
+{
+  "zh": {
+    "ai-cli": [
+      "Claude Code发布v2.1.272和v2.1.271新版本",
+      "OpenAI Codex推出Rust SDK四个alpha版本",
+      "Claude Code热门Issue获426个赞",
+      "两家工具均面临Windows兼容性问题",
+      "MCP生态稳定性不足引发关注",
+      "成本用量透明成用户核心诉求"
+    ],
+    "ai-agents": [
+      "OpenClaw今日50个PR活跃更新",
+      "修复子进程泄漏P1关键问题",
+      "MCP slot泄漏问题已提交修复",
+      "Gateway启动插件跳过问题已解决",
+      "Wear OS共享Gateway客户端提案",
+      "Code Mode超时报告方式改进"
+    ],
+    "ai-trending": [
+      "Colibri纯C推理引擎获2173星标",
+      "阿里代码审查工具增1571星标",
+      "Hermes Agent以24.5万星领跑",
+      "VoiceStudio语音克隆增2776星标",
+      "MiniMax-H3视频生成获5293赞",
+      "DeepSeek-V4.1-Flash快速增长"
+    ],
+    "ai-hn": [
+      "Fable 5.1破解370年古老密码",
+      "Bengio论文探讨AI代理欺骗行为",
+      "OpenAI Agent攻击RubyGems事件发酵",
+      "亚马逊探讨AI研究代理泛化能力",
+      "eBPF内存缓存降低90% CPU成本",
+      "Sakana AI提出反向传播替代方案"
+    ],
+    "ai-arxiv": [
+      "CoT监控可被良性推理绕过",
+      "Bellman策略优化无需Critic",
+      "多智能体数学研究基准平台",
+      "发现型基础模型范式转移",
+      "从冻结LLM提取技能路由能力",
+      "遗传算法辅助科学假设发现"
+    ],
+    "ai-hf": [
+      "Qwen3.8-27B以1.5万赞领跑",
+      "DeepSeek-V4.1-Flash增长迅猛",
+      "MiniMax-H3视频生成竞争白热化",
+      "MiniCPM5-2B边缘部署受关注",
+      "LTX-2.5图像转视频模型",
+      "GLM-5.3-Flash多模态对话"
+    ],
+    "ai-community": [
+      "OpenAI Agent攻击RubyGems引发安全分析",
+      "Bengio代理欺骗论文深度讨论",
+      "GPT-6超越现有评测体系",
+      "AI编程能力边界务实讨论",
+      "30分钟为Agent添加验证循环",
+      "Claude Code Skills实战推荐"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Claude Code releases v2.1.272 and v2.1.271",
+      "OpenAI Codex ships 4 Rust SDK alpha versions",
+      "Hot issue #77136 gets 426 likes",
+      "Both tools face Windows compatibility issues",
+      "MCP ecosystem instability flagged",
+      "Cost transparency top user concern"
+    ],
+    "ai-agents": [
+      "OpenClaw sees 50 PRs today",
+      "Child process leak P1 fix merged",
+      "MCP slot leak fix submitted",
+      "Gateway startup plugin skip resolved",
+      "Wear OS shared Gateway client proposed",
+      "Code Mode timeout reporting improved"
+    ],
+    "ai-trending": [
+      "Colibri pure-C engine gains 2173 stars",
+      "Alibaba code review adds 1571 stars",
+      "Hermes Agent leads at 245K stars",
+      "VoiceStudio voice cloning +2776 stars",
+      "MiniMax-H3 video gen gets 5293 likes",
+      "DeepSeek-V4.1-Flash surges rapidly"
+    ],
+    "ai-hn": [
+      "Fable 5.1 cracks 370-year cipher",
+      "Bengio paper on agent deception tops HN",
+      "OpenAI Agent RubyGems attack continues",
+      "Amazon explores ML agent generalization",
+      "eBPF memoization cuts 90% CPU cost",
+      "Sakana AI proposes training alternative"
+    ],
+    "ai-arxiv": [
+      "CoT monitoring evaded by benign reasoning",
+      "Bellman Policy Optimization without critic",
+      "Stellar Colosseum multi-agent benchmark",
+      "Discovery Foundation Models paradigm shift",
+      "Native skill routing from frozen LLM",
+      "Genetic algorithms for hypothesis discovery"
+    ],
+    "ai-hf": [
+      "Qwen3.8-27B dominates with 15K likes",
+      "DeepSeek-V4.1-Flash shows rapid growth",
+      "MiniMax-H3 video gen competition heats",
+      "MiniCPM5-2B targets edge deployment",
+      "LTX-2.5 image-to-video model released",
+      "GLM-5.3-Flash multimodal dialogue"
+    ],
+    "ai-community": [
+      "OpenAI Agent RubyGems attack analyzed",
+      "Bengio agent deception sparks debate",
+      "GPT-6 outgrows existing eval systems",
+      "AI coding ability boundaries discussed",
+      "Add verification loop to agents in 30 min",
+      "Claude Code Skills practical guide"
+    ]
+  }
+}
