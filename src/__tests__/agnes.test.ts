@@ -164,9 +164,7 @@ describe("AgnesProvider batching", () => {
     });
 
     const provider = new AgnesProvider({ apiKey: "test", batchWindowMs: 1, requestBudget: 2 });
-    await expect(provider.call("still malformed", 100)).rejects.toThrow(
-      "Agnes batch response was invalid JSON",
-    );
+    await expect(provider.call("still malformed", 100)).rejects.toThrow("Agnes batch response was not JSON");
     expect(create).toHaveBeenCalledTimes(2);
   });
 
