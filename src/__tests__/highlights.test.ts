@@ -153,6 +153,69 @@ Open source coding agents dominated discussion today with several major releases
     expect(en["ai-agents"]).toEqual(["OpenClaw added safer plugin isolation and recovery."]);
   });
 
+  it("skips metadata bullets and auto-generated footer but keeps real failure-related findings", () => {
+    const result = extractReportHighlights(
+      {
+        "ai-hn": `# HN 日报
+
+- **原文链接**: https://example.com/post
+- **HN讨论**: https://news.ycombinator.com/item?id=1
+- **分数**: 267 | 评论: 97
+- API Failure 策略讨论失败恢复边界，而非状态失败。
+
+---
+*本日报由 [agents-radar](https://github.com/example/radar) 自动生成。*`,
+      },
+      "zh",
+    );
+
+    expect(result["ai-hn"]).toEqual(["API Failure 策略讨论失败恢复边界，而非状态失败。"]);
+  });
+
+  it("ignores transposed comparison tables and only reads item-list tables with summary columns", () => {
+    const result = extractReportHighlights(
+      {
+        "ai-agents": `# Agent comparison
+
+| Project | OpenClaw | NanoBot |
+| --- | --- | --- |
+| Issues Count | 47 open issues | 7 open issues |
+| PR Count | 50 pull requests updated | 31 pull requests updated |
+| Release Status | No new releases today | 3 new alpha releases |
+| Health Score | Active with mixed user satisfaction | Active with strong contributions |
+
+| 项目 | Stars | 简要说明 |
+| :--- | ---: | :--- |
+| [OpenClaw](https://example.com/openclaw) | 12000 | OpenClaw 新增安全插件隔离和任务恢复。 |
+| [NanoBot](https://example.com/nanobot) | 9000 | 无新版本发布 |`,
+      },
+      "zh",
+    );
+
+    const items = result["ai-agents"] ?? [];
+    expect(items).toHaveLength(1);
+    expect(items[0]).toContain("OpenClaw：OpenClaw 新增安全插件隔离");
+    expect(items.join("\n")).not.toContain("Issues Count");
+    expect(items.join("\n")).not.toContain("Health Score");
+    expect(items.join("\n")).not.toContain("无新版本发布");
+  });
+
+  it("filters English no-release status rows while retaining useful summaries", () => {
+    const result = extractReportHighlights(
+      {
+        "ai-cli": `# CLI report
+
+| Project | Stars | Summary |
+| :--- | ---: | :--- |
+| Claude Code | 1000 | No new releases today |
+| Codex | 900 | Codex added safer parallel review and recovery. |`,
+      },
+      "en",
+    );
+
+    expect(result["ai-cli"]).toEqual(["Codex：Codex added safer parallel review and recovery."]);
+  });
+
   it("deduplicates repeated highlights", () => {
     const result = extractReportHighlights(
       {
