@@ -54,6 +54,11 @@ interface BatchEnvelope {
   results: BatchResult[];
 }
 
+interface BatchRecoveryState {
+  malformedRetriesRemaining: number;
+  omittedRetriesRemaining: number;
+}
+
 export interface AgnesProviderOptions {
   apiKey?: string;
   model?: string;
@@ -101,11 +106,25 @@ function parseBatchEnvelope(raw: string): BatchEnvelope {
   const last = cleaned.lastIndexOf("}");
   if (first < 0 || last <= first) throw new Error("Agnes batch response was not JSON");
 
+  // Batch content is mostly Markdown embedded inside JSON strings. LLMs can
+  // occasionally emit a bare newline/control character inside one of those
+  // strings or leave a trailing comma. Both are recoverable without spending
+  // another provider request, and this mirrors the JSON repair already used by
+  // report parsing elsewhere in the project.
+  // eslint-disable-next-line no-control-regex
+  const controlCharacters = new RegExp("[\\u0000-\\u001F]", "g");
+  const candidate = cleaned.slice(first, last + 1).replace(controlCharacters, " ");
+  const repaired = candidate.replace(/,(\s*[}\]])/g, "$1");
+
   let parsed: unknown;
   try {
-    parsed = JSON.parse(cleaned.slice(first, last + 1));
+    parsed = JSON.parse(candidate);
   } catch {
-    throw new Error("Agnes batch response was invalid JSON");
+    try {
+      parsed = JSON.parse(repaired);
+    } catch {
+      throw new Error("Agnes batch response was invalid JSON");
+    }
   }
   if (!parsed || typeof parsed !== "object" || !Array.isArray((parsed as BatchEnvelope).results)) {
     throw new Error("Agnes batch response did not contain results");
@@ -235,7 +254,10 @@ export class AgnesProvider implements LlmProvider {
     });
   }
 
-  private async sendBatch(tasks: PendingTask[], allowRecovery = true): Promise<void> {
+  private async sendBatch(
+    tasks: PendingTask[],
+    recovery: BatchRecoveryState = { malformedRetriesRemaining: 1, omittedRetriesRemaining: 1 },
+  ): Promise<void> {
     if (this.providerRequests >= this.requestBudget) {
       const error = new Error(
         `AGNES_REQUEST_BUDGET exhausted after ${this.providerRequests} provider requests`,
@@ -272,10 +294,13 @@ export class AgnesProvider implements LlmProvider {
       try {
         envelope = parseBatchEnvelope(raw);
       } catch (error) {
-        if (allowRecovery) {
+        if (recovery.malformedRetriesRemaining > 0) {
           const message = error instanceof Error ? error.message : "Agnes batch response could not be parsed";
           console.warn(`[agnes] ${message}; retrying ${tasks.length} affected task(s) once`);
-          await this.sendBatch(tasks, false);
+          await this.sendBatch(tasks, {
+            ...recovery,
+            malformedRetriesRemaining: recovery.malformedRetriesRemaining - 1,
+          });
           return;
         }
         throw error;
@@ -300,12 +325,15 @@ export class AgnesProvider implements LlmProvider {
       }
 
       if (missing.length > 0) {
-        if (allowRecovery) {
+        if (recovery.omittedRetriesRemaining > 0) {
           console.warn(
             `[agnes] Batch response omitted ${missing.length}/${tasks.length} task(s); ` +
               "retrying omitted tasks once",
           );
-          await this.sendBatch(missing, false);
+          await this.sendBatch(missing, {
+            ...recovery,
+            omittedRetriesRemaining: recovery.omittedRetriesRemaining - 1,
+          });
         } else {
           for (const task of missing) {
             task.reject(new Error(`Agnes batch response omitted task ${task.id}`));

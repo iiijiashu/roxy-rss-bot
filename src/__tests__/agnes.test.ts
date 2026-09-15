@@ -157,6 +157,63 @@ describe("AgnesProvider batching", () => {
     expect(create).toHaveBeenCalledTimes(2);
   });
 
+  it("repairs common LLM JSON defects without spending a retry", async () => {
+    const create = await getCreateMock();
+    create.mockImplementationOnce(async (...args: unknown[]) => {
+      const [task] = submittedTasks(args);
+      return {
+        choices: [
+          {
+            message: {
+              content: `\`\`\`json\n{"results":[{"id":"${task?.id}","content":"line one\nline two",},],}\n\`\`\``,
+            },
+          },
+        ],
+      };
+    });
+
+    const provider = new AgnesProvider({ apiKey: "test", batchWindowMs: 1, requestBudget: 1 });
+    await expect(provider.call("repair malformed JSON", 100)).resolves.toBe("line one line two");
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps malformed and omitted-task recovery budgets independent", async () => {
+    const create = await getCreateMock();
+    create
+      .mockImplementationOnce(async (...args: unknown[]) => {
+        const [first] = submittedTasks(args);
+        return {
+          choices: [
+            { message: { content: JSON.stringify({ results: [{ id: first?.id, content: "first" }] }) } },
+          ],
+        };
+      })
+      .mockResolvedValueOnce({
+        choices: [{ message: { content: '{"results":[' } }],
+      })
+      .mockImplementationOnce(async (...args: unknown[]) => {
+        const [missing] = submittedTasks(args);
+        return {
+          choices: [
+            { message: { content: JSON.stringify({ results: [{ id: missing?.id, content: "second" }] }) } },
+          ],
+        };
+      });
+
+    const provider = new AgnesProvider({ apiKey: "test", batchWindowMs: 1, requestBudget: 3 });
+    await expect(Promise.all([provider.call("first", 100), provider.call("second", 100)])).resolves.toEqual([
+      "first",
+      "second",
+    ]);
+    expect(create).toHaveBeenCalledTimes(3);
+    expect(submittedTasks(create.mock.calls[1] ?? [])).toEqual([
+      expect.objectContaining({ prompt: "second", maxTokens: 100 }),
+    ]);
+    expect(submittedTasks(create.mock.calls[2] ?? [])).toEqual([
+      expect.objectContaining({ prompt: "second", maxTokens: 100 }),
+    ]);
+  });
+
   it("rejects after one malformed-response recovery attempt", async () => {
     const create = await getCreateMock();
     create.mockResolvedValue({
