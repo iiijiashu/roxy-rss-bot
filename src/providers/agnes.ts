@@ -4,7 +4,7 @@
  *
  * Env vars:
  *   AGNES_API_KEY                 - API key (required)
- *   AGNES_MODEL                   - model name (default: agnes-2.5-flash)
+ *   AGNES_MODEL                   - model name (default: agnes-3.0-flash)
  *   AGNES_BATCH_WINDOW_MS         - coalescing window (default: 25)
  *   AGNES_MAX_BATCH_TASKS         - maximum tasks in one provider request (default: 64)
  *   AGNES_MAX_BATCH_INPUT_BYTES   - maximum serialized request bytes (default: 1000000)
@@ -16,7 +16,7 @@ import OpenAI from "openai";
 import type { LlmProvider } from "./types.ts";
 
 const AGNES_BASE_URL = "https://apihub.agnes-ai.com/v1";
-const DEFAULT_MODEL = "agnes-2.5-flash";
+const DEFAULT_MODEL = "agnes-3.0-flash";
 const DEFAULT_BATCH_WINDOW_MS = 25;
 const DEFAULT_MAX_BATCH_TASKS = 64;
 const DEFAULT_MAX_BATCH_INPUT_BYTES = 1_000_000;
@@ -52,6 +52,44 @@ interface BatchResult {
 
 interface BatchEnvelope {
   results: BatchResult[];
+}
+
+function removeTrailingCommasOutsideStrings(input: string): string {
+  let output = "";
+  let inString = false;
+  let escaping = false;
+
+  for (let index = 0; index < input.length; index++) {
+    const char = input[index]!;
+
+    if (inString) {
+      output += char;
+      if (escaping) {
+        escaping = false;
+      } else if (char === "\\") {
+        escaping = true;
+      } else if (char === '"') {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (char === '"') {
+      inString = true;
+      output += char;
+      continue;
+    }
+
+    if (char === ",") {
+      let next = index + 1;
+      while (next < input.length && /\s/.test(input[next]!)) next++;
+      if (input[next] === "}" || input[next] === "]") continue;
+    }
+
+    output += char;
+  }
+
+  return output;
 }
 
 interface BatchRecoveryState {
@@ -114,7 +152,7 @@ function parseBatchEnvelope(raw: string): BatchEnvelope {
   // eslint-disable-next-line no-control-regex
   const controlCharacters = new RegExp("[\\u0000-\\u001F]", "g");
   const candidate = cleaned.slice(first, last + 1).replace(controlCharacters, " ");
-  const repaired = candidate.replace(/,(\s*[}\]])/g, "$1");
+  const repaired = removeTrailingCommasOutsideStrings(candidate);
 
   let parsed: unknown;
   try {

@@ -260,7 +260,7 @@ openclaw_peers:
 | 供应商 | `LLM_PROVIDER` | 所需环境变量 | 模型选择 |
 |--------|---------------|------------|----------|
 | Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` |
-| Agnes | `agnes` | `AGNES_API_KEY` | `agnes-2.5-flash` |
+| Agnes | `agnes` | `AGNES_API_KEY` | `agnes-3.0-flash` |
 | OpenAI | `openai` | `OPENAI_API_KEY` | `gpt-4o` |
 | OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4` |
 | DeepSeek | `deepseek` | `DEEPSEEK_API_KEY` | `deepseek-v4-flash` |
@@ -288,7 +288,7 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxxxxx
 # 方式 C: Agnes
 # export LLM_PROVIDER=agnes
 # export AGNES_API_KEY=your-agnes-key
-# export AGNES_MODEL=agnes-2.5-flash
+# export AGNES_MODEL=agnes-3.0-flash
 
 # 方式 D: OpenRouter
 # export LLM_PROVIDER=openrouter

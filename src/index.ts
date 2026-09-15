@@ -27,15 +27,8 @@ import {
   buildPeersComparisonPrompt,
   buildSkillsPrompt,
 } from "./prompts.ts";
-import { buildTrendingPrompt, buildHighlightsPrompt, type ReportHighlights } from "./prompts-data.ts";
-import {
-  callLlm,
-  parseLlmJson,
-  assertReportHighlights,
-  saveFile,
-  autoGenFooter,
-  LLM_TOKENS_TRENDING,
-} from "./report.ts";
+import { buildTrendingPrompt, extractReportHighlights, type ReportHighlights } from "./prompts-data.ts";
+import { callLlm, saveFile, autoGenFooter, LLM_TOKENS_TRENDING } from "./report.ts";
 import { buildCliReportContent, buildOpenclawReportContent } from "./report-builders.ts";
 import {
   saveWebReport,
@@ -450,36 +443,19 @@ async function main(): Promise<void> {
     if (en) enReports[id] = en;
   }
 
-  console.log("  Generating highlights for Telegram...");
-  const highlights: Record<Lang, ReportHighlights> = { zh: {}, en: {} };
-  // Generate + parse one language, retrying once. The LLM occasionally emits
-  // slightly malformed JSON that repairJson can't fix (seen 2026-07-13: zh
-  // failed with "Expected ',' or ']' after array element"); a fresh generation
-  // usually returns valid JSON. Each language runs independently so a failure
-  // in one never wipes the other.
-  const genHighlights = async (reports: Record<string, string>, lang: Lang): Promise<ReportHighlights> => {
-    for (let attempt = 1; attempt <= 2; attempt++) {
-      try {
-        const parsed = parseLlmJson<unknown>(await callLlm(buildHighlightsPrompt(reports, lang), 2048));
-        assertReportHighlights(parsed, lang);
-        return parsed;
-      } catch (err) {
-        const tag = attempt < 2 ? "retrying" : "giving up";
-        console.error(`  [highlights] ${lang} attempt ${attempt} failed (${tag}): ${err}`);
-      }
-    }
-    return {};
+  console.log("  Extracting highlights for Telegram from finished reports...");
+  const highlights: Record<Lang, ReportHighlights> = {
+    zh: extractReportHighlights(zhReports, "zh"),
+    en: extractReportHighlights(enReports, "en"),
   };
-  const [zhRes, enRes] = await Promise.all([genHighlights(zhReports, "zh"), genHighlights(enReports, "en")]);
-  highlights.zh = zhRes;
-  highlights.en = enRes;
 
-  // Chinese is the primary Roxy notification language. Do not silently publish
-  // English text in its place; fail the run after the dedicated retry instead.
+  // Chinese is the primary Roxy notification language. If deterministic
+  // extraction finds nothing, fail closed rather than silently publishing an
+  // empty notification layer.
   const zhEmpty = Object.keys(highlights.zh).length === 0;
   const enEmpty = Object.keys(highlights.en).length === 0;
   if (zhEmpty) {
-    throw new Error("Chinese highlights generation failed after 2 attempts");
+    throw new Error("Chinese highlights extraction produced no usable items");
   }
   if (enEmpty) {
     console.warn("  [highlights] en empty — backfilling from zh");

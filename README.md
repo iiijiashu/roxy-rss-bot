@@ -263,7 +263,7 @@ Set `LLM_PROVIDER` to choose which model backend powers the digest generation. D
 | Provider | `LLM_PROVIDER` | Required env vars | Model selection |
 |----------|---------------|-------------------|---------------|
 | Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` |
-| Agnes | `agnes` | `AGNES_API_KEY` | `agnes-2.5-flash` |
+| Agnes | `agnes` | `AGNES_API_KEY` | `agnes-3.0-flash` |
 | OpenAI | `openai` | `OPENAI_API_KEY` | `gpt-4o` |
 | OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4` |
 | DeepSeek | `deepseek` | `DEEPSEEK_API_KEY` | `deepseek-v4-flash` |
@@ -291,7 +291,7 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxxxxx
 # Option C: Agnes
 # export LLM_PROVIDER=agnes
 # export AGNES_API_KEY=your-agnes-key
-# export AGNES_MODEL=agnes-2.5-flash
+# export AGNES_MODEL=agnes-3.0-flash
 
 # Option D: OpenRouter
 # export LLM_PROVIDER=openrouter

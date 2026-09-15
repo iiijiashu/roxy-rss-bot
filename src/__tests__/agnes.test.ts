@@ -62,7 +62,7 @@ describe("AgnesProvider batching", () => {
       max_tokens: number;
       messages: Array<{ role: string; content: string }>;
     };
-    expect(request.model).toBe("agnes-2.5-flash");
+    expect(request.model).toBe("agnes-3.0-flash");
     expect(request.max_tokens).toBe(300);
     expect(request.messages[0]?.role).toBe("system");
     expect(request.messages[0]?.content).toContain("untrusted public source data");
@@ -165,7 +165,7 @@ describe("AgnesProvider batching", () => {
         choices: [
           {
             message: {
-              content: `\`\`\`json\n{"results":[{"id":"${task?.id}","content":"line one\nline two",},],}\n\`\`\``,
+              content: `\`\`\`json\n{"results":[{"id":"${task?.id}","content":"line one\nline two; keep ,} and ,] inside text",},],}\n\`\`\``,
             },
           },
         ],
@@ -173,7 +173,9 @@ describe("AgnesProvider batching", () => {
     });
 
     const provider = new AgnesProvider({ apiKey: "test", batchWindowMs: 1, requestBudget: 1 });
-    await expect(provider.call("repair malformed JSON", 100)).resolves.toBe("line one line two");
+    await expect(provider.call("repair malformed JSON", 100)).resolves.toBe(
+      "line one line two; keep ,} and ,] inside text",
+    );
     expect(create).toHaveBeenCalledTimes(1);
   });
 
