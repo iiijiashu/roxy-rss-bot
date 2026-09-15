@@ -161,11 +161,13 @@ describe("AgnesProvider batching", () => {
     const create = await getCreateMock();
     create.mockImplementationOnce(async (...args: unknown[]) => {
       const [task] = submittedTasks(args);
+      const expected = 'line one\nline two; escaped quote " and slash \\; keep ,} and ,] inside text';
+      const encodedContent = JSON.stringify(expected).replace("\\n", "\n");
       return {
         choices: [
           {
             message: {
-              content: `\`\`\`json\n{"results":[{"id":"${task?.id}","content":"line one\nline two; keep ,} and ,] inside text",},],}\n\`\`\``,
+              content: `\`\`\`json\n{"results":[{"id":"${task?.id}","content":${encodedContent},},],}\n\`\`\``,
             },
           },
         ],
@@ -174,7 +176,7 @@ describe("AgnesProvider batching", () => {
 
     const provider = new AgnesProvider({ apiKey: "test", batchWindowMs: 1, requestBudget: 1 });
     await expect(provider.call("repair malformed JSON", 100)).resolves.toBe(
-      "line one line two; keep ,} and ,] inside text",
+      'line one line two; escaped quote " and slash \\; keep ,} and ,] inside text',
     );
     expect(create).toHaveBeenCalledTimes(1);
   });

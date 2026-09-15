@@ -270,7 +270,7 @@ Set `LLM_PROVIDER` to choose which model backend powers the digest generation. D
 
 Override the model name with `ANTHROPIC_MODEL`, `AGNES_MODEL`, `OPENAI_MODEL`, `OPENROUTER_MODEL`, or `DEEPSEEK_MODEL` respectively.
 
-The Roxy workflow performs fetching, deduplication, source filtering, and ranking in local TypeScript. Concurrent logical summaries are coalesced into three Agnes phases: source summaries, comparisons plus detailed reports, and final notification highlights. `AGNES_REQUEST_BUDGET=4` is a hard per-process ceiling on real provider requests, leaving room for one rate-limit retry while replacing roughly 30 independent model sessions. Public feed/report content is sent as untrusted source data and the direct chat endpoint has no tools or repository write capability.
+The Roxy daily workflow performs fetching, deduplication, source filtering, and ranking in local TypeScript. Concurrent logical work is coalesced into two Agnes phases: source summaries, then comparisons plus detailed reports. Notification highlights are extracted deterministically from those finished reports in local TypeScript and do not consume another provider request. `AGNES_REQUEST_BUDGET=4` remains a hard per-process ceiling on real provider requests, leaving recovery headroom while replacing roughly 30 independent model sessions. Public feed/report content is sent as untrusted source data and the direct chat endpoint has no tools or repository write capability.
 
 The provider abstraction lives in `src/providers/` — each provider is a separate file implementing the `LlmProvider` interface. Adding a new provider only requires creating a new file and registering it in the factory.
 

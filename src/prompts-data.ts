@@ -396,10 +396,7 @@ export interface ReportHighlights {
 }
 
 const HIGHLIGHT_NOISE_RE =
-  /(?:no new content|no data|nothing new|skipping report|failed|failure|暂无|无新内容|无数据|未发现|跳过|失败)/i;
-
-const GENERIC_HIGHLIGHT_HEADING_RE =
-  /^(?:今日速览|各维度热门项目|热门项目|总结|结论|参考(?:资料|链接)?|数据来源|overview|summary|highlights?|top projects?|references?|sources?)$/i;
+  /(?:no new content|no data|nothing new|no activity(?: in the last 24 hours)?|no updates?|no notable activity|skipping report|failed|failure|暂无(?:内容|活动|更新)?|无新内容|无数据|无活动|无更新|无新增|未发现|跳过|失败|过去24小时无活动)/i;
 
 function cleanHighlightText(raw: string): string {
   return raw
@@ -420,6 +417,25 @@ function truncateHighlight(text: string, maxChars: number): string {
     .replace(/[\s,，:：;；.!。!?！？-]+$/u, "")}…`;
 }
 
+function isMarkdownTableSeparator(line: string): boolean {
+  const trimmed = line.trim();
+  if (!trimmed.startsWith("|") || !trimmed.endsWith("|")) return false;
+  const cells = trimmed
+    .slice(1, -1)
+    .split("|")
+    .map((cell) => cell.trim())
+    .filter(Boolean);
+  return cells.length > 0 && cells.every((cell) => /^:?-{3,}:?$/.test(cell));
+}
+
+function isPureLinkBullet(raw: string): boolean {
+  const normalized = raw
+    .trim()
+    .replace(/^\*\*(.+)\*\*$/, "$1")
+    .trim();
+  return /^\[[^\]]+\]\([^)]+\)$/.test(normalized);
+}
+
 function tableHighlight(line: string): string | null {
   const trimmed = line.trim();
   if (!trimmed.startsWith("|") || !trimmed.endsWith("|")) return null;
@@ -431,66 +447,60 @@ function tableHighlight(line: string): string | null {
     .filter(Boolean);
 
   if (cells.length === 0 || cells.every((cell) => /^:?-{3,}:?$/.test(cell))) return null;
-  const headerTokens = new Set([
-    "项目",
-    "名称",
-    "标题",
-    "语言",
-    "说明",
-    "摘要",
-    "stars",
-    "star",
-    "score",
-    "rank",
-    "project",
-    "title",
-    "language",
-    "description",
-    "summary",
-  ]);
-  if (cells.some((cell) => headerTokens.has(cell.toLowerCase()))) return null;
 
   const first = cells[0] ?? "";
-  const last = cells[cells.length - 1] ?? "";
   if (!first) return null;
-  if (last && last !== first && !/^[-+]?\d[\d,.%+\s⭐]*$/.test(last)) {
-    return `${first}：${last}`;
-  }
-  return first;
+
+  const metricRe = /^[-+]?\d[\d,.%+\s⭐/]*$/;
+  const languageRe =
+    /^(?:python|typescript|javascript|go|rust|java|c\+\+|c#|shell|html|css|kotlin|swift|ruby|php)$/i;
+  const detail = cells
+    .slice(1)
+    .reverse()
+    .find(
+      (cell) =>
+        cell !== first && !metricRe.test(cell) && !languageRe.test(cell) && Array.from(cell).length >= 4,
+    );
+
+  // A row containing only a project name plus metrics/language is useful as
+  // navigation, but too low-information to consume a Telegram highlight slot.
+  return detail ? `${first}：${detail}` : null;
 }
 
 function highlightCandidates(content: string): string[] {
   const candidates: string[] = [];
   const lines = content.replace(/\r\n?/g, "\n").split("\n");
 
-  for (const rawLine of lines) {
+  for (let index = 0; index < lines.length; index++) {
+    const rawLine = lines[index] ?? "";
     const line = rawLine.trim();
     if (!line || /^---+$/.test(line) || /^```/.test(line) || line.startsWith(">")) continue;
+    if (/^<\/?(?:details|summary)\b/i.test(line)) continue;
     if (HIGHLIGHT_NOISE_RE.test(line)) continue;
 
-    const table = tableHighlight(line);
-    if (table) {
-      candidates.push(table);
+    if (line.startsWith("|")) {
+      if (isMarkdownTableSeparator(line)) continue;
+      const nextLine = (lines[index + 1] ?? "").trim();
+      // A Markdown table header is defined by the separator row that follows it.
+      // This avoids maintaining a fragile list of 论文/产品/模型/文章/etc.
+      if (isMarkdownTableSeparator(nextLine)) continue;
+      const table = tableHighlight(line);
+      if (table) candidates.push(table);
       continue;
     }
 
-    const heading = line.match(/^#{2,4}\s+(.+)$/)?.[1];
-    if (heading) {
-      const cleaned = cleanHighlightText(heading.replace(/^[^\p{L}\p{N}]+/u, ""));
-      if (cleaned && !GENERIC_HIGHLIGHT_HEADING_RE.test(cleaned) && !/^\d{4}-\d{2}-\d{2}$/.test(cleaned)) {
-        candidates.push(cleaned);
-      }
-      continue;
-    }
+    // Headings are report structure/navigation, not findings. The report body,
+    // tables and descriptive bullets carry the actual user-facing details.
+    if (/^#{1,6}\s+/.test(line)) continue;
 
     const bullet = line.match(/^(?:[-*+]\s+|\d+[.)]\s+)(.+)$/)?.[1];
     if (bullet) {
+      if (isPureLinkBullet(bullet)) continue;
       const cleaned = cleanHighlightText(bullet);
       if (cleaned) candidates.push(cleaned);
       continue;
     }
 
-    if (/^#\s+/.test(line) || /^\|/.test(line)) continue;
     const paragraph = cleanHighlightText(line);
     if (paragraph.length >= 12 && !HIGHLIGHT_NOISE_RE.test(paragraph)) candidates.push(paragraph);
   }
@@ -515,7 +525,7 @@ export function extractReportHighlights(
   const maxChars = lang === "zh" ? 30 : 60;
 
   for (const [reportId, content] of Object.entries(reportContents)) {
-    if (!content.trim() || HIGHLIGHT_NOISE_RE.test(content.trim().slice(0, 240))) continue;
+    if (!content.trim()) continue;
 
     const seen = new Set<string>();
     const items: string[] = [];
@@ -523,6 +533,7 @@ export function extractReportHighlights(
       const cleaned = truncateHighlight(cleanHighlightText(candidate), maxChars);
       const key = cleaned.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
       if (!cleaned || !key || seen.has(key)) continue;
+      if (lang === "zh" && !/[\u3400-\u9fff]/u.test(cleaned)) continue;
       seen.add(key);
       items.push(cleaned);
       if (items.length >= itemsPerReport) break;

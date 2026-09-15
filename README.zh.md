@@ -267,7 +267,7 @@ openclaw_peers:
 
 可通过 `ANTHROPIC_MODEL`、`AGNES_MODEL`、`OPENAI_MODEL`、`OPENROUTER_MODEL` 或 `DEEPSEEK_MODEL` 覆盖对应模型。
 
-Roxy 工作流先由本地 TypeScript 完成抓取、去重、来源过滤和排序，再把并发的逻辑总结合并为三个 Agnes 阶段：来源摘要、对比分析与详细报告、最终通知重点。`AGNES_REQUEST_BUDGET=4` 是真实 API 请求的进程级硬上限，正常日更约 3 次，并为一次限流重试预留空间；相比原先约 30 个独立模型会话大幅缩减。公开 Feed/报告内容按不可信来源数据处理，直接聊天接口没有工具和仓库写入能力。
+Roxy 日更工作流先由本地 TypeScript 完成抓取、去重、来源过滤和排序，再把并发逻辑合并为两个 Agnes 阶段：来源摘要，以及对比分析与详细报告。最终通知重点直接从已完成报告中由本地 TypeScript 确定性提取，不再额外占用一次模型请求。`AGNES_REQUEST_BUDGET=4` 仍是真实 API 请求的进程级硬上限，并为异常恢复保留余量；相比原先约 30 个独立模型会话大幅缩减。公开 Feed/报告内容按不可信来源数据处理，直接聊天接口没有工具和仓库写入能力。
 
 Provider 抽象层位于 `src/providers/`，每个供应商对应独立文件并实现 `LlmProvider` 接口。新增供应商只需创建新文件并在工厂函数中注册。
 

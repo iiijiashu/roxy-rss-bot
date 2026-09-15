@@ -26,7 +26,81 @@ describe("extractReportHighlights", () => {
     expect(result["ai-trending"]?.length).toBeGreaterThanOrEqual(3);
     expect(result["ai-trending"]?.join("\n")).toContain("acme/voice");
     expect(result["ai-trending"]?.join("\n")).not.toContain("https://");
+    expect(result["ai-trending"]?.join("\n")).not.toContain("今日速览");
+    expect(result["ai-trending"]?.join("\n")).not.toContain("项目：简要说明");
     expect(result["ai-trending"]?.every((item) => Array.from(item).length <= 30)).toBe(true);
+  });
+
+  it("skips arbitrary table headers by Markdown structure", () => {
+    const result = extractReportHighlights(
+      {
+        "ai-arxiv": `# ArXiv 日报
+
+## 重点论文
+| 论文 | 方向 | 简要说明 |
+| :--- | :--- | :--- |
+| [Agent Paper](https://example.com/paper) | Agents | 论文提出新的多智能体协作训练方法。 |`,
+        "ai-hf": `# Hugging Face 日报
+
+## 热门模型
+| 模型 | 下载量 | 简要说明 |
+| :--- | ---: | :--- |
+| [Acme-3B](https://example.com/model) | 12000 | 新模型支持更低显存的本地推理。 |`,
+      },
+      "zh",
+    );
+
+    const joined = JSON.stringify(result);
+    expect(joined).not.toContain("论文：简要说明");
+    expect(joined).not.toContain("模型：简要说明");
+    expect(joined).not.toContain("重点论文");
+    expect(joined).not.toContain("热门模型");
+    expect(result["ai-arxiv"]?.join("\n")).toContain("多智能体协作训练方法");
+    expect(result["ai-hf"]?.join("\n")).toContain("低显存的本地推理");
+  });
+
+  it("drops navigation-only links and details structure before findings", () => {
+    const result = extractReportHighlights(
+      {
+        "ai-cli": `# AI CLI 日报
+
+- [Claude Code](https://github.com/anthropics/claude-code)
+- **[OpenAI Codex](https://github.com/openai/codex)**
+<details>
+<summary>仓库导航</summary>
+</details>
+
+## 热门新闻与讨论
+Claude Code 新版本加入并行子代理，并修复长会话上下文恢复问题。
+Codex 更新审查流程，降低多文件修改时的冲突概率。`,
+      },
+      "zh",
+      6,
+    );
+
+    const items = result["ai-cli"] ?? [];
+    expect(items).toHaveLength(2);
+    expect(items.join("\n")).toContain("并行子代理");
+    expect(items.join("\n")).toContain("多文件修改");
+    expect(items).not.toContain("Claude Code");
+    expect(items).not.toContain("OpenAI Codex");
+    expect(items.join("\n")).not.toContain("仓库导航");
+  });
+
+  it("keeps Chinese notifications free of English-only candidates", () => {
+    const result = extractReportHighlights(
+      {
+        "ai-community": `# 社区日报
+
+## Today's Highlights
+- OpenAI launches a new agent runtime with faster tool calls.
+- Claude Code 发布新版本，修复多代理任务恢复问题。
+- DeepSeek V4.1 improves code generation benchmarks.`,
+      },
+      "zh",
+    );
+
+    expect(result["ai-community"]).toEqual(["Claude Code 发布新版本，修复多代理任务恢复问题。"]);
   });
 
   it("extracts English highlights and enforces the language length limit", () => {
@@ -59,6 +133,24 @@ Open source coding agents dominated discussion today with several major releases
 
     expect(result["ai-web"]).toBeUndefined();
     expect(result["ai-hf"]).toEqual(["新模型发布并进入热门榜单。"]);
+  });
+
+  it("filters explicit no-activity variants in both languages", () => {
+    const zh = extractReportHighlights(
+      {
+        "ai-agents": `# Agents\n\n- 过去24小时无活动。\n- OpenClaw 新增中文插件市场和权限隔离。`,
+      },
+      "zh",
+    );
+    const en = extractReportHighlights(
+      {
+        "ai-agents": `# Agents\n\n- No activity in the last 24 hours.\n- OpenClaw added safer plugin isolation and recovery.`,
+      },
+      "en",
+    );
+
+    expect(zh["ai-agents"]).toEqual(["OpenClaw 新增中文插件市场和权限隔离。"]);
+    expect(en["ai-agents"]).toEqual(["OpenClaw added safer plugin isolation and recovery."]);
   });
 
   it("deduplicates repeated highlights", () => {
