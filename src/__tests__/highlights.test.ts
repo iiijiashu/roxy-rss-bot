@@ -394,6 +394,8 @@ Open source coding agents dominated discussion today with several major releases
     ["2026-07-07/ai-agents.md", "zh", "日期:"],
     ["2026-03-04/ai-web-en.md", "en", "Crawl Period:"],
     ["2026-03-08/ai-web-en.md", "en", "Coverage Period:"],
+    ["2026-07-09/ai-web-en.md", "en", "Crawl Date:"],
+    ["2026-07-09/ai-web-en.md", "en", "Focus Period:"],
   ] as const)("skips report dates in the real digest %s", (file, lang, label) => {
     const report = readFileSync(new URL(`../../digests/${file}`, import.meta.url), "utf8");
     // Inspect beyond the notification cap: the Chinese date appears in a later project section.
@@ -434,7 +436,143 @@ Open source coding agents dominated discussion today with several major releases
       ]);
     },
   );
+  it.each([
+    ["2026-07-07/ai-agents-en.md", 73, "en", "#43661：Session hangs"],
+    ["2026-07-07/ai-agents-en.md", 594, "en", "#3230：Gemini API via OpenAI"],
+    ["2026-07-07/ai-agents-en.md", 1160, "en", "#8193：MCP tools absent"],
+    ["2026-03-04/ai-agents-en.md", 1241, "en", "#156：macOS startup race"],
+    ["2026-06-17/ai-agents-en.md", 1026, "en", "#5243 — ChromaDB"],
+    ["2026-03-08/ai-cli-en.md", 185, "en", "/loop command：Run prompts"],
+    ["2026-03-03/ai-agents-en.md", 54, "en", "#32714"],
+    ["2026-03-12/ai-trending-en.md", 21, "en", "ollama/ollama：The de facto"],
+    ["2026-03-03/ai-cli.md", 157, "zh", "feature-dev workflow fix：修复"],
+    ["2026-02-25/ai-cli.md", 28, "zh", "Claude Code：Windows Bash"],
+    ["2026-02-28/ai-cli.md", 44, "zh", "MCP 生态成熟化：服务器生命周期管理"],
+    ["2026-02-27/ai-cli.md", 55, "zh", "Claude Code：闭源、TUI 优先"],
+  ] as const)("extracts the item and descriptive column in %s:%s", (file, start, lang, prefix) => {
+    const table = digestLines(file, start, start + 2);
+    expect(table).toMatch(/\n\|[-:| ]+\|\n/);
+    const items = extractReportHighlights({ probe: table }, lang).probe;
+    expect(items).toHaveLength(1);
+    expect(items?.[0]?.startsWith(prefix)).toBe(true);
+  });
+
+  it("supports the requested reading-reason header using a real item as the representative fixture", () => {
+    const table = digestLines("2026-03-03/ai-cli.md", 157, 159).replace("核心价值", "阅读理由");
+    expect(extractReportHighlights({ probe: table }, "zh").probe?.[0]).toMatch(
+      /^feature-dev workflow fix：修复/,
+    );
+  });
+
+  it("still excludes screening and transposed metric tables after accepting issue subjects", () => {
+    const screening =
+      "| Issue | Decision | Summary |\n| --- | --- | --- |\n| #1 | Excluded | General purpose learning material |";
+    const transposed =
+      "| Metric | Claude Code | Codex |\n| --- | --- | --- |\n| Issues Count | 7 open issues | 3 open issues |";
+    expect(extractReportHighlights({ screening, transposed }, "en")).toEqual({});
+  });
+
+  it.each([
+    ["2026-04-02/ai-cli.md", 83, 98],
+    ["2026-02-25/ai-cli.md", 274, 282],
+  ] as const)("ignores the complete fenced diagram in %s and resumes after it", (file, start, end) => {
+    const diagram = digestLines(file, start, end);
+    expect(diagram).toMatch(/^```/);
+    expect(diagram).toMatch(/```$/);
+    const result = extractReportHighlights(
+      { probe: `${diagram}\n- OpenAI 修复 failed recovery 故障。` },
+      "zh",
+    );
+    expect(result.probe).toEqual(["OpenAI 修复 failed recovery 故障。"]);
+  });
+
+  it.each(["````", "~~~~"])("requires a matching closing fence for %s", (fence) => {
+    const result = extractReportHighlights(
+      {
+        probe: `${fence}mermaid\n- 图中节点不应进入摘要。\n${fence.slice(1)}\n| 项目 | 说明 |\n| --- | --- |\n| 图中项目 | 图中说明不应进入摘要。 |\n${fence[0] === "`" ? "~~~~" : "````"}\n- 仍在代码围栏内部。\n${fence} trailing text\n- 还未到合法结束围栏。\n${fence}\n- 正常正文继续解释 failure 恢复。`,
+      },
+      "zh",
+    );
+    expect(result.probe).toEqual(["正常正文继续解释 failure 恢复。"]);
+  });
+
+  it("ignores an unclosed fenced block until the report ends", () => {
+    expect(extractReportHighlights({ probe: "~~~text\n- 不完整代码块仍不能成为摘要。" }, "zh")).toEqual({});
+  });
+
+  it.each(["- ", "1. ", "  - "])("ignores diagrams fenced inside a %s list item", (prefix) => {
+    const indent = " ".repeat(prefix.length);
+    const report = `${prefix}\`\`\`mermaid\n${indent}graph TD\n${indent}A[图中节点不应进入摘要] --> B[另一个图中节点]\n${indent}\`\`\`\n\n- 正常正文继续解释 failure 恢复。`;
+    expect(extractReportHighlights({ probe: report }, "zh").probe).toEqual([
+      "正常正文继续解释 failure 恢复。",
+    ]);
+  });
+
+  it("ends an unclosed list fence at the end of its list item", () => {
+    const report =
+      "- ~~~mermaid\n  图中节点不应该被错误识别成正文摘要。\n\n- OpenAI 修复 failure 恢复问题。\n后续正文描述了新的任务恢复能力。";
+    expect(extractReportHighlights({ probe: report }, "zh").probe).toEqual([
+      "OpenAI 修复 failure 恢复问题。",
+      "后续正文描述了新的任务恢复能力。",
+    ]);
+  });
+
+  it.each([
+    ["-\t", "\t"],
+    ["  -\t", "\t"],
+    ["\t-\t", "\t\t"],
+  ])("uses tab stops for list fence indentation %s", (prefix, indent) => {
+    const report = `${prefix}\`\`\`mermaid\n${indent}graph TD\n${indent}A[图中节点不应进入摘要] --> B[另一个图中节点]\n${indent}\`\`\`\n\n- 正常正文继续解释 failure 恢复。`;
+    expect(extractReportHighlights({ probe: report }, "zh").probe).toEqual([
+      "正常正文继续解释 failure 恢复。",
+    ]);
+  });
+
+  it("keeps findings beginning with an inline code span instead of treating it as an opening fence", () => {
+    expect(
+      extractReportHighlights({ probe: "```a|b``` 支持两种恢复模式。\n- OpenAI 修复任务恢复问题。" }, "zh")
+        .probe,
+    ).toEqual(["a|b 支持两种恢复模式。", "OpenAI 修复任务恢复问题。"]);
+  });
+
+  it.each([
+    ["2026-07-07/ai-hn.md", 21, 25, "Anthropic发布的最新研究成果"],
+    ["2026-07-07/ai-ph.md", 21, 23, "与一个 AI 专家团队协作"],
+  ] as const)("keeps descriptive content without its field label in %s", (file, start, end, finding) => {
+    const items = extractReportHighlights({ probe: digestLines(file, start, end) }, "zh").probe;
+    expect(items).toHaveLength(1);
+    expect(items?.[0]).toMatch(new RegExp(`^${finding}`));
+    expect(items?.[0]).not.toMatch(/^(?:一句话说明|简介)[:：]/);
+  });
+
+  it("filters statuses after removing descriptive labels and preserves failure findings", () => {
+    expect(
+      extractReportHighlights(
+        { probe: "- **简介**：无新版本发布\n- 一句话说明：OpenAI 修复 failed recovery 问题。" },
+        "zh",
+      ).probe,
+    ).toEqual(["OpenAI 修复 failed recovery 问题。"]);
+  });
+
+  it.each([false, true])("filters the real no-release sentence with optional spaces: %s", (spaced) => {
+    const status = digestLines("2026-07-10/ai-agents.md", 35, 35);
+    expect(status).toBe("过去24小时内无新版本发布。");
+    const line = spaced ? status.replace("过去24小时内无", "过去 24 小时 内 无 ") : status;
+    const result = extractReportHighlights(
+      { probe: `${line}\n- ${line}但 OpenAI 修复了故障恢复问题。` },
+      "zh",
+    );
+    expect(result.probe).toHaveLength(1);
+    expect(result.probe?.[0]).toContain("但 OpenAI");
+  });
 });
+
+function digestLines(file: string, start: number, end: number): string {
+  return readFileSync(new URL(`../../digests/${file}`, import.meta.url), "utf8")
+    .split(/\r?\n/)
+    .slice(start - 1, end)
+    .join("\n");
+}
 
 function highlightGraphemeCount(text: string): number {
   return Array.from(new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(text)).length;
