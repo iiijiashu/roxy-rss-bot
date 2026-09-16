@@ -574,7 +574,7 @@ function highlightCandidates(content: string): string[] {
 
   for (let index = 0; index < lines.length; index++) {
     const rawLine = lines[index] ?? "";
-    const line = rawLine.trim();
+    let line = rawLine.trim();
     // A fence opened on a list item ends when that item's indentation ends.
     // Top-level unclosed blocks continue through the end of the report.
     const indent = markdownPrefixColumns(rawLine.match(/^[ \t]*/)?.[0] ?? "");
@@ -596,18 +596,41 @@ function highlightCandidates(content: string): string[] {
       continue;
     }
     if (inSummary) {
-      if (/<\/summary\s*>/i.test(line)) inSummary = false;
-      continue;
+      const closingSummary = line.match(/<\/summary\s*>/i);
+      if (closingSummary?.index !== undefined) {
+        inSummary = false;
+        tableSchema = null;
+        line = line.slice(closingSummary.index + closingSummary[0].length).trim();
+        if (!line) continue;
+      } else if (/^<\/details\b/i.test(line)) {
+        // Malformed report fallback: do not let an unterminated summary hide
+        // the rest of the report after its containing details block ends.
+        inSummary = false;
+        tableSchema = null;
+        continue;
+      } else {
+        continue;
+      }
     }
     if (/^<summary\b/i.test(line)) {
-      if (!/<\/summary\s*>/i.test(line)) inSummary = true;
-      continue;
+      const closingSummary = line.match(/<\/summary\s*>/i);
+      tableSchema = null;
+      if (closingSummary?.index === undefined) {
+        inSummary = true;
+        continue;
+      }
+      line = line.slice(closingSummary.index + closingSummary[0].length).trim();
+      if (!line) continue;
     }
     if (!line || /^---+$/.test(line) || line.startsWith(">")) continue;
-    if (/^<\/?details\b/i.test(line)) continue;
+    if (/^<\/?details\b/i.test(line)) {
+      tableSchema = null;
+      continue;
+    }
 
     const nextLine = (lines[index + 1] ?? "").trim();
     if (/^(?:={3,}|-{3,})$/.test(nextLine) && !/^(?:[-*+]|\d+[.)]|#{1,6}\s|\|)/.test(line)) {
+      tableSchema = null;
       continue;
     }
 
