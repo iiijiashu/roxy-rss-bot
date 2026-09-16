@@ -3,7 +3,7 @@
 [English](./README.md) | 中文
 
 > **Roxy 部署版。** 本分支每天北京时间 08:20 运行，通过 GitHub Pages
-> 发布 Markdown、网页和 RSS；模型使用 Agnes 2.5 Flash，仓库跟踪范围压缩为
+> 发布 Markdown、网页和 RSS；模型使用 Agnes 3.0 Flash，仓库跟踪范围压缩为
 > 4 个。默认不发布 Issues、不发送聊天通知，周报和月报仅允许手动运行。
 > 生成报告保存在 `digest-output` 发布分支，使受保护的 `main` 仍只接受 PR；
 > 下方详细章节也保留了部分上游可选能力的说明。
@@ -260,14 +260,14 @@ openclaw_peers:
 | 供应商 | `LLM_PROVIDER` | 所需环境变量 | 模型选择 |
 |--------|---------------|------------|----------|
 | Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` |
-| Agnes | `agnes` | `AGNES_API_KEY` | `agnes-2.5-flash` |
+| Agnes | `agnes` | `AGNES_API_KEY` | `agnes-3.0-flash` |
 | OpenAI | `openai` | `OPENAI_API_KEY` | `gpt-4o` |
 | OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4` |
 | DeepSeek | `deepseek` | `DEEPSEEK_API_KEY` | `deepseek-v4-flash` |
 
 可通过 `ANTHROPIC_MODEL`、`AGNES_MODEL`、`OPENAI_MODEL`、`OPENROUTER_MODEL` 或 `DEEPSEEK_MODEL` 覆盖对应模型。
 
-Roxy 工作流先由本地 TypeScript 完成抓取、去重、来源过滤和排序，再把并发的逻辑总结合并为三个 Agnes 阶段：来源摘要、对比分析与详细报告、最终通知重点。`AGNES_REQUEST_BUDGET=4` 是真实 API 请求的进程级硬上限，正常日更约 3 次，并为一次限流重试预留空间；相比原先约 30 个独立模型会话大幅缩减。公开 Feed/报告内容按不可信来源数据处理，直接聊天接口没有工具和仓库写入能力。
+Roxy 日更工作流先由本地 TypeScript 完成抓取、去重、来源过滤和排序，再把并发逻辑合并为两个 Agnes 阶段：来源摘要，以及对比分析与详细报告。最终通知重点直接从已完成报告中由本地 TypeScript 确定性提取，不再额外占用一次模型请求。`AGNES_REQUEST_BUDGET=4` 仍是真实 API 请求的进程级硬上限，并为异常恢复保留余量；相比原先约 30 个独立模型会话大幅缩减。公开 Feed/报告内容按不可信来源数据处理，直接聊天接口没有工具和仓库写入能力。
 
 Provider 抽象层位于 `src/providers/`，每个供应商对应独立文件并实现 `LlmProvider` 接口。新增供应商只需创建新文件并在工厂函数中注册。
 
@@ -288,7 +288,7 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxxxxx
 # 方式 C: Agnes
 # export LLM_PROVIDER=agnes
 # export AGNES_API_KEY=your-agnes-key
-# export AGNES_MODEL=agnes-2.5-flash
+# export AGNES_MODEL=agnes-3.0-flash
 
 # 方式 D: OpenRouter
 # export LLM_PROVIDER=openrouter

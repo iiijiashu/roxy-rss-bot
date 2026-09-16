@@ -3,7 +3,7 @@
 English | [中文](./README.zh.md)
 
 > **Roxy deployment profile.** This fork runs at 08:20 China Standard Time,
-> publishes Markdown, Web, and RSS through GitHub Pages, and uses Agnes 2.5 Flash
+> publishes Markdown, Web, and RSS through GitHub Pages, and uses Agnes 3.0 Flash
 > with a compact four-repository watchlist. Issue publishing and chat
 > notifications are disabled; weekly and monthly rollups are manual-only. The
 > detailed sections below also document optional upstream capabilities. Generated
@@ -263,14 +263,14 @@ Set `LLM_PROVIDER` to choose which model backend powers the digest generation. D
 | Provider | `LLM_PROVIDER` | Required env vars | Model selection |
 |----------|---------------|-------------------|---------------|
 | Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` |
-| Agnes | `agnes` | `AGNES_API_KEY` | `agnes-2.5-flash` |
+| Agnes | `agnes` | `AGNES_API_KEY` | `agnes-3.0-flash` |
 | OpenAI | `openai` | `OPENAI_API_KEY` | `gpt-4o` |
 | OpenRouter | `openrouter` | `OPENROUTER_API_KEY` | `anthropic/claude-sonnet-4` |
 | DeepSeek | `deepseek` | `DEEPSEEK_API_KEY` | `deepseek-v4-flash` |
 
 Override the model name with `ANTHROPIC_MODEL`, `AGNES_MODEL`, `OPENAI_MODEL`, `OPENROUTER_MODEL`, or `DEEPSEEK_MODEL` respectively.
 
-The Roxy workflow performs fetching, deduplication, source filtering, and ranking in local TypeScript. Concurrent logical summaries are coalesced into three Agnes phases: source summaries, comparisons plus detailed reports, and final notification highlights. `AGNES_REQUEST_BUDGET=4` is a hard per-process ceiling on real provider requests, leaving room for one rate-limit retry while replacing roughly 30 independent model sessions. Public feed/report content is sent as untrusted source data and the direct chat endpoint has no tools or repository write capability.
+The Roxy daily workflow performs fetching, deduplication, source filtering, and ranking in local TypeScript. Concurrent logical work is coalesced into two Agnes phases: source summaries, then comparisons plus detailed reports. Notification highlights are extracted deterministically from those finished reports in local TypeScript and do not consume another provider request. `AGNES_REQUEST_BUDGET=4` remains a hard per-process ceiling on real provider requests, leaving recovery headroom while replacing roughly 30 independent model sessions. Public feed/report content is sent as untrusted source data and the direct chat endpoint has no tools or repository write capability.
 
 The provider abstraction lives in `src/providers/` — each provider is a separate file implementing the `LlmProvider` interface. Adding a new provider only requires creating a new file and registering it in the factory.
 
@@ -291,7 +291,7 @@ export ANTHROPIC_API_KEY=sk-ant-xxxxxxxx
 # Option C: Agnes
 # export LLM_PROVIDER=agnes
 # export AGNES_API_KEY=your-agnes-key
-# export AGNES_MODEL=agnes-2.5-flash
+# export AGNES_MODEL=agnes-3.0-flash
 
 # Option D: OpenRouter
 # export LLM_PROVIDER=openrouter

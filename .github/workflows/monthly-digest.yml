@@ -35,7 +35,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
-          AGNES_MODEL: agnes-2.5-flash
+          AGNES_MODEL: agnes-3.0-flash
           AGNES_BATCH_WINDOW_MS: "25"
           AGNES_REQUEST_BUDGET: "3"
           LLM_PROVIDER: agnes
