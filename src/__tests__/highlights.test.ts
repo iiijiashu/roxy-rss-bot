@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { extractReportHighlights } from "../prompts-data.ts";
 
@@ -387,6 +388,52 @@ Open source coding agents dominated discussion today with several major releases
 
     expect(result.probe).toEqual(["Actual finding: new recovery logic shipped successfully."]);
   });
+
+  it.each([
+    ["2026-07-07/ai-cli-en.md", "en", "Date:"],
+    ["2026-07-07/ai-agents.md", "zh", "日期:"],
+    ["2026-03-04/ai-web-en.md", "en", "Crawl Period:"],
+    ["2026-03-08/ai-web-en.md", "en", "Coverage Period:"],
+  ] as const)("skips report dates in the real digest %s", (file, lang, label) => {
+    const report = readFileSync(new URL(`../../digests/${file}`, import.meta.url), "utf8");
+    // Inspect beyond the notification cap: the Chinese date appears in a later project section.
+    const items = extractReportHighlights({ probe: report }, lang, 1000).probe ?? [];
+
+    expect(items.length).toBeGreaterThan(0);
+    expect(items.some((item) => item.startsWith(label))).toBe(false);
+  });
+
+  it.each(["bare URLs", "bold Markdown links"])(
+    "skips pipe-separated %s without dropping linked findings",
+    (format) => {
+      const report = readFileSync(
+        new URL("../../digests/2026-07-06/ai-agents-en.md", import.meta.url),
+        "utf8",
+      );
+      const links = report.split("\n").find((line) => line.includes("/pull/3192 | https://"));
+      expect(links).toBeDefined();
+      // Also exercise the same real links with per-link Markdown emphasis.
+      const linkLine =
+        format === "bare URLs"
+          ? links
+          : `📎 ${(links ?? "")
+              .trim()
+              .split(" | ")
+              .map((url) => `**[PR ${url.split("/").at(-1)}](${url})**`)
+              .join(" | ")}`;
+      const result = extractReportHighlights(
+        {
+          probe: `${linkLine}\n- OpenAI: fixed [failed recovery](https://example.com/fix).\n- API failure policy: preserve [context](https://example.com/context).`,
+        },
+        "en",
+      );
+
+      expect(result.probe).toEqual([
+        "OpenAI: fixed failed recovery.",
+        "API failure policy: preserve context.",
+      ]);
+    },
+  );
 });
 
 function highlightGraphemeCount(text: string): number {
