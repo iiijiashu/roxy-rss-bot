@@ -570,6 +570,7 @@ function highlightCandidates(content: string): string[] {
   let tableSchema: HighlightTableSchema | null = null;
   let fence: string | null = null;
   let fenceIndent = 0;
+  let inSummary = false;
 
   for (let index = 0; index < lines.length; index++) {
     const rawLine = lines[index] ?? "";
@@ -594,12 +595,24 @@ function highlightCandidates(content: string): string[] {
       tableSchema = null;
       continue;
     }
+    if (inSummary) {
+      if (/<\/summary\s*>/i.test(line)) inSummary = false;
+      continue;
+    }
+    if (/^<summary\b/i.test(line)) {
+      if (!/<\/summary\s*>/i.test(line)) inSummary = true;
+      continue;
+    }
     if (!line || /^---+$/.test(line) || line.startsWith(">")) continue;
-    if (/^<\/?(?:details|summary)\b/i.test(line)) continue;
+    if (/^<\/?details\b/i.test(line)) continue;
+
+    const nextLine = (lines[index + 1] ?? "").trim();
+    if (/^(?:={3,}|-{3,})$/.test(nextLine) && !/^(?:[-*+]|\d+[.)]|#{1,6}\s|\|)/.test(line)) {
+      continue;
+    }
 
     if (line.startsWith("|")) {
       if (isMarkdownTableSeparator(line)) continue;
-      const nextLine = (lines[index + 1] ?? "").trim();
       if (isMarkdownTableSeparator(nextLine)) {
         // Only item-list tables with an explicit subject + summary/description
         // schema are highlight sources. Metric/transposed comparison tables such
