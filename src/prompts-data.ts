@@ -570,10 +570,11 @@ function highlightCandidates(content: string): string[] {
   let tableSchema: HighlightTableSchema | null = null;
   let fence: string | null = null;
   let fenceIndent = 0;
+  let inSummary = false;
 
   for (let index = 0; index < lines.length; index++) {
     const rawLine = lines[index] ?? "";
-    const line = rawLine.trim();
+    let line = rawLine.trim();
     // A fence opened on a list item ends when that item's indentation ends.
     // Top-level unclosed blocks continue through the end of the report.
     const indent = markdownPrefixColumns(rawLine.match(/^[ \t]*/)?.[0] ?? "");
@@ -594,12 +595,47 @@ function highlightCandidates(content: string): string[] {
       tableSchema = null;
       continue;
     }
+    if (inSummary) {
+      const closingSummary = line.match(/<\/summary\s*>/i);
+      if (closingSummary?.index !== undefined) {
+        inSummary = false;
+        tableSchema = null;
+        line = line.slice(closingSummary.index + closingSummary[0].length).trim();
+        if (!line) continue;
+      } else if (/^<\/details\b/i.test(line)) {
+        // Malformed report fallback: do not let an unterminated summary hide
+        // the rest of the report after its containing details block ends.
+        inSummary = false;
+        tableSchema = null;
+        continue;
+      } else {
+        continue;
+      }
+    }
+    if (/^<summary\b/i.test(line)) {
+      const closingSummary = line.match(/<\/summary\s*>/i);
+      tableSchema = null;
+      if (closingSummary?.index === undefined) {
+        inSummary = true;
+        continue;
+      }
+      line = line.slice(closingSummary.index + closingSummary[0].length).trim();
+      if (!line) continue;
+    }
     if (!line || /^---+$/.test(line) || line.startsWith(">")) continue;
-    if (/^<\/?(?:details|summary)\b/i.test(line)) continue;
+    if (/^<\/?details\b/i.test(line)) {
+      tableSchema = null;
+      continue;
+    }
+
+    const nextLine = (lines[index + 1] ?? "").trim();
+    if (/^(?:={3,}|-{3,})$/.test(nextLine) && !/^(?:[-*+]|\d+[.)]|#{1,6}\s|\|)/.test(line)) {
+      tableSchema = null;
+      continue;
+    }
 
     if (line.startsWith("|")) {
       if (isMarkdownTableSeparator(line)) continue;
-      const nextLine = (lines[index + 1] ?? "").trim();
       if (isMarkdownTableSeparator(nextLine)) {
         // Only item-list tables with an explicit subject + summary/description
         // schema are highlight sources. Metric/transposed comparison tables such

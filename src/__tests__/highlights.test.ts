@@ -88,6 +88,78 @@ Codex 更新审查流程，降低多文件修改时的冲突概率。`,
     expect(items.join("\n")).not.toContain("仓库导航");
   });
 
+  it("skips multiline summary text without discarding useful details content", () => {
+    const result = extractReportHighlights(
+      {
+        "ai-cli": `<details>
+<summary>
+这是一个很长的仓库导航摘要不应进入通知
+</summary>
+- 真正发现：工具新增多代理恢复能力。
+</details>`,
+      },
+      "zh",
+    );
+
+    expect(result["ai-cli"]).toEqual(["真正发现：工具新增多代理恢复能力。"]);
+  });
+
+  it("recovers after an unterminated summary when its details block closes", () => {
+    const result = extractReportHighlights(
+      {
+        "ai-cli": `<details>
+<summary>仓库导航
+</details>
+- 真正发现：工具新增多代理恢复能力。`,
+      },
+      "zh",
+    );
+
+    expect(result["ai-cli"]).toEqual(["真正发现：工具新增多代理恢复能力。"]);
+  });
+
+  it("keeps useful content after a multiline summary closing tag", () => {
+    const result = extractReportHighlights(
+      {
+        "ai-cli": `<summary>
+仓库导航
+</summary>真正发现：工具新增更安全的多代理恢复能力。`,
+      },
+      "zh",
+    );
+
+    expect(result["ai-cli"]).toEqual(["真正发现：工具新增更安全的多代理恢复能力。"]);
+  });
+
+  it("skips Setext-style headings before English findings", () => {
+    const result = extractReportHighlights(
+      {
+        "ai-web": `Today's Highlights
+------------------
+Open source coding agents added safer repository recovery this week.`,
+      },
+      "en",
+    );
+
+    expect(result["ai-web"]).toEqual(["Open source coding agents added safer repository recovery t…"]);
+  });
+
+  it("clears table schema when crossing a Setext heading", () => {
+    const result = extractReportHighlights(
+      {
+        "ai-web": `| Project | Summary |
+| --- | --- |
+| alpha | Useful first row explains repository recovery. |
+Section Title
+---
+| stray | This row must not inherit the previous table schema. |`,
+      },
+      "en",
+    );
+
+    expect(result["ai-web"]).toEqual(["alpha：Useful first row explains repository recovery."]);
+  });
+
   it("keeps Chinese notifications free of English-only candidates", () => {
     const result = extractReportHighlights(
       {
