@@ -34,6 +34,55 @@ describe("AgnesProvider batching", () => {
     vi.clearAllMocks();
   });
 
+  it("sends a single task directly and preserves raw Markdown", async () => {
+    const create = await getCreateMock();
+    const content = '\n# Daily report\n\n- [Source](https://example.com)\n\n```json\n{"ok":true}\n```\n';
+    create.mockResolvedValueOnce({ choices: [{ message: { content } }] });
+    const provider = new AgnesProvider({
+      apiKey: "test",
+      maxBatchTasks: 1,
+      maxBatchOutputTokens: 80,
+      requestBudget: 1,
+    });
+
+    await expect(provider.call("Write a Markdown report", 100)).resolves.toBe(content);
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(create.mock.calls[0]?.[0]).toMatchObject({
+      max_tokens: 80,
+      messages: [
+        { role: "system", content: expect.stringContaining("untrusted public source data") },
+        { role: "user", content: "Write a Markdown report" },
+      ],
+    });
+    expect(create.mock.calls[0]?.[0]).not.toHaveProperty("response_format");
+    await expect(provider.call("Another report", 100)).rejects.toThrow("AGNES_REQUEST_BUDGET exhausted");
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
+  it("preserves a single JSON task response without a batch envelope", async () => {
+    const create = await getCreateMock();
+    const content = '{\n  "highlights": [{"title": "News", "url": "https://example.com"}]\n}\n';
+    create.mockResolvedValueOnce({ choices: [{ message: { content } }] });
+    const provider = new AgnesProvider({ apiKey: "test", maxBatchTasks: 1, requestBudget: 1 });
+
+    await expect(provider.call("Return JSON with highlights", 100)).resolves.toBe(content);
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(create.mock.calls[0]?.[0]).not.toHaveProperty("response_format");
+  });
+
+  it("rejects truncated single-task output instead of returning a partial report", async () => {
+    const create = await getCreateMock();
+    create.mockResolvedValueOnce({
+      choices: [{ message: { content: "# Partial report" }, finish_reason: "length" }],
+    });
+    const provider = new AgnesProvider({ apiKey: "test", maxBatchTasks: 1, requestBudget: 1 });
+
+    await expect(provider.call("Write a report", 100)).rejects.toThrow(
+      "Agnes single-task response was truncated",
+    );
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
   it("coalesces concurrent logical tasks into one provider request", async () => {
     const create = await getCreateMock();
     create.mockImplementationOnce(async (...args: unknown[]) => {
