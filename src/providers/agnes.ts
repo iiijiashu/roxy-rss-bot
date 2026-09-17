@@ -319,6 +319,7 @@ export class AgnesProvider implements LlmProvider {
       const response = await this.client.chat.completions.create({
         model: this.model,
         temperature: 0.2,
+        response_format: { type: "json_object" },
         max_tokens: maxTokens,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
@@ -332,6 +333,10 @@ export class AgnesProvider implements LlmProvider {
       try {
         envelope = parseBatchEnvelope(raw);
       } catch (error) {
+        console.warn(
+          `[agnes] JSON parse failure: finish=${response.choices[0]?.finish_reason ?? "unknown"}, ` +
+            `output_tokens=${response.usage?.completion_tokens ?? "unknown"}, chars=${raw.length}`,
+        );
         if (recovery.malformedRetriesRemaining > 0) {
           const message = error instanceof Error ? error.message : "Agnes batch response could not be parsed";
           console.warn(`[agnes] ${message}; retrying ${tasks.length} affected task(s) once`);
