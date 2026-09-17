@@ -60,10 +60,12 @@ describe("AgnesProvider batching", () => {
     const request = create.mock.calls[0]?.[0] as {
       model: string;
       max_tokens: number;
+      response_format: { type: string };
       messages: Array<{ role: string; content: string }>;
     };
     expect(request.model).toBe("agnes-3.0-flash");
     expect(request.max_tokens).toBe(300);
+    expect(request.response_format).toEqual({ type: "json_object" });
     expect(request.messages[0]?.role).toBe("system");
     expect(request.messages[0]?.content).toContain("untrusted public source data");
     expect(submittedTasks(create.mock.calls[0] ?? [])).toEqual([
