@@ -1,0 +1,49 @@
+# ArXiv AI Research Digest 2026-09-18
+
+> Source: [ArXiv](https://arxiv.org/) (cs.AI, cs.CL, cs.LG) | 50 papers | Generated: 2026-09-17 17:22 UTC
+
+---
+
+**Today's Highlights**
+The most significant research directions today center on the robustness and interpretability of agentic systems, with multiple papers addressing how AI agents can secure, monitor, and govern complex workflows. A critical breakthrough involves preventing model collapse during recursive training on synthetic data by applying Fisher-Rao geometry, providing a mathematical foundation for stable continual learning. Furthermore, researchers are shifting focus from outcome-based metrics to internal model representations, specifically investigating how reward hacking manifests in the latent spaces of frontier Large Language Models (LLMs). There is also a notable trend toward integrating physical constraints into machine learning, such as using physics-informed kernel methods and Lyapunov operators to ensure stability in nonlinear control systems. Finally, the efficiency of inference and tokenization is being re-evaluated, with new approaches demonstrating how architectural interventions can modify scaling exponents and improve performance without simply increasing parameter counts.
+
+**Key Papers**
+
+### 🧠 Large Language Models
+| Paper | Authors | Summary |
+| :--- | :--- | :--- |
+| [Infinite-Parameter LLMs: Generating and Adapting Weights from Live Data](http://arxiv.org/abs/2609.18842v1) | Jinli Hu, Ross M. Clarke, Yichuan Zhang et al. | This paper proposes a paradigm shift from static parameter banks to generating and adapting weights from live data. It challenges the limitations of standard Mixture-of-Experts scaling laws by decoupling model growth from fixed storage. |
+| [Preventing Model Collapse: A Fisher-Rao Perspective on the Dynamics of Training with Synthetic Data](http://arxiv.org/abs/2609.18878v1) | Matteo Marchi, João Pedro Silvestre, Bahman Gharesifard et al. | The authors provide a theoretical framework using Fisher-Rao geometry to analyze and prevent model collapse in synthetic data training. This is crucial for understanding the stability of recursive LLM self-improvement loops. |
+| [Higher-order pruning of experts in mixture-of-experts language models](http://arxiv.org/abs/2609.18916v1) | Alex M. Tseng, Prannay Kaul, Luca Zancato et al. | This work introduces higher-order pruning techniques that account for the interdependencies between experts rather than treating them in isolation. It offers a more effective path to reducing the memory bottleneck in MoE architectures. |
+| [Probabilistic Linear Explanations](http://arxiv.org/abs/2609.19077v1) | Frederic Koriche, Jean-Marie Lagniez, Chi Tran | The paper presents a method for generating explainable AI outputs that extend probabilistic relaxations beyond categorical classification. It addresses the cognitive limit of abductive explanations by using linear structures. |
+
+### 🤖 Agents & Reasoning
+| Paper | Authors | Summary |
+| :--- | :--- | :--- |
+| [Taming the Agentic RAN: Stability-Guaranteed Arbitration of Autonomous AI Agents in O-RAN](http://arxiv.org/abs/2609.18857v1) | Seyed Bagher Hashemi Natanzi, Bo Tang | This study demonstrates that independent control loops in agentic O-RAN systems can be unsafe, even with correct individual objectives. It introduces a stability-guaranteed arbitration mechanism for multi-agent coordination in critical infrastructure. |
+| [Compositional Policy Violations: When Step-Level Compliance Fails In Agentic AI Workflows](http://arxiv.org/abs/2609.18820v1) | Ashwini Kurady, Sri Sai Charith Grandhi, Rajesh Gupta et al. | The authors identify a gap where step-scoped governance fails to catch compositional policy violations in agentic workflows. This highlights the need for span-level evaluators to manage consequential decisions in regulated settings. |
+| [Cognitive Extensions for Dual-Process Language Agents: Memory and Self-Reflection in Interactive Environments](http://arxiv.org/abs/2609.19128v1) | João Meneses dos Santos, Arlindo L. Oliveira | This paper extends dual-process agents with modular cognitive extensions for memory and self-reflection. It aims to improve long-horizon state tracking and recovery from failures in interactive environments. |
+| [Social Laws for Multi-agent Coordination in Stochastic Environments](http://arxiv.org/abs/2609.18929v1) | Rolando Fernandez, Caleb Probine, Tyler Lee et al. | The research extends the concept of social laws from deterministic settings to stochastic environments. It addresses the critical challenge of preventing interference and ensuring robust performance in multi-agent systems. |
+
+### 🔧 Methods & Frameworks
+| Paper | Authors | Summary |
+| :--- | :--- | :--- |
+| [Double descent is the principle of least action](http://arxiv.org/abs/2609.19076v1) | Congzhou M Sha | The author explains the double descent phenomenon through the lens of statistical mechanics and the principle of least action. This provides a physical intuition for why test error peaks at the interpolation threshold. |
+| [Learning Lyapunov Operators for Nonlinear Systems](http://arxiv.org/abs/2609.18894v1) | Amartya Mukherjee, Maxwell Fitzsimmons, David C. Del Rey Fernández et al. | This work introduces a method for constructing Lyapunov functions for nonlinear systems by learning operators rather than single functions. It solves a central problem in stability analysis for complex dynamical systems. |
+| [Fast Learning Rates for Physics-Informed Kernel Methods](http://arxiv.org/abs/2609.18901v1) | Luc Brogat-Motte, Joachim Bona-Pellissier, Giacomo Meanti et al. | The paper establishes fast learning rates for physics-informed machine learning that incorporates differential constraints. This is significant for improving the efficiency of learning functions that must obey physical laws. |
+| [ScienceIDE: Turning World's Scientific Codebase into Agent Learnable Environments](http://arxiv.org/abs/2609.19134v1) | Hejia Geng, Zesen Huang, Haoyang Li et al. | The authors present a framework to convert fragmented scientific codebases into reliable learning environments for AI agents. This addresses the challenge of converting human domain knowledge in code into executable learning experience. |
+
+### 📊 Applications
+| Paper | Authors | Summary |
+| :--- | :--- | :--- |
+| [Evidence-Grounded Agentic Formulation Development in an Autonomous Laboratory](http://arxiv.org/abs/2609.19099v1) | Michael M. Craig, Riley J. Hickman, Yingshan Ma et al. | This paper presents Andromeda 2, an agentic system that reasons over experimental evidence to develop drug formulations. It demonstrates the potential of AI in autonomous scientific discovery for high-performing chemical delivery systems. |
+| [Interpretable Multi-Instance Learning Enables Early Prediction of Key Molecular Alterations from Routine Flow Cytometry in Acute Myeloid Leukemia](http://arxiv.org/abs/2609.18825v1) | Jonathan Legrand, Aguirre Mimoun, Baudouin Denis de Senneville et al. | The study uses interpretable machine learning to predict critical genetic mutations in leukemia from routine flow cytometry. This enables early treatment decisions without waiting for weeks-long molecular testing results. |
+| [Monitoring and Discovering Reward Hacking with Internal Representations during LLM Evaluations](http://arxiv.org/abs/2609.19101v1) | Leon Bergen, Usha Bhalla, Andrew Lee et al. | The authors analyze how reward hacking is represented internally in frontier open-source LLMs. This work is vital for developing monitoring tools that can detect sophisticated misalignment before it manifests in final outputs. |
+
+**Research Trend Signal**
+A prominent emerging direction is the formalization of "safe" and "stable" multi-agent coordination. While early agentic research focused on single-agent task completion, this batch of papers explicitly addresses the stability, interference, and policy compliance of multi-agent systems in stochastic and physical environments (O-RAN, control systems). This signals a maturing phase of the field where "agent" is no longer just a language model but a complex actor in shared, regulated spaces. Simultaneously, there is a strong shift toward physical grounding. Papers on Lyapunov operators, physics-informed kernels, and force-aware manipulation indicate that AI is moving beyond abstract text or static images into continuous control and scientific simulation. This trend suggests that future "general" intelligence will likely be defined by the ability to operate reliably within the physical and mathematical constraints of the real world, rather than just optimizing textual likelihoods.
+
+**Worth Deep Reading**
+1.  **Preventing Model Collapse: A Fisher-Rao Perspective on the Dynamics of Training with Synthetic Data**: As synthetic data becomes the primary fuel for future LLM training, understanding the mathematical dynamics that lead to (or prevent) model collapse is a priority. This paper provides the theoretical grounding for why we need to move beyond simple sampling and use geometric perspectives.
+2.  **Taming the Agentic RAN: Stability-Guaranteed Arbitration of Autonomous AI Agents in O-RAN**: This is a practical, system-level look at the "agentic" paradigm. It moves beyond abstract benchmarks to show how autonomous agents can actually cause harm in live infrastructure. It is essential reading for anyone deploying AI in safety-critical or network-controlled environments.
+3.  **Evidence-Grounded Agentic Formulation Development in an Autonomous Laboratory**: This paper bridges the gap between "agentic AI" and scientific discovery. It shows a concrete instance of an agent reasoning over experimental data to create something new (a drug formulation), which is a stronger signal of general intelligence than simple coding or Q&A tasks.

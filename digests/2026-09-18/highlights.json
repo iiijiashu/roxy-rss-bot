@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态正处于“稳定性修补”与“架构演…",
+      "注：数据基于各工具过去 24 小时提供的热点摘要统计，Co…",
+      "多个工具社区均展现出对企业级可用性和环境隔离安全性的强烈诉…",
+      "跨账户与多租户管理：Claude Code (#27302…",
+      "Windows 平台环境适配：两大工具的顶级 Bug 均指…",
+      "后台进程与资源控制：Claude Code 关注 VM 磁…"
+    ],
+    "ai-agents": [
+      "过去 24 小时 OpenClaw 项目保持高度活跃，共记…",
+      "今日合并/关闭的 10 个 PR 主要集中在 UI 体验优…",
+      "UI 交互优化：合并了 PR #150440，实现了长转发…",
+      "网关恢复机制：关闭了 PR #150953（已合并），修复…",
+      "测试可靠性：关闭了 PR #151005（已合并），通过调…",
+      "文档完善：合并了 PR #150798，详细说明了去部分克…"
+    ],
+    "ai-trending": [
+      "今日 GitHub 热点被“智能体（Agent）工程化”彻…",
+      "affaan-m/ECC：专为 Coding Agent…",
+      "alibaba/open-code-review：阿里推出…",
+      "huggingface/transformers：Hugg…",
+      "pytorch/pytorch：业界标准的张量与动态神经网…",
+      "0xPlaygrounds/rig：用于在 Rust 中构…"
+    ],
+    "ai-web": [
+      "Anthropic 今日增量更新（2026-09-18抓取…",
+      "摘要: Anthropic 完成 300 亿美元 G 轮融…",
+      "战略意义: 极估值融资表明资本市场对 AI 基础设施层的高…",
+      "摘要: Anthropic 宣布在美国德克萨斯州和纽约州投…",
+      "战略意义: 算力即主权。通过大规模本土基建投资，Anthr…",
+      "摘要: 启动“Claude Corps”全国奖学金项目，投…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 AI 的讨论焦点从单纯的模型能力转向了…",
+      "Introducing System One Models…",
+      "Gemini 3.8 Live and 3.8 Live…",
+      "Intelligence per Watt: Measur…",
+      "Breaking the 1.58-bit Barrier…",
+      "GLM Built Its Own Inference I…"
+    ],
+    "ai-arxiv": [
+      "今日 ArXiv 投稿呈现出“AI 可靠性与安全”与“高效…",
+      "Objective vs. Search: Decompo…",
+      "Monitoring and Discovering Re…",
+      "Preventing Model Collapse: A…",
+      "Higher-order pruning of exper…",
+      "Infinite-Parameter LLMs: Gene…"
+    ],
+    "ai-hf": [
+      "本日榜单显示 Qwen 3.8 系列成为社区绝对热点，其…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "Qwen/Qwen3.8-27B：阿里巴巴 Qwen 家族…",
+      "Qwen/Qwen3.8-Flash-Next：Qwen…",
+      "zai-org/GLM-5.3-Flash：智谱 AI 最…",
+      "meta-llama/Llama-3.1-8B-Instr…"
+    ],
+    "ai-community": [
+      "今日技术社区对 AI 的讨论焦点已从单纯的大模型能力转向了…",
+      "AI Can Write the Code. Can It…",
+      "How AI Actually Calls an API…",
+      "Show a model your old code an…",
+      "Tool-Call Injection in LLM Ag…",
+      "A 4 GB Laptop GPU Beats a 12…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI tool ecosystem is currently transitioning from s…",
+      "Note: Counts reflect the specific high-signal items provide…",
+      "Multi-Account & Workspace Switching:",
+      "Claude Code: High demand (378 upvotes) for supporting multi…",
+      "OpenAI Codex: Strong request (22 upvotes) for in-app accoun…",
+      "Insight: Both ecosystems are moving toward \"pro-grade\" work…"
+    ],
+    "ai-agents": [
+      "Today's Overview",
+      "OpenClaw maintains high development velocity with 50 pull r…",
+      "Project Progress",
+      "Three pull requests were merged or closed during the last 2…",
+      "PR #150440: fix(ui): collapse long forwarded session messag…",
+      "PR #150311: fix: keep local scheduled account reads authori…"
+    ],
+    "ai-trending": [
+      "Today's most significant development is the explosive tract…",
+      "🔧 AI Infrastructure",
+      "colibri：A pure C inference engine that streams MoE experts…",
+      "claude-code：Anthropic's agentic coding tool that lives in t…",
+      "codewhale：A community-driven, open-source coding agent buil…",
+      "deepseek-reasonix：A DeepSeek-native coding agent engineered…"
+    ],
+    "ai-web": [
+      "Sources: Anthropic (claude.com / anthropic.com), OpenAI (op…",
+      "Note: While the crawl timestamp is September 18, 2026, the…",
+      "The most significant technical signal is the release of Cla…",
+      "Claude Fable 5 & Mythos 5 Access Control:",
+      "Insight: Following a US government directive, Anthropic sus…",
+      "Claude Opus 4.6 & 4.8:"
+    ],
+    "ai-hn": [
+      "The Hacker News community is currently fixated on AI alignm…",
+      "Introducing System One Models and Jev · HN：This launch of a…",
+      "Gemini 3.8 Live and 3.8 Live Extended Thinking · HN：Google'…",
+      "Breaking the 1.58-bit Barrier for Ternary LLMs · HN：This pa…",
+      "Training Text-to-Image Models 3.6× Faster · HN：A new techni…",
+      "HarnessTax: How Much Does the Harness Matter for Coding Age…"
+    ],
+    "ai-arxiv": [
+      "Today's Highlights",
+      "The most significant research directions today center on th…",
+      "Infinite-Parameter LLMs: Generating and Adapting Weights fr…",
+      "Preventing Model Collapse: A Fisher-Rao Perspective on the…",
+      "Higher-order pruning of experts in mixture-of-experts langu…",
+      "Probabilistic Linear Explanations：The paper presents a meth…"
+    ],
+    "ai-hf": [
+      "Today's Highlights",
+      "The Qwen3.8-27B family dominates the trending lists, with b…",
+      "Trending Models",
+      "Edge0-35B-A3B-preview：This preview model is an Mixture-of-E…",
+      "Qwen3.8-27B：A mid-sized open-weight LLM supporting both tex…",
+      "Qwen3.8-Flash-Next：An experimental variant of the Qwen3.8 f…"
+    ],
+    "ai-community": [
+      "The community is deeply focused on the practical integratio…",
+      "Building PoCs with Codex and GitHub Copilot：The author desc…",
+      "How AI Actually Calls an API? Tool Calling Explained：This t…",
+      "Temp Squads: How to Organize Ephemeral and Mixed Teams：This…",
+      "Show a model your old code and it writes your old bugs：The…",
+      "AI Can Write the Code. Can It Prove the Fix?：This article a…"
+    ]
+  }
+}
