@@ -256,10 +256,40 @@ export function emptyState(): WebState {
 
 export function loadWebState(): WebState {
   try {
-    return JSON.parse(fs.readFileSync(STATE_FILE, "utf-8")) as WebState;
+    const stored: unknown = JSON.parse(fs.readFileSync(STATE_FILE, "utf-8"));
+    const state = emptyState();
+    if (!isRecord(stored)) return state;
+    for (const site of ["anthropic", "openai"] as const) {
+      const entry = stored[site];
+      if (!isRecord(entry)) continue;
+      const seenUrls: Record<string, string> = {};
+      if (isRecord(entry.seenUrls)) {
+        for (const [url, value] of Object.entries(entry.seenUrls)) {
+          if (typeof value === "string") seenUrls[url] = value;
+        }
+      } else if (isRecord(entry.urls)) {
+        // Published history also contains status-based URL records. Preserve
+        // them and retry unfinished entries instead of marking every URL seen.
+        for (const [url, value] of Object.entries(entry.urls)) {
+          if (isRecord(value) && (value.status === "accepted" || value.status === "metadata_only")) {
+            seenUrls[url] = typeof value.sitemapLastmod === "string" ? value.sitemapLastmod : "seen";
+          }
+        }
+      }
+      state[site] = {
+        ...entry,
+        lastChecked: typeof entry.lastChecked === "string" ? entry.lastChecked : "",
+        seenUrls,
+      };
+    }
+    return state;
   } catch {
     return emptyState();
   }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 export function saveWebState(state: WebState): void {
