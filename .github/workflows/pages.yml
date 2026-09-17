@@ -2,7 +2,7 @@ name: Deploy GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [digest-output]
   workflow_dispatch:
     inputs:
       source_ref:
