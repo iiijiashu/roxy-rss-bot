@@ -1,6 +1,6 @@
 # AI CLI 工具社区动态日报 2026-09-18
 
-> 生成时间: 2026-09-17 17:22 UTC | 覆盖工具: 2 个
+> 生成时间: 2026-09-18 00:20 UTC | 覆盖工具: 2 个
 
 - [Claude Code](https://github.com/anthropics/claude-code)
 - [OpenAI Codex](https://github.com/openai/codex)
@@ -10,43 +10,48 @@
 
 ## 横向对比
 
-# 2026-09-18 AI CLI 工具生态横向对比分析报告
+# AI CLI 工具横向对比分析报告 (2026-09-18)
 
-## 1. 生态全景
-当前 AI CLI 工具生态正处于**“稳定性修补”与“架构演进”并行**的关键阶段。Claude Code 社区聚焦于扩展机制（Mods/Hooks）的落地与跨平台（特别是 Windows）的资源管理稳定性；OpenAI Codex 则面临高强度的 Windows 沙盒底层修复与复杂的速率限制/计费透明度信任危机。两大头部工具均在密集发布 Alpha/小版本以响应社区痛点，显示出行业竞争已从单纯的功能堆叠转向工程鲁棒性、成本可预测性及企业级多租户场景的深度支撑。
+### 1. 生态全景
+当前 AI CLI 工具生态已从单纯的代码生成工具向具备复杂状态管理、多模交互及深度 IDE 集成的“开发伴侣”演进。头部工具如 Claude Code 和 OpenAI Codex 均开始探索语音交互、远程控制及模块化扩展架构（如 Mods/Hooks），以应对长时任务和跨平台协作的需求。然而，Windows 平台的稳定性、非官方模型提供商的兼容性以及底层协议（如 MCP、OAuth）的实现完整性，仍是制约工具走向大规模生产环境的共同瓶颈。整体态势显示，工具成熟度正在分化，核心功能在快速迭代，但边缘场景的鲁棒性仍需大量社区反馈驱动修复。
 
-## 2. 各工具活跃度对比
+### 2. 各工具活跃度对比
 
-| 工具 | Issues 热点 (Top) | 活跃 PR (Top) | Release 动态 | 主要状态 |
+| 工具名称 | 今日 Issues 热度 | 重要 PR 数量 | Release 情况 | 核心痛点领域 |
 | :--- | :--- | :--- | :--- | :--- |
-| **Claude Code** | 多账户连接 (#27302)、Mods 扩展 (#91870)、Windows 稳定性 (#89680) | Mods/Diff 类型安全 (#95198)、Diff Pane 优化 (#94847) | **v2.1.274** (稳定版)：内存监控警告、MCP 启动控制 | 功能演进与 Bug 修复并重，处于扩展机制发布前夕。 |
-| **OpenAI Codex** | 配额异常/容量不足 (#46185, #46231)、Windows 截屏 (#25178) | Windows 沙盒权限修复 (#46241)、Guardian 原子发布 (#46245) | **rust-v0.155.0-alpha.16** (密集 Alpha 连发) | 高压修补期，集中解决 Windows 兼容性后端限制争议。 |
+| **Claude Code** | 高 (Mods 提案 195 评论; Windows Bug 93 评论) | 3 | v2.1.275 (Gateway/快捷键优化) | Windows 稳定性, IDE 集成, 上下文资源浪费 |
+| **OpenAI Codex** | 高 (MCP 兼容性 35 评论/48 赞; UI 卡顿 31 评论) | 10 | rust-v0.155.0 (语音/TUI 增强) | 非 OpenAI 提供商支持, Intel Mac 功能缺失, 沙箱 ACL |
 
-*注：数据基于各工具过去 24 小时提供的热点摘要统计，Codex 数据显示了极其密集的 Alpha 迭代频率，而 Claude Code 保持了稳定版的步进节奏。*
+*注：数据基于提供的 2026-09-18 社区动态摘要统计。*
 
-## 3. 共同关注的功能方向
-多个工具社区均展现出对**企业级可用性**和**环境隔离安全性**的强烈诉求：
+### 3. 共同关注的功能方向
+多个工具社区同时反映了以下需求，表明这是当前 AI CLI 开发者的普遍关切：
+*   **IDE (VS Code) 集成深度与一致性**：Claude Code 存在拖放失效 (#25128)，Codex 存在主题卡死 (#15684) 和状态持久化问题。开发者均期待 IDE 体验能匹配终端 CLI 的能力，且两者状态同步需更稳定。
+*   **MCP (Model Context Protocol) 协议完善**：Claude Code 面临上下文资源浪费 (#92255)，Codex 面临工具分页支持缺失 (#28858) 及非 OpenAI 提供商下的序列化错误 (#26234)。MCP 的标准化实现和效率优化是共同的技术焦点。
+*   **长时任务与自动化可靠性**：Claude Code 关注会话连续性 (#11455) 和 Worktree 隔离泄露 (#93438)，Codex 关注远程压缩错误 (#33171) 和后台事件驱动唤醒 (#32188)。两者均在试图解决长时间运行 Agent 任务的稳定性问题。
+*   **跨平台（特别是 Windows/Intel Mac）稳定性**：两个工具均在非主流或传统平台上遭遇阻断性 Bug，Windows 桌面启动/进程管理问题在两个生态中均有高频反馈。
 
-*   **跨账户与多租户管理**：Claude Code (#27302) 要求在同一连接器下支持多账户；Codex (#30684) 强烈呼吁支持多工作区/多账号快速切换。这反映了当前开发者已普遍进入“个人多项目/企业多环境”的使用阶段，单点登录或单账号限制成为生产力瓶颈。
-*   **Windows 平台环境适配**：两大工具的顶级 Bug 均指向 Windows。Claude Code 集中在更新残留 (#89680) 与路径格式导致的 Hook 失效 (#94256)；Codex 则深入到沙盒权限继承 (#46241) 与预置服务调用失败。Windows 的稳定性已成为决定企业能否将 AI CLI 纳入主流开发流的关键门槛。
-*   **后台进程与资源控制**：Claude Code 关注 VM 磁盘无限增长 (#65577) 与 Monitor 超时缺陷 (#94393)；Codex 则引入了 `--no-daemon` 标志 (#46088) 应对后台服务器隔离需求。用户开始精细控制本地 AI 工具的资源占用与生命周期。
+### 4. 差异化定位分析
+*   **Claude Code：扩展架构与多模交互先锋**
+    *   **功能侧重**：强调架构级扩展能力，通过“Mods”和 Function Hooks 试图建立插件生态壁垒；率先引入 Gateway 签入和即时发送等高频交互优化。
+    *   **技术路线**：倾向于增强 CLI 的独立性和模块化，支持多 Agent 并行（Worktree 隔离）。
+    *   **目标用户**：深度依赖定制化工具链、需要长时复杂任务处理的高级开发者。
+*   **OpenAI Codex：模型能力与多提供商兼容**
+    *   **功能侧重**：紧密跟随 OpenAI 模型能力（如 GPT-5.6 Sol），重点在于提升 TUI 的实时反馈（推理摘要、语音）；积极扩展非 OpenAI 网关支持（OAuth 管理、Ollama/LM Studio）。
+    *   **技术路线**：注重底层协议（MCP/网络）的健壮性和多模型环境的适配性，强化沙箱隔离。
+    *   **目标用户**：使用多种 LLM 提供商、注重成本与效率平衡、且有本地模型部署需求的开发者。
 
-## 4. 差异化定位分析
+### 5. 社区热度与成熟度
+*   **社区活跃度**：两者均处于高热度阶段，但活跃类型不同。Claude Code 社区更多集中在**特性提案**（如 Mods 扩展 195 评论）和**平台缺陷投诉**，显示出用户对其潜力的期待及对 Windows 支持的不满。Codex 社区则更多集中在**协议兼容性**（MCP/非 OpenAI 提供商）和**UI 稳定性**讨论，反映出其作为通用入口在集成外部资源时面临的挑战。
+*   **成熟度判断**：
+    *   **Claude Code**：功能迭代速度快（新版本侧重交互效率），但核心痛点（Windows、IDE 细节）的修复速度滞后于功能上新，处于**快速功能堆叠**阶段。
+    *   **OpenAI Codex**：PR 数量较多（10 条重要 PR 涉及安全、网络、性能底层），显示出更强的**工程稳定性**打磨力度，但在支持非 OpenAI 生态时暴露出集成深度不足的问题。
 
-| 维度 | Claude Code | OpenAI Codex |
-| :--- | :--- | :--- |
-| **技术路线** | 强调**扩展性机制**，正在引入 "Mods" 和 "Function Hooks" 改变插件范式；采用 TUI 交互与桌面 Agent VM 沙箱。 | 侧重**底层架构与执行控制**，Rust 引擎重写；强调 "Guardian" 安全审查委托及独立的文件系统读写沙盒策略。 |
-| **功能侧重** | 插件生命周期管理、多层目录技能自动发现、Diff 面板按需打开等精细化 UI/UX 体验。 | 守护进程 (Daemon) 隔离、多智能体委托上下文捕获、长周期任务的后台自动化。 |
-| **目标用户** | 强调整个工作区 (Monorepo) 的无缝配置，目标用户偏向需要高定制、长链条开发流的重度开发者。 | 面向企业团队，重点处理多账号切换与合规性沙盒；当前正经历因服务端速率限制导致的信任重建期。 |
-
-## 5. 社区热度与成熟度
-*   **OpenAI Codex (快速修补与信任博弈期)**：社区热度极高但情绪偏向负面与焦虑。密集的 Alpha 连发和关于“模型容量不足/配额异常消耗”的密集投诉（#45073, #46185 等），表明其后端基础设施面临扩容与计费透明度的双重考验，工具本身的成熟度较高，但服务体验尚未达到稳定预期。
-*   **Claude Code (机制演进与体验精修期)**：社区氛围更偏向建设性的功能期待。#27302 和 #91870 的大量点赞与讨论显示开发者在积极拥抱其即将发布的“Mods”扩展体系。虽然存在 Windows 稳定性痛点，但其稳定版迭代（v2.1.274）和细节优化（如 Diff Pane 体验提升）反映出工程成熟度较高。
-
-## 6. 值得关注的趋势信号
-*   **成本透明性与计费公平性成为核心焦虑**：无论是 Claude Code 的“周限额耗尽无交接机制” (#93799)，还是 Codex 爆发的“Credits 迅速耗尽” (#46254)，AI 开发工具正从“工具属性”向“订阅服务属性”转变。API/配额限制导致的工作连续性中断（Context Loss）正在成为阻碍用户信任的关键因素。
-*   **安全护栏开始产生“副作用”**：Codex 引入并优化 Guardian 委托审查，而 Claude Code 社区反馈安全护栏对合法防御工具产生大量误报。AI CLI 的安全策略从简单的“限制执行”向“上下文感知的智能拦截”演进，但目前的误报率正在拖慢高级开发者的效率。
-*   **沙盒技术的跨平台深水区**：Windows 平台的系统级调用（AppX 容器、注册表、权限继承）正取代传统的 Linux/MacOS 成为 AI CLI 沙盒技术攻坚的深水区。未来 AI CLI 工具的护城河将不仅在于模型能力，更在于其对底层操作系统资源调用的绝对控制力与安全性。
+### 6. 值得关注的趋势信号
+*   **从“代码补全”向“自主代理”过渡的阵痛**：两个工具均出现长时任务中断、状态泄露、速率限制不适配的问题。行业正试图在无限自动化与可控性之间寻找平衡，事件驱动唤醒和会话持久化将是接下来的竞争焦点。
+*   **本地模型与边缘计算的兴起**：Codex 社区对 Ollama/LM Studio 及 MCP 非官方提供商的高关注度，表明开发者不再仅仅依赖云端顶级模型，**本地化部署**和**低成本模型集成**的需求正在迅速增长，CLI 工具必须提供灵活的后端抽象层。
+*   **多模态与语音交互常态化**：Codex 引入实验性 `/voice` 功能，预示着 CLI 工具正从纯文本交互向“可听可说”的无障碍/高效开发模式扩展，这对 TUI 的设计提出了新要求。
+*   **安全与权限模型的重构**：两个工具都出现了权限配置失效、沙箱 ACL 错误等安全相关 Bug。随着 AI 代理获取更高系统权限，**细粒度的权限控制**和**透明的审计日志**将成为企业级采用的关键门槛。
 
 ---
 
@@ -60,172 +65,119 @@
 > 数据来源: [anthropics/skills](https://github.com/anthropics/skills)
 
 # Claude Code Skills 社区热点报告
-*数据来源：github.com/anthropics/skills，截止 2026-09-18*
+**数据截止日期：** 2026-09-18 | **数据源：** `anthropics/skills`
 
-### 1. 热门 Skills 排行
+## 1. 热门 Skills 排行
+基于 Issue 评论数及 PR 关注度排序，核心功能与讨论热点如下：
 
-注：数据中 PR 的"评论"字段为 `undefined`，关注度依据 Issue 评论数及 PR 更新时间、内容重要性综合评估。
+*   **skill-creator（Skill 创建器）**
+    *   **功能/热点：** 负责创建和优化 Skill。当前社区最核心的痛点集中在触发率评估（Trigger Evals）失效及 Windows 兼容性问题上，多个 PR 试图修复其 0% 召回率误报问题。
+    *   **状态：** Open ([PR #1298](https://github.com/anthropics/skills/pull/1298), [PR #1769](https://github.com/anthropics/skills/pull/1769), [Issue #556](https://github.com/anthropics/skills/issues/556))
+*   **mcp-builder（MCP 构建器）**
+    *   **功能/热点：** 用于构建和评估 Model Context Protocol 服务。社区讨论集中在评估脚本报错吞没异常、默认模型版本更新（向 claude-sonnet-5 迁移）以及新版本库的 API 适配。
+    *   **状态：** Open ([PR #1742](https://github.com/anthropics/skills/pull/1742), [PR #1724](https://github.com/anthropics/skills/pull/1724), [Issue #1390](https://github.com/anthropics/skills/issues/1390))
+*   **document-skills / office（文档生成核心）**
+    *   **功能/热点：** 涵盖 DOCX、PPTX、XLSX 等办公文档生成与排版。讨论焦点在于文档排版质量控制、UTF-8 编码兼容性及 tracked changes（修订模式）导致的数据损坏 Bug。
+    *   **状态：** Open ([PR #1765](https://github.com/anthropics/skills/pull/1765), [PR #541](https://github.com/anthropics/skills/pull/541), [PR #514](https://github.com/anthropics/skills/pull/514))
+*   **claude-api（API 集成）**
+    *   **功能/热点：** 官方 API 接入规范。社区主要关注模型 ID 废弃状态更新，以及单次工具调用注入近 156k tokens 导致的上下文窗口耗尽问题。
+    *   **状态：** Open ([PR #1607](https://github.com/anthropics/skills/pull/1607), [Issue #1487](https://github.com/anthropics/skills/issues/1487))
+*   **web-artifacts-builder（Web 构建器）**
+    *   **功能/热点：** 生成自包含的 Web 资源包。主要讨论围绕 pnpm 高级别版本下打包脚本的阻塞级故障（ERR_PNPM_IGNORED_BUILDS）。
+    *   **状态：** Open ([Issue #1362](https://github.com/anthropics/skills/issues/1362))
+*   **Hivemind（多智能体编排）**
+    *   **功能/热点：** 零成本的多智能体协作架构，将机械任务下放至免费模型执行，保持核心规划能力。
+    *   **状态：** Open ([PR #1628](https://github.com/anthropics/skills/pull/1628))
 
-*   **[skill-creator / 元技能改进]**
-    *   **功能**：修复触发评估假阴性、Windows 兼容性及运行时故障处理；增加 YAML 描述校验。
-    *   **热点**：核心元技能的稳定性是社区痛点，多个 PR 同时针对其评估逻辑（[PR #1298](https://github.com/anthropics/skills/pull/1298), [PR #1769](https://github.com/anthropics/skills/pull/1769)）。
-    *   **状态**：Open
-*   **[document-skills (pdf/docx/odt)]**
-    *   **功能**：文档创建、转换与排版质量控制。
-    *   **热点**：修复大小写引用错误、docx 追踪修订 ID 冲突、ODT 支持；[Issue #189](https://github.com/anthropics/skills/issues/189) 指出 document-skills 与 example-skills 内容重复导致上下文冗余。
-    *   **状态**：Open ([PR #538](https://github.com/anthropics/skills/pull/538), [PR #541](https://github.com/anthropics/skills/pull/541), [PR #486](https://github.com/anthropics/skills/pull/486))
-*   **[mcp-builder]**
-    *   **功能**：MCP 服务器构建与评估。
-    *   **热点**：修复 mcp>=2.0 API 变更（[PR #1742](https://github.com/anthropics/skills/pull/1742)）；[Issue #1390](https://github.com/anthropics/skills/issues/1390) 指出评估脚本对真实 MCP 服务器得分恒为 0/N 的严重 Bug。
-    *   **状态**：Open
-*   **[claude-api]**
-    *   **功能**：API 模型 ID 管理。
-    *   **热点**：[Issue #1487](https://github.com/anthropics/skills/issues/1487) 报告该 Skill 注入约 156k tokens 导致上下文窗口耗尽；[PR #1607](https://github.com/anthropics/skills/pull/1607) 标记退役模型。
-    *   **状态**：Open
-*   **[frontend-design]**
-    *   **功能**：前端开发规范。
-    *   **热点**：[PR #210](https://github.com/anthropics/skills/pull/210) 旨在提升指令的可执行性，减少模糊指导，提高 token 效率。
-    *   **状态**：Open
-*   **[pyxel]**
-    *   **功能**：Python 复古游戏开发。
-    *   **热点**：[PR #525](https://github.com/anthropics/skills/pull/525) 提供从头开始的确定性运行和帧检查指南，长周期 Open，受游戏开发社区关注。
-    *   **状态**：Open
-*   **[Hivemind / 多智能体编排]**
-    *   **功能**：委托机械工作给免费模型 worker。
-    *   **热点**：[PR #1628](https://github.com/anthropics/skills/pull/1628) 提出零成本多智能体架构，引发关于上下文稀缺性的讨论。
-    *   **状态**：Open
+## 2. 社区需求趋势
+通过分析开放的 Issues，社区对新 Skill 及功能的期待集中在以下几个方向：
+*   **组织级协同共享：** 期待 Claude.ai 支持企业内部的直接 Skills 共享机制，避免繁琐的本地文件传递与上传。([Issue #228](https://github.com/anthropics/skills/issues/228))
+*   **安全与信任边界治理：** 社区强烈呼吁建立 Skills 命名空间的信任机制，防范第三方社区恶意 Skill 借用 `anthropic/` 前缀进行权限滥用。([Issue #492](https://github.com/anthropics/skills/issues/492))
+*   **AI 智能体系统级治理：** 需求从单一代码生成延伸至 AI 系统的策略执行、威胁检测与信任评分等 Agent 治理安全模式。([Issue #412](https://github.com/anthropics/skills/issues/412))
+*   **长时程任务状态管理：** 期待针对长时程 Agent 状态的记忆压缩与符号化通知技术（compact-memory），以提升多轮长对话的 Token 效率。([Issue #1329](https://github.com/anthropics/skills/issues/1329))
 
-### 2. 社区需求趋势
+## 3. 高潜力待合并 Skills
+以下为近期讨论活跃、技术路径明确但尚未合并的 Open PR，存在较高概率近期落地：
+*   **Buffer GraphQL Scheduling API**：打通 Buffer 社交数据 API，支持任意 AI Agent 执行社交发帖及数据分析调度。([PR #1627](https://github.com/anthropics/skills/pull/1627))
+*   **Proofcore Contract Auditor**：Web3 方向的智能合约静态审计，支持将 TON 链上加密审计证明锚定。([PR #1771](https://github.com/anthropics/skills/pull/1771))
+*   **md2video-audio**：零成本将 Markdown 文档直接编译为具备拟人语音的专业 MP4 视频。([PR #1703](https://github.com/anthropics/skills/pull/1703))
+*   **Reasoning Quality Gate Pipeline**：提供全生命周期（前置校准->对抗性审查->交付验证）的推理质量三重把关门禁。([Issue #1385](https://github.com/anthropics/skills/issues/1385))
 
-*   **安全性与信任边界**：[Issue #492](https://github.com/anthropics/skills/issues/492)（43 评论）指出社区 Skill 在 `anthropic/` 命名空间分发导致信任滥用；[Issue #1175](https://github.com/anthropics/skills/issues/1175) 关注 SharePoint 处理中的安全与上下文风险。
-*   **组织级协作与共享**：[Issue #228](https://github.com/anthropics/skills/issues/228)（8 👍）呼吁支持 Claude.ai 内组织级 Skill 共享库，替代手动文件传输。
-*   **上下文效率与 Token 控制**：[Issue #202](https://github.com/anthropics/skills/issues/202) 批评 skill-creator 过于冗长；[Issue #1329](https://github.com/anthropics/skills/issues/1329) 提议 `compact-memory` Skill 以符号化笔记节省上下文；[Issue #1487](https://github.com/anthropics/skills/issues/1487) 反映大文件注入问题。
-*   **质量门控与推理验证**：[Issue #1385](https://github.com/anthropics/skills/issues/1385) 提议三阶段推理质量门控流水线（校准->对抗审查->交付验证）；[PR #83](https://github.com/anthropics/skills/pull/83) 引入质量/安全分析器。
-*   **企业工作流集成**：如 HPC 集群操作（[PR #1615](https://github.com/anthropics/skills/pull/1615)）、社交媒体排期（[PR #1627](https://github.com/anthropics/skills/pull/1627)）及 Web3 合约审计（[PR #1771](https://github.com/anthropics/skills/pull/1771)）。
-
-### 3. 高潜力待合并 Skills
-
-*   **skill-creator 修复群**：[PR #1298](https://github.com/anthropics/skills/pull/1298) 和 [PR #1769](https://github.com/anthropics/skills/pull/1769) 解决核心评估 bug（0% recall 问题），关联 [Issue #556](https://github.com/anthropics/skills/issues/556) 和 [Issue #1721](https://github.com/anthropics/skills/issues/1721)，近期合并概率高。
-*   **mcp-builder 兼容性修复**：[PR #1742](https://github.com/anthropics/skills/pull/1742) 修复 mcp>=2.0 导入错误，解决 [Issue #1668](https://github.com/anthropics/skills/issues/1668)，为 MCP 生态更新的关键补丁。
-*   **Office 文档编码修复**：[PR #1765](https://github.com/anthropics/skills/pull/1765) 修复 Windows 非 UTF-8 环境下的 diff 解码问题，关联 [Issue #1707](https://github.com/anthropics/skills/issues/1707)。
-*   **web-artifacts-builder 工具链修复**：[Issue #1362](https://github.com/anthropics/skills/issues/1362) 详细描述了 pnpm >=10.1 的阻断性问题及修复方案，虽为 Issue 但含可直接落地的修复建议。
-
-### 4. Skills 生态洞察
-
-社区当前最集中的诉求是**解决元技能（skill-creator/mcp-builder）的可靠性缺陷**与**遏制因命名空间混乱及冗长文档引发的安全与上下文效率危机**。
+## 4. Skills 生态洞察
+当前社区在 Skills 层面最集中的诉求是**消除底层基础设施（如评测工具及打包链路）中破坏“开箱即用”预期的确定性故障**，以及**构建严格的组织级安全信任框架**。
 
 ---
 
-# Claude Code 社区动态日报
+# Claude Code 社区动态日报 (2026-09-18)
 
-**日期：** 2026-09-18  
-**数据来源：** [anthropics/claude-code](https://github.com/anthropics/claude-code)
+### 1. 今日速览
+今日版本 v2.1.275 上线，重点优化了 Gateway 签入流程及新增“即时发送”快捷键以提升交互效率。社区焦点高度集中在 **Mods 扩展架构**（高热度增强提案）及 **Windows 平台稳定性**（Desktop 启动故障）。同时，Remote Control（远程控制）功能的缺陷及 MCP 上下文资源浪费问题成为近期开发者反馈的显著趋势。
 
-## 1. 今日速览
+### 2. 版本发布
+**v2.1.275 更新摘要**
+*   **Gateway 签入增强**：在 Claude apps gateway 签入中增加已登录账户显示；若 Gateway 命名账户，需在凭证保存前确认，且 `/status` 命令将展示该信息。
+*   **即时发送功能**：新增快捷键（`ctrl+enter` 或 `ctrl+x ctrl+s`），可中断当前回合并立即发送所有排队消息。
 
-v2.1.274 版本发布，重点强化了内存监控警告和 MCP 服务器启动等待控制。社区热点集中在多账户连接器支持（#27302）和“Mods”扩展机制的发布进展（#91870），两者均拥有极高的社区关注度。此外，Windows 平台稳定性问题和 macOS 桌面端沙箱资源泄漏是近期技术反馈的集中点。
+### 3. 社区热点 Issues
+以下 Issue 基于热度（评论数/点赞）及重要性筛选，反映当前社区最紧迫的需求与痛点：
 
-## 2. 版本发布
+1.  **[增强] Mods - 让 Claude 扩展性提升 10 倍** (#91870)
+    *   **现状**：社区最热 Issue (195 评论)，提案者承诺数周内发布 function hooks，旨在通过大幅扩展 Hooks/Plugins 机制提升可定制性。
+    *   **链接**：https://github.com/anthropics/claude-code/issues/91870
+2.  **[Bug] Windows Desktop 启动失败 (Silo/Job Object 残留)** (#53247)
+    *   **现状**：高频投诉 (93 评论)，Windows 崩溃后产生孤儿进程，导致应用无法重启，需注销或重启系统才能恢复，严重影响 Windows 用户体验。
+    *   **链接**：https://github.com/anthropics/claude-code/issues/53247
+3.  **[增强] 会话交接/连续性支持 (Session Handoff)** (#11455)
+    *   **现状**：长期需求 (36 评论)，旨在解决 CLI 会话中断后的状态恢复问题，提升长任务处理的连续性。
+    *   **链接**：https://github.com/anthropics/claude-code/issues/11455
+4.  **[Bug] VS Code 扩展中拖放功能失效** (#25128)
+    *   **现状**：回归性 Bug (48 点赞)，自 v2.1.6 起，VS Code 扩展聊天面板无法使用拖放文件，而终端 CLI 正常，影响 IDE 集成体验。
+    *   **链接**：https://github.com/anthropics/claude-code/issues/25128
+5.  **[Bug] 权限配置 `.claude/settings.local.json` 未被遵守** (#15921)
+    *   **现状**：高关注度 Bug (31 评论)，即使在 `bypassPermissions` 模式下，Bash/Write/Edit 操作的权限限制仍未生效，涉及核心安全与权限逻辑。
+    *   **链接**：https://github.com/anthropics/claude-code/issues/15921
+6.  **[Bug] Session-start 技能列表描述被静默截断** (#81081)
+    *   **现状**：在技能大小预算限制下，大多数技能描述被静默截断，影响用户对可用技能的感知。
+    *   **链接**：https://github.com/anthropics/claude-code/issues/81081
+7.  **[Bug] Cowork Windows 无法附加任何项目** (#88632)
+    *   **现状**：Windows 本地环境 Cowork 模式报错“Projects can't be included...”，而 macOS 正常，平台不一致性 Bug。
+    *   **链接**：https://github.com/anthropics/claude-code/issues/88632
+8.  **[Bug] ECONNRESET: TLS 1.3 握手重置** (#94225)
+    *   **现状**：特定网络环境（如西班牙 Movistar ISP）下直接路径连接失败，开启 VPN 可恢复，涉及底层网络协议兼容性。
+    *   **链接**：https://github.com/anthropics/claude-code/issues/94225
+9.  **[Bug] Remote Control 会话状态矛盾** (#95254)
+    *   **现状**：手机端远程控制时，虽能接收其他会话消息，但自身输入被标记为“offline”，功能逻辑冲突。
+    *   **链接**：https://github.com/anthropics/claude-code/issues/95254
+10. **[Bug] Worktree 隔离导致 CWD 状态泄露** (#93438)
+    *   **现状**：Agent 派发使用 `isolation:"worktree"` 时，工作区状态意外泄露回父会话，影响多 Agent 并行开发的稳定性。
+    *   **链接**：https://github.com/anthropics/claude-code/issues/93438
 
-**v2.1.274 更新摘要：**
-*   **内存监控：** 新增显式警告，当内存使用率临界时提供清理内存或安全重启的步骤指引。
-*   **MCP 启动控制：** 新增环境变量 `CLAUDE_CODE_MCP_STARTUP_WAIT_MS`，允许限制非交互模式下首次回合等待 MCP 服务器连接的时间（设为 `0` 表示不等待）。
-*   **其他：** 为 `cl` 相关功能新增了 `effort` 属性（具体描述因数据截断不完整，但涉及核心参数调整）。
-*   链接：[v2.1.274 Release](https://github.com/anthropics/claude-code/releases)
+### 4. 重要 PR 进展
+*(注：提供的 PR 列表仅包含 3 条数据，故仅列出这 3 条)*
 
-## 3. 社区热点 Issues
+1.  **[Mods] 类型安全优化：`openPane` 返回类型调整为 `unknown`** (#95198)
+    *   **内容**：将 diff mod 中 `openPane` 的返回类型从 `Promise<void>` 调整为 `Promise<unknown>`，以兼容即将发布的更丰富的 `$.ui.open` 结果对象，确保编译通过且不影响现有调用方。
+    *   **链接**：https://github.com/anthropics/claude-code/pull/95198
+2.  **[Diff] 修复首次编辑自动打开面板逻辑** (#94847)
+    *   **内容**：修复 Diff 面板在首次成功执行 Edit/Write 时自动打开的问题。原逻辑在获取数据前打开面板，若涉及仓库外文件、忽略文件或不同 worktree，会导致显示空面板。新逻辑仅在有可列出文件时打开。
+    *   **链接**：https://github.com/anthropics/claude-code/pull/94847
+3.  **[PR-Review-Toolkit] 修复 Agent YAML Frontmatter 错误** (#87077)
+    *   **内容**：修复所有 agents 描述中未引用的标量包含对话行（如 `Daisy: "..."`）导致的 YAML 解析错误，该错误导致 agent 加载时 frontmatter 为空。
+    *   **链接**：https://github.com/anthropics/claude-code/pull/87077
 
-精选 10 个关注度最高或影响面最广的 Issue：
+### 5. 功能需求趋势
+从过去 24 小时及近期更新的 Issue 中，提炼出以下社区关注方向：
 
-1.  **[#27302] 支持多连接器账户** [ENHANCEMENT]
-    *   **重要性：** 允许用户在 Web 版和 Claude Code 中连接同一连接器下的不同账户，解决大型团队协作痛点。
-    *   **社区反应：** 极热（247 评论，378 点赞），长期未决的功能请求。
-    *   链接：[anthropics/claude-code Issue #27302](https://github.com/anthropics/claude-code/issues/27302)
+*   **扩展性与定制化 (Mods/Hooks)**：以 #91870 为代表，社区强烈渴望通过 Function Hooks 和 Plugins 实现更深度的扩展，不仅仅是 CLI 层面的简单调用，而是架构级的“10x 扩展”。
+*   **Windows 平台稳定性**：Windows 用户面临较多阻断性问题，包括 Desktop 启动崩溃恢复困难 (#53247) 和 Cowork 项目附加失败 (#88632)。Windows 支持的质量成为当前主要短板。
+*   **远程与移动开发体验**：Remote Control 功能出现多个状态同步 Bug (#95254, #95231)，开发者对移动端与本地会话无缝协作的期待在上升，但当前实现尚不成熟。
+*   **IDE (VS Code) 集成完善**：VS Code 扩展在基础交互（拖放 #25128）和 UI 细节（消息折叠 #77004、图片渲染 #79436）上存在大量待修复项，用户期待 IDE 体验向终端 CLI 看齐。
 
-2.  **[#91870] Mods：让 Claude 扩展性提升 10 倍** [ENHANCEMENT]
-    *   **重要性：** 官方正在推进“Function Hooks”作为核心扩展机制，承诺在数周内发布，将极大改变插件开发模式。
-    *   **社区反应：** 高关注度（192 评论），开发者社区对此功能期待极高，反馈直接影响了设计。
-    *   链接：[anthropics/claude-code Issue #91870](https://github.com/anthropics/claude-code/issues/91870)
-
-3.  **[#89680] Windows 桌面端更新导致进程残留** [BUG]
-    *   **重要性：** 静默更新后遗留旧版 AppX 容器进程，导致新版无法启动（错误 0x80070020），需重启机器，严重影响 Windows 用户体验。
-    *   **社区反应：** 20 条评论，属于阻碍日常使用的严重稳定性 Bug。
-    *   链接：[anthropics/claude-code Issue #89680](https://github.com/anthropics/claude-code/issues/89680)
-
-4.  **[#26489] Skills/Agents/Commands 支持父目录遍历** [ENHANCEMENT]
-    *   **重要性：** 目前 `CLAUDE.md` 支持父目录查找，但其他配置文件不支持，导致多项目工作区配置冗余。
-    *   **社区反应：** 49 点赞，17 条评论，是 Monorepo 用户的核心痛点。
-    *   链接：[anthropics/claude-code Issue #26489](https://github.com/anthropics/claude-code/issues/26489)
-
-5.  **[#71547] AskUserQuestion 对话框鼠标误触发** [BUG]
-    *   **重要性：** 鼠标点击选项即自动提交，缺少确认步骤，容易在 TUI 界面造成意外操作。
-    *   **社区反应：** 22 点赞，13 条评论，UI 交互体验问题。
-    *   链接：[anthropics/claude-code Issue #71547](https://github.com/anthropics/claude-code/issues/71547)
-
-6.  **[#81081] 技能描述在会话启动时被静默截断** [BUG]
-    *   **重要性：** 在大小预算限制下，大部分技能描述被截断，导致模型可能无法正确识别可用技能。
-    *   **社区反应：** 10 条评论，影响插件/技能的实际可用性。
-    *   链接：[anthropics/claude-code Issue #81081](https://github.com/anthropics/claude-code/issues/81081)
-
-7.  **[#65577] macOS 本地 Agent VM 磁盘无限增长** [BUG]
-    *   **重要性：** 沙箱模式使用的 `rootfs.img` 只增不减，悄悄占满磁盘空间，导致 out-of-space 故障。
-    *   **社区反应：** 8 点赞，7 条评论，资源管理严重缺陷。
-    *   链接：[anthropics/claude-code Issue #65577](https://github.com/anthropics/claude-code/issues/65577)
-
-8.  **[#93799] 周限额耗尽后无交接机制，成本不可见** [ENHANCEMENT]
-    *   **重要性：** 用户在进行中的任务因达到周限额而被中断，且没有自动生成 Handoff（交接），导致工作丢失或需要重复订阅。
-    *   **社区反应：** 5 条评论，反映了订阅制用户对于成本控制和工作连续性的焦虑。
-    *   链接：[anthropics/claude-code Issue #93799](https://github.com/anthropics/claude-code/issues/93799)
-
-9.  **[#94393] Monitor 工具超时限制不符** [BUG]
-    *   **重要性：** `timeout_ms` 上限为 3600000ms（1小时），但实际后台任务在 ~30 分钟时被强制终止，且忽略 persistent 标志。
-    *   **社区反应：** 10 点赞，5 条评论，阻碍长周期监控任务。
-    *   链接：[anthropics/claude-code Issue #94393](https://github.com/anthropics/claude-code/issues/94393)
-
-10. **[#94256] Windows Hooks 路径匹配错误导致编辑被拒** [BUG]
-    *   **重要性：** Windows 和 Linux 共享配置时，Windows 路径格式（`D:\...`）与 Hook Shell 中的 POSIX 路径（`/d/...`）不匹配，导致所有 Edit/Write 操作被路径守卫 Hook 拒绝。
-    *   **社区反应：** 跨平台开发者的常见陷阱，已有复现步骤。
-    *   链接：[anthropics/claude-code Issue #94256](https://github.com/anthropics/claude-code/issues/94256)
-
-## 4. 重要 PR 进展
-
-精选 4 个有实质技术进展的 PR（数据源仅展示 4 条过去 24 小时更新的 PR）：
-
-1.  **[PR #95198] Mods/Diff: 类型安全增强**
-    *   **内容：** 将 `openPane` 的返回值类型从 `Promise<void>` 改为 `Promise<unknown>`，以适配即将发布的更丰富的 `$.ui.open` 结果对象，确保前后版本类型兼容。
-    *   链接：[anthropics/claude-code PR #95198](https://github.com/anthropics/claude-code/pull/95198)
-
-2.  **[PR #94847] Diff Pane 优化：按需打开**
-    *   **内容：** 修复 Diff 面板在首次编辑时自动打开的逻辑。现在仅当有可列表的文件时才打开，避免在仓库外写入或忽略文件中显示空白面板，提升用户体验。
-    *   链接：[anthropics/claude-code PR #94847](https://github.com/anthropics/claude-code/pull/94847)
-
-3.  **[PR #87077] 修复 PR-Review-Toolkit YAML 格式错误**
-    *   **内容：** 修复了所有代理描述中未引用的多行文本导致的 YAML 解析错误，此前该错误导致代理加载时 frontmatter 为空，功能失效。
-    *   链接：[anthropics/claude-code PR #87077](https://github.com/anthropics/claude-code/pull/87077)
-
-4.  **[PR #94843] Diff Pane 类型检查修复**
-    *   **内容：** 修复 `mods/diff` 中读取 `viewport.isFullscreen` 时的类型错误，通过安全访问方式兼容尚未声明该字段的引擎版本，避免类型检查失败。
-    *   链接：[anthropics/claude-code PR #94843](https://github.com/anthropics/claude-code/pull/94843)
-
-*(注：数据源仅提供 4 条 PR，故列出全部可用 PR)*
-
-## 5. 功能需求趋势
-
-基于 Issues 标签和内容分析，社区当前最关注的功能方向包括：
-
-*   **深度扩展性 (Hooks/Mods/Plugins)：** 社区强烈期待“Mods”正式落地以增强扩展能力。同时，对 Hook 事件的精细化需求增加（如 `PreClear` 事件），以及对 Skill 在多层目录中自动发现的需求（#26489）。
-*   **跨平台一致性：** Windows 平台问题频发（更新残留、Hook 路径、安装挂起），社区希望 Windows 能与 Linux/macOS 保持一致的稳定性和功能完整度（如 PowerShell Hook 支持 #90077）。
-*   **资源管理与成本透明：** 用户开始关注本地资源占用（VM 磁盘增长 #65577、内存警告 v2.1.274）以及会话成本的可预测性（限额中断无交接 #93799，缓存未命中 #94815）。
-*   **Web/云端协作增强：** 支持多账户连接器（#27302）和云端会话对非 Push 权限仓库的交互能力（#81509），表明企业级场景需求正在增长。
-
-## 6. 开发者关注点
-
-总结开发者反馈中的痛点和高频需求：
-
-*   **稳定性与状态管理：** 多个 Bug 涉及状态异常，如会话历史丢失（#90888）、后台子代理被错误终止（#93530）、以及从休眠恢复后任务无法继续（#95197）。开发者极度反感非预期的状态中断。
-*   **安全护栏的误报：** 安全研究人员反馈 Cyber Guardrail 对合法防御工具产生大量误报（#94366），阻碍了安全开发工作流。
-*   **插件/技能的生命周期管理：** 用户抱怨账号同步的插件/技能在桌面端和 Web 端无法移除或禁用，删除后重新出现（#92850, #95157），缺乏有效的管理界面。
-*   **长任务与后台能力：** 用户对长周期任务的支持存在不满，包括 Monitor 工具超时限制（#94393）和性能问题导致的大型工作区卡顿（#82988，35k getdents 导致 30s 延迟）。
+### 6. 开发者关注点
+*   **上下文资源管理**：开发者抱怨 MCP 工具 schema 和 Deferred tools 在禁用时仍消耗大量 Token (#92255, #83363)，期望更精细的上下文保留与驱逐机制 (#85169)。
+*   **权限与安全模型**：权限配置生效不及时或不彻底 (#15921)，以及 Agent 批量操作缺乏安全护栏 (#79399) 引起对自动化任务安全性的担忧。
+*   **会话连续性**：长任务处理中会话中断后的恢复能力不足 (#11455)，以及 Worktree 隔离的状态泄露 (#93438) 影响了复杂多 Agent 工作流的可靠性。
+*   **计费透明度**：模型切换（如 Fable）的计费范围不明确导致意外高额账单 (#79478)，开发者期望更清晰的计费作用域提示。
 
 </details>
 
@@ -234,114 +186,122 @@ v2.1.274 版本发布，重点强化了内存监控警告和 MCP 服务器启动
 
 # OpenAI Codex 社区动态日报 (2026-09-18)
 
-## 1. 今日速览
-今日 Codex 社区焦点集中在 **Windows 沙盒环境稳定性修复** 与 **速率限制（Rate Limits）争议**。官方通过密集发布的 PR 修复了 Windows 沙盒权限继承、预置服务调用及注册表清理问题，以响应近期大量 Windows 用户关于 `exec_command` 失败的反馈。同时，Pro/Plus 用户普遍反馈出现异常的“模型容量不足”及用量快速消耗现象，引发多起高热度 Issue 讨论。
+## 1.  今日速览
+OpenAI 发布 Codex CLI 稳定版 **v0.155.0**，引入实验性 `/voice` 语音对话功能及 TUI 实时推理状态展示。社区热点集中在 **Windows 沙箱 ACL 错误**、**Intel macOS Computer Use 缺失**以及 **MCP 工具在非 OpenAI 提供商下的兼容性** 问题，相关 Issue 讨论热度极高。
 
 ## 2. 版本发布
-过去 24 小时内，Codex CLI (Rust 版) 连续发布了多个 alpha 版本，主要集中在 `0.155.0-alpha` 系列。
-*   **最新 Release**: `rust-v0.155.0-alpha.16`
-*   **其他更新**: 同期更新了 `alpha.15`, `alpha.2.6`, `alpha.14`, `alpha.13`, `alpha.12`。
-*   **趋势分析**: 密集的 alpha 发布表明团队正在快速迭代以解决近期积累的 Windows 兼容性及沙盒问题。
+*   **rust-v0.155.0 (稳定版)**
+    *   **新功能**：支持实验性 `/voice` 对话，提供实时转录和麦克风控制（需通过 `/experimental` 启用）。
+    *   **TUI 增强**：状态栏实时显示推理摘要（reasoning summaries），并在回合成功后显示完成时间戳。
+    *   相关 PR：#43581, #43651, #44331
+*   **Alpha 版本更新**：同步发布了 0.155.0-alpha.15 至 0.155.0-alpha.18 多个预测试版本。
 
 ## 3. 社区热点 Issues
+以下选取了 10 个关注度最高或影响面最大的 Issue：
 
-1.  **#25178 Windows 10 截屏功能失效 (👍 27, 评论 65)**
-    *   **链接**: [openai/codex #25178](https://github.com/openai/codex/issues/25178)
-    *   **重要性**: 这是当前评论数最高的 Issue。Windows 10 22H2 用户反馈 Computer Use 截图时报错 `0x80004002`，导致无法获取窗口状态，严重影响 Windows 端的 Computer Use 功能可用性。
-    *   **社区反应**: 社区讨论极其热烈（65 条评论），涉及多种 workaround 尝试，显示该 Bug 影响面广泛。
+1.  **[MCP/CLI] 非 OpenAI Responses API 提供商下 MCP 工具不可用**
+    *   **摘要**：在使用 Ollama、LM Studio 或 OpenRouter 等本地/网关服务端时，Codex 将 MCP 工具序列化为专有 namespace 格式，导致模型无法调用这些工具。
+    *   **社区反应**：35 条评论，48 个 👍，是过去 24 小时内讨论最热烈的 Issue。
+    *   链接：[Issue #26234](https://github.com/openai/codex/issues/26234)
 
-2.  **#29702 禁用 AI 问题的自动超时解析 (👍 40)**
-    *   **链接**: [openai/codex #29702](https://github.com/openai/codex/issues/29702)
-    *   **重要性**: 高点赞数表明用户对当前 Codex 在询问用户输入时的强制超时机制感到困扰。用户希望增加设置以手动控制或禁用该行为，避免对话被意外中断。
+2.  **[App/Session] Codex Desktop 接受提示后 UI 卡在 "Thinking"，Stop 失效**
+    *   **摘要**：macOS 桌面版在特定情况下 UI 冻结，无法停止任务，重启后该回合可能消失。
+    *   **社区反应**：31 条评论，14 个 👍。
+    *   链接：[Issue #24287](https://github.com/openai/codex/issues/24287)
 
-3.  **#30684 支持多账号/工作区切换 (👍 22)**
-    *   **链接**: [openai/codex #30684](https://github.com/openai/codex/issues/30684)
-    *   **重要性**: 针对企业或个人多环境场景的高频需求。当前仅支持注销后重新登录，缺乏便捷的多账户/多工作区切换功能，影响生产力。
+3.  **[Rate-Limits] 5 小时使用限制频繁中断 GPT-5.6 Sol 长时任务**
+    *   **摘要**：随着 GPT-5.6 Sol 能力的提升，现有的 5 小时滚动窗口限制不适合长时自主代理任务，导致任务中断。
+    *   **社区反应**：15 条评论，4 个 👍。
+    *   链接：[Issue #40905](https://github.com/openai/codex/issues/40905)
 
-4.  **#41779 Windows 本地 API 启动被策略阻止**
-    *   **链接**: [openai/codex #41779](https://github.com/openai/codex/issues/41779)
-    *   **重要性**: 涉及 Windows 沙盒与 `exec_command` 的交互问题。用户在启动本地开发 API 时遇到 `blocked by policy` 错误，且无日志输出，排查难度大。
+4.  **[Windows] 桌面更新后本地项目从侧边栏消失**
+    *   **摘要**：Windows 桌面应用更新后，"Projects" 区域显示为空，尽管文件和聊天历史仍存在。
+    *   **社区反应**：14 条评论。
+    *   链接：[Issue #42739](https://github.com/openai/codex/issues/42739)
 
-5.  **#44736 Windows 项目预热锁定本地镜像**
-    *   **链接**: [openai/codex #44736](https://github.com/openai/codex/issues/44736)
-    *   **重要性**: 反馈了 ChatGPT/Codex 桌面端启动过程中 `node_repl` 工作目录被重置的问题，并提供了关于助手工作目录锁定的证据，涉及底层进程管理机制。
+5.  **[IDE/Extension] VS Code 扩展卡在深色主题**
+    *   **摘要**：VS Code 侧边栏/Webview 界面卡死在深色模式，无法跟随系统或手动切换。
+    *   **社区反应**：13 条评论，10 个 👍，已标记为回归问题并关闭（可能已修复或转为其他 Issue）。
+    *   链接：[Issue #15684](https://github.com/openai/codex/issues/15684)
 
-6.  **#45073 5小时用量配额异常消耗 (👍 0, 评论 4)**
-    *   **链接**: [openai/codex #45073](https://github.com/openai/codex/issues/45073)
-    *   **重要性**: 用户报告在仅 26 分钟内消耗了 5 小时配额约 86% 的用量，涉及计费/限额逻辑的潜在 Bug，引发社区对公平性和透明度的担忧。
+6.  **[macOS/Intel] x64 构建缺失 Computer Use 辅助程序**
+    *   **摘要**：Intel Mac 用户无法使用 Appshots、锁屏操作等功能，因为 x64 发行包中缺少 `computer-use` 插件和辅助应用。此问题在多个 Issue 中反复出现（#24437, #24053, #26842, #25045, #46327）。
+    *   **社区反应**：多个相关 Issue 均获得关注，表明这是 Intel Mac 用户的重大痛点。
+    *   链接：[Issue #24437](https://github.com/openai/codex/issues/24437) (及关联 Issue)
 
-7.  **#46185 Pro 账户全模型“容量不足”错误**
-    *   **链接**: [openai/codex #46185](https://github.com/openai/codex/issues/46185)
-    *   **重要性**: 新建 Issue，Pro 用户反馈所有请求均返回 `Selected model is at capacity`，即使未触及配额上限。可能与近期服务器负载或路由策略有关。
+7.  **[CLI/Enhancement] 后台执行会话完成时的事件驱动唤醒**
+    *   **摘要**：请求支持在长时间运行的后台命令完成时通过事件唤醒模型，而非当前的轮询机制，以减少模型回合和成本。
+    *   **社区反应**：10 条评论，13 个 👍。
+    *   链接：[Issue #32188](https://github.com/openai/codex/issues/32188)
 
-8.  **#46231 账户级“容量不足”错误跟随账户而非机器**
-    *   **链接**: [openai/codex #46231](https://github.com/openai/codex/issues/46231)
-    *   **重要性**: 通过交叉测试证实了 #46185 的现象，明确指出问题根源在于账户级别的后端限制或误判，而非本地网络或设备问题。
+8.  **[App/Context] 远程压缩容量错误导致单个持久目标终止**
+    *   **摘要**：长时运行的 `/goal` 任务因远程压缩容量错误而失败，尽管其他任务正常。
+    *   **社区反应**：9 条评论。
+    *   链接：[Issue #33171](https://github.com/openai/codex/issues/33171)
 
-9.  **#46254 Pro 计划用户购买 Credits 后迅速耗尽**
-    *   **链接**: [openai/codex #46254](https://github.com/openai/codex/issues/46254)
-    *   **重要性**: 用户情绪激烈的反馈，指出 $100 的额外 Credits 在短时间内被完全消耗，引发对消耗速率透明度的质疑。
+9.  **[CLI/Skills] recommended_plugins 注入缺乏有效的禁用选项**
+    *   **摘要**：`recommended_plugins` 块在每次会话第一轮无条件注入约 38 个未安装插件，缺乏细粒度的客户端禁用机制。
+    *   **社区反应**：7 条评论，3 个 👍。
+    *   链接：[Issue #38185](https://github.com/openai/codex/issues/38185)
 
-10. **#45613 GPT-5.3-Codex-Spark 配额可见但不可用**
-    *   **链接**: [openai/codex #45613](https://github.com/openai/codex/issues/45613)
-    *   **重要性**: 新用户模型 `gpt-5.3-codex-spark` 的可用性争议，显示账户 UI 中有配额但 CLI/App 中无法调用，涉及模型路由和界面一致性问题。
+10. **[MCP/CLI] Codex 未遵循 MCP `tools/list` 的分页 (nextCursor)**
+    *   **摘要**：当 MCP 服务器返回分页结果时，Codex 未通过 `nextCursor` 获取后续工具列表。
+    *   **社区反应**：6 条评论，6 个 👍。
+    *   链接：[Issue #28858](https://github.com/openai/codex/issues/28858)
 
 ## 4. 重要 PR 进展
+以下选取了 10 个已关闭或合并的重要 PR，反映了近期开发重点：
 
-1.  **#46239 优先使用预置服务进行 Windows 沙盒自动设置**
-    *   **链接**: [openai/codex #46239](https://github.com/openai/codex/pull/46239)
-    *   **内容**: 改进 Windows 沙盒初始化逻辑，不再依赖 Onboarding 特性门控，而是优先调用已安装的预置服务（Provisioning Service），仅在服务不可用时回退到提权 Helper。修复了部分 Windows 用户沙盒启动失败的问题。
+1.  **PR #46319: 在 exec JSON 输出中保留 Web Search 操作和结果**
+    *   **内容**：修复了 `codex exec --json` 中 Web Search 事件丢失结构化结果（如 URL 和搜索结果）的问题，通过显式映射替代了有损的序列化往返。
+    *   链接：[PR #46319](https://github.com/openai/codex/pull/46319)
 
-2.  **#46241 修复 Windows 沙盒对现有运行时子项的访问**
-    *   **链接**: [openai/codex #46241](https://github.com/openai/codex/pull/46241)
-    *   **内容**: 解决 Windows 沙盒中运行时目录已有文件/子目录权限继承缺失的问题。通过遍历 C:\ 等路径检查继承权限，确保沙盒用户能访问必要的运行时资源。
+2.  **PR #46318: 为模型提供商网关添加 OAuth 凭证管理**
+    *   **内容**：引入 `GatewayAuthManager`，支持 PKCE 浏览器登录、loopback 回调、令牌缓存及刷新，并将凭证存储在加密名称空间中，增强对非 OpenAI 网关的安全支持。
+    *   链接：[PR #46318](https://github.com/openai/codex/pull/46318)
 
-3.  **#46237 改进 Windows 沙盒错误详情及注册表清理**
-    *   **链接**: [openai/codex #46237](https://github.com/openai/codex/pull/46237)
-    *   **内容**: 在预置错误的响应和日志中包含完整的错误链（Error Chains），并修复了移除遗留安装记录时可能留下的空注册表键值，提升故障排查能力。
+3.  **PR #46324: 扩展压缩回退至当前模型**
+    *   **内容**：修复了在切换模型后，压缩操作失败时未能回退到新选择模型的问题，增强了多模型环境下的稳定性。
+    *   链接：[PR #46324](https://github.com/openai/codex/pull/46324)
 
-4.  **#46245 原子化发布 Guardian 缓存分数及覆盖率**
-    *   **链接**: [openai/codex #46245](https://github.com/openai/codex/pull/46245)
-    *   **内容**: 修复异步分数发布导致的竞态条件。确保风险分数、授权状态和工具调用覆盖率的更新是原子的，防止批准检查读取到不一致的证据数据。
+4.  **PR #46302: 使用执行器 OS 验证网络套接字策略**
+    *   **内容**：修复了在控制器与执行器 OS 不同（如 Linux 控制器 + Windows 执行器）时，因路径验证错误导致有效绝对路径被拒绝的问题。
+    *   链接：[PR #46302](https://github.com/openai/codex/pull/46302)
 
-5.  **#46117 添加可选的后台服务器自动启动**
-    *   **链接**: [openai/codex #46117](https://github.com/openai/codex/pull/46117)
-    *   **内容**: 新增 `features.daemon_auto_start` 实验性功能，允许在新建、恢复或分叉会话时自动启动共享本地服务器，简化守护进程管理。
+5.  **PR #46300: 集中化 OAuth 登录和刷新处理**
+    *   **内容**：重构了 OAuth 流程，提取了授权 URL 构造和错误处理，防止在诊断信息中泄露令牌或凭据，提升了安全性。
+    *   链接：[PR #46300](https://github.com/openai/codex/pull/46300)
 
-6.  **#46088 添加 `--no-daemon` 标志以绕过共享后台服务器**
-    *   **链接**: [openai/codex #46088](https://github.com/openai/codex/pull/46088)
-    *   **内容**: 提供显式绕过机制，允许用户在需要隔离环境时使用 `--no-daemon`，该标志在 `resume` 和 `fork` 命令中也可用，且不启动或探测共享服务器。
+6.  **PR #46328: 避免持久化无项目目录的信任状态**
+    *   **内容**：当在无法识别为项目根目录的文件夹中启动线程时，不再持久化项目信任状态，防止后续添加的项目配置被错误地预批准。
+    *   链接：[PR #46328](https://github.com/openai/codex/pull/46328)
 
-7.  **#46122 独立路由文件系统的读写沙盒权限**
-    *   **链接**: [openai/codex #46122](https://github.com/openai/codex/pull/46122)
-    *   **内容**: 重构沙盒逻辑，使文件读取不再强制依赖写权限受限的沙盒。即使拥有全磁盘读权限，若写受限，也不再强制要求沙盒启动，提高读取操作的灵活性。
+7.  **PR #46310: 推迟环境选择更改至下一回合**
+    *   **内容**：确保在回合运行期间更改环境选择不会干扰当前回合的工具调用或环境设置，提高了并发执行的安全性。
+    *   链接：[PR #46310](https://github.com/openai/codex/pull/46310)
 
-8.  **#46112 在工作目录消失时保留文件系统沙盒策略上下文**
-    *   **链接**: [openai/codex #46112](https://github.com/openai/codex/pull/46112)
-    *   **内容**: 修复当用户删除当前工作目录（cwd）后，沙盒 Helper 无法启动或权限规则失效的问题。确保绝对路径的权限规则在 cwd 消失后依然有效。
+8.  **PR #46309: 在显示元数据刷新时保留插件缓存**
+    *   **内容**：优化了插件缓存策略，避免因图像 URL 等显示元数据的变化而无效化 MCP 和技能缓存，提升性能。
+    *   链接：[PR #46309](https://github.com/openai/codex/pull/46309)
 
-9.  **#46230 保留配置的 Flex 层级（即使无目录支持）**
-    *   **链接**: [openai/codex #46230](https://github.com/openai/codex/pull/46230)
-    *   **内容**: 修复当 `fast-mode` 禁用或模型目录未明确标记 Flex 支持时，用户显式配置的 `service_tier = "flex"` 被丢弃的问题，确保 API 请求参数一致性。
+9.  **PR #46293: 通过 EnvironmentAccess 路由技能发现**
+    *   **内容**：将技能发现和插件命名空间解析重构为使用 `EnvironmentAccess`，替代直接的 `ExecutorFileSystem` 调用，增强了沙箱隔离的明确性。
+    *   链接：[PR #46293](https://github.com/openai/codex/pull/46293)
 
-10. **#46179 在 Guardian 委托审查中包含发送者用户消息**
-    *   **链接**: [openai/codex #46179](https://github.com/openai/codex/pull/46179)
-    *   **内容**: 增强多智能体委托场景下的安全审查。当启用线程拥有的 Guardian 上下文时，捕获发送者最多 N 条用户消息，以便在接收线程中审查操作时拥有完整的上下文限制信息。
+10. **PR #46288: 为代码模式响应添加可选开销计时**
+    *   **内容**：新增实验性标志 `experimental_show_cell_overhead`，用于在 TUI 中显示 host 持续时间及 app-server 等待时间，帮助调试性能瓶颈。
+    *   链接：[PR #46288](https://github.com/openai/codex/pull/46288)
 
 ## 5. 功能需求趋势
-
-基于 Issue 和 PR 数据，社区当前最关注的功能方向包括：
-
-*   **Windows 平台稳定性**: 大量 Issue 集中在 Windows 沙盒启动、权限继承、注册表清理及截屏功能。PR 中的密集修复表明这是当前工程资源投入的重点。
-*   **多租户/多账户支持**: 用户强烈需求跨账户、跨工作区的快速切换能力（#30684），以适应企业多环境或个人多项目场景。
-*   **会话管理与持久化**: 涉及会话恢复、线程存储错误（CRC 错误）、以及多窗口/分屏支持（#42291），用户希望更精细地管理长程任务和历史记录。
-*   **沙盒安全与隔离**: 除了稳定性，社区关注沙盒的粒度控制，如独立读写权限（#46122）和守护进程隔离（#46088），以平衡安全与开发效率。
+*   **多模型/非 OpenAI 提供商支持**：社区强烈需求更好地支持 Ollama、LM Studio、OpenRouter 等本地或网关提供商，特别是 MCP 工具调用的兼容性和 OAuth 认证流程。
+*   **长时任务与代理能力**：随着 GPT-5.6 Sol 等模型的推出，用户需要更灵活的速率限制策略（如针对长时任务的例外）和更高效的事件驱动机制（如后台命令完成唤醒）来支持自主代理。
+*   **跨平台一致性**：Intel macOS 和 Windows 平台存在显著的功能缺失或 Bug（如 Computer Use 缺失、沙箱 ACL 错误），用户期望各平台功能对齐。
+*   **插件与技能管理**：对插件注入的细粒度控制（如禁用特定插件）和技能发现机制的优化是近期热点。
 
 ## 6. 开发者关注点
-
-*   **不透明的速率限制与计费**: 多个高热度 Issue (#45073, #46185, #46231, #45613) 指出用量消耗过快、全模型容量不足、新模型不可用等问题。开发者迫切需要更透明的配额反馈机制和明确的错误日志，以区分是后端过载、账户级限制还是本地网络问题。
-*   **Windows 环境的“黑盒”故障**: 许多 Windows 相关的 Bug 缺乏详细的 stderr/stdout 日志（如 #41779, #32315），导致开发者难以自行诊断。PR 中增加的“错误链记录” (#46237) 是针对此痛点的直接响应。
-*   **自动化流程的干扰**: 用户对自动超时解析 (#29702) 和后台守护进程行为 (#46088, #46117) 提出控制需求，希望在不牺牲安全性的前提下，拥有更多对自动化行为的干预权（如禁用自动启动或修改超时策略）。
-*   **符号链接与文件系统兼容性**: 在 Skills 发现机制中，符号链接的支持缺失 (#31592) 阻碍了模块化的配置管理，成为高级开发者的痛点。
+*   **Windows 沙箱稳定性**：多个 Issue 指向 Windows 10/11 上 `deny_read_acl_state.json` 损坏或 ACL 应用失败，导致 Computer Use 和 CLI 命令被阻止。这是一个高频且影响面大的底层问题。
+*   **MCP 协议实现的完整性**：除了非 OpenAI 提供商的工具序列化问题，MCP 的分页支持（`nextCursor`）也是开发者关注的核心协议细节。
+*   **CLI 自动化与无头模式**：开发者在使用 `codex exec` 进行自动化时，遇到了 Hooks 信任机制不明确（无诊断信息）、JSON 输出数据丢失等问题，影响了 CI/CD 流水线的集成体验。
+*   **桌面应用状态持久性**：项目列表消失、UI 卡死等问题影响了日常开发效率，用户对应用的稳定性和状态恢复能力提出更高要求。
 
 </details>

@@ -1,134 +1,134 @@
 {
   "zh": {
     "ai-cli": [
-      "当前 AI CLI 工具生态正处于“稳定性修补”与“架构演…",
-      "注：数据基于各工具过去 24 小时提供的热点摘要统计，Co…",
-      "多个工具社区均展现出对企业级可用性和环境隔离安全性的强烈诉…",
-      "跨账户与多租户管理：Claude Code (#27302…",
-      "Windows 平台环境适配：两大工具的顶级 Bug 均指…",
-      "后台进程与资源控制：Claude Code 关注 VM 磁…"
+      "当前 AI CLI 工具生态已从单纯的代码生成工具向具备复…",
+      "注：数据基于提供的 2026-09-18 社区动态摘要统计。",
+      "多个工具社区同时反映了以下需求，表明这是当前 AI CLI…",
+      "IDE (VS Code) 集成深度与一致性：Claude…",
+      "MCP (Model Context Protocol)…",
+      "长时任务与自动化可靠性：Claude Code 关注会话连…"
     ],
     "ai-agents": [
-      "过去 24 小时 OpenClaw 项目保持高度活跃，共记…",
-      "今日合并/关闭的 10 个 PR 主要集中在 UI 体验优…",
-      "UI 交互优化：合并了 PR #150440，实现了长转发…",
-      "网关恢复机制：关闭了 PR #150953（已合并），修复…",
-      "测试可靠性：关闭了 PR #151005（已合并），通过调…",
-      "文档完善：合并了 PR #150798，详细说明了去部分克…"
+      "今日速览",
+      "OpenClaw 项目今日（2026-09-18）保持高频…",
+      "版本发布",
+      "项目进展",
+      "今日合并/关闭的 PR 较少（共3条），主要进展体现在大量…",
+      "Gateway 与任务系统重构：#148574 与 #14…"
     ],
     "ai-trending": [
-      "今日 GitHub 热点被“智能体（Agent）工程化”彻…",
-      "affaan-m/ECC：专为 Coding Agent…",
-      "alibaba/open-code-review：阿里推出…",
-      "huggingface/transformers：Hugg…",
-      "pytorch/pytorch：业界标准的张量与动态神经网…",
-      "0xPlaygrounds/rig：用于在 Rust 中构…"
+      "今日 GitHub Trending 榜单被“AI 智能体…",
+      "聚焦框架、SDK、推理引擎及开发工具链",
+      "alibaba/open-code-review：阿里巴巴…",
+      "cloudflare/security-audit-ski…",
+      "JustVugg/colibri：纯 C 语言编写的轻量级…",
+      "anthropics/claude-code：Anthro…"
     ],
     "ai-web": [
-      "Anthropic 今日增量更新（2026-09-18抓取…",
-      "摘要: Anthropic 完成 300 亿美元 G 轮融…",
-      "战略意义: 极估值融资表明资本市场对 AI 基础设施层的高…",
-      "摘要: Anthropic 宣布在美国德克萨斯州和纽约州投…",
-      "战略意义: 算力即主权。通过大规模本土基建投资，Anthr…",
-      "摘要: 启动“Claude Corps”全国奖学金项目，投…"
+      "数据模式说明： Anthropic 为正文内容级，Open…",
+      "Anthropic 连续多日发布生命科学领域核心内容，正式…",
+      "核心解析： Claude 在生物分子建模任务上实现了显著的…",
+      "技术亮点： 结合 Claude 的 agentic 编排能…",
+      "核心解析： 这是一份高度透明的安全对齐评估报告，详细披露了…",
+      "技术亮点： 团队通过主动安全审计扫查了高达 4.81 亿条…"
     ],
     "ai-hn": [
-      "今日 HN 社区对 AI 的讨论焦点从单纯的模型能力转向了…",
-      "Introducing System One Models…",
-      "Gemini 3.8 Live and 3.8 Live…",
-      "Intelligence per Watt: Measur…",
+      "今日 HN 社区焦点集中在AI 安全与对齐以及基础设施优化…",
+      "Infinite-Parameter LLMs: Gene…",
+      "Jev Ultrafast: A browser agen…",
       "Breaking the 1.58-bit Barrier…",
-      "GLM Built Its Own Inference I…"
+      "HarnessTax: How Much Does the…",
+      "Bend – A language that blocks…"
     ],
     "ai-arxiv": [
-      "今日 ArXiv 投稿呈现出“AI 可靠性与安全”与“高效…",
-      "Objective vs. Search: Decompo…",
+      "今日投稿聚焦于LLM 内部机制可解释性与智能体安全对齐。研…",
       "Monitoring and Discovering Re…",
       "Preventing Model Collapse: A…",
+      "A Zeroth-Order Paradigm for L…",
       "Higher-order pruning of exper…",
       "Infinite-Parameter LLMs: Gene…"
     ],
     "ai-hf": [
-      "本日榜单显示 Qwen 3.8 系列成为社区绝对热点，其…",
+      "《Hugging Face 热门模型日报》",
+      "Qwen 3.8 系列衍生生态爆发，包括社区微调的 Tur…",
+      "🧠 语言模型（LLM、对话模型、指令微调）",
+      "Qwen/Qwen3.8-27B：榜首基础模型，以超 70…",
       "deepseek-ai/DeepSeek-V4.1-Fla…",
-      "Qwen/Qwen3.8-27B：阿里巴巴 Qwen 家族…",
-      "Qwen/Qwen3.8-Flash-Next：Qwen…",
-      "zai-org/GLM-5.3-Flash：智谱 AI 最…",
       "meta-llama/Llama-3.1-8B-Instr…"
     ],
     "ai-community": [
-      "今日技术社区对 AI 的讨论焦点已从单纯的大模型能力转向了…",
-      "AI Can Write the Code. Can It…",
-      "How AI Actually Calls an API…",
+      "今日技术社区对 AI 的关注点从单纯的内容生成转向了工程可…",
       "Show a model your old code an…",
-      "Tool-Call Injection in LLM Ag…",
-      "A 4 GB Laptop GPU Beats a 12…"
+      "How I built an AI Coding Ment…",
+      "AI Can Write the Code. Can It…",
+      "I Let AI Plan 170 Changes. It…",
+      "Knowledge Poisoning in RAG: A…"
     ]
   },
   "en": {
     "ai-cli": [
-      "The AI CLI tool ecosystem is currently transitioning from s…",
-      "Note: Counts reflect the specific high-signal items provide…",
-      "Multi-Account & Workspace Switching:",
-      "Claude Code: High demand (378 upvotes) for supporting multi…",
-      "OpenAI Codex: Strong request (22 upvotes) for in-app accoun…",
-      "Insight: Both ecosystems are moving toward \"pro-grade\" work…"
+      "Ecosystem Overview",
+      "The AI CLI tool landscape is transitioning from simple chat…",
+      "Activity Comparison",
+      "Shared Feature Directions",
+      "Windows Platform Stability: Both communities report critica…",
+      "Permission & Context Management: Developers across both eco…"
     ],
     "ai-agents": [
-      "Today's Overview",
-      "OpenClaw maintains high development velocity with 50 pull r…",
-      "Project Progress",
-      "Three pull requests were merged or closed during the last 2…",
-      "PR #150440: fix(ui): collapse long forwarded session messag…",
-      "PR #150311: fix: keep local scheduled account reads authori…"
+      "OpenClaw experienced a highly active development day with 5…",
+      "No new releases were identified for this period.",
+      "Merged/Closed PRs: Three PRs were closed/merged in the last…",
+      "UI & Agent Features: Significant work was advanced on separ…",
+      "Security & Compatibility: Maintenance focus included preser…",
+      "Issue #97616: This issue has accumulated 30 comments, highl…"
     ],
     "ai-trending": [
-      "Today's most significant development is the explosive tract…",
-      "🔧 AI Infrastructure",
-      "colibri：A pure C inference engine that streams MoE experts…",
-      "claude-code：Anthropic's agentic coding tool that lives in t…",
-      "codewhale：A community-driven, open-source coding agent buil…",
-      "deepseek-reasonix：A DeepSeek-native coding agent engineered…"
+      "Today’s trending data reveals a dominant shift from general…",
+      "alibaba/open-code-review：A hybrid code review tool combinin…",
+      "cloudflare/security-audit-skill：A coding-agent skill that e…",
+      "Tencent/BrowserSkill：A CLI and extension enabling AI agents…",
+      "affaan-m/ECC：An agent harness performance optimization syst…",
+      "JustVugg/colibri：A tiny, pure C inference engine that runs…"
     ],
     "ai-web": [
-      "Sources: Anthropic (claude.com / anthropic.com), OpenAI (op…",
-      "Note: While the crawl timestamp is September 18, 2026, the…",
-      "The most significant technical signal is the release of Cla…",
-      "Claude Fable 5 & Mythos 5 Access Control:",
-      "Insight: Following a US government directive, Anthropic sus…",
-      "Claude Opus 4.6 & 4.8:"
+      "Scope: Incremental update focusing on new content released…",
+      "Anthropic has aggressively expanded its footprint in the li…",
+      "Core Insights: Claude, operating within \"Claude Science,\" o…",
+      "Business Significance: This positions Claude not just as a…",
+      "Core Insights: Anthropic disclosed four incidents where Cla…",
+      "Business Significance: The company is treating \"agentic int…"
     ],
     "ai-hn": [
-      "The Hacker News community is currently fixated on AI alignm…",
-      "Introducing System One Models and Jev · HN：This launch of a…",
-      "Gemini 3.8 Live and 3.8 Live Extended Thinking · HN：Google'…",
-      "Breaking the 1.58-bit Barrier for Ternary LLMs · HN：This pa…",
-      "Training Text-to-Image Models 3.6× Faster · HN：A new techni…",
-      "HarnessTax: How Much Does the Harness Matter for Coding Age…"
+      "Today's Highlights",
+      "OpenAI's expansion into the legal sector with \"Astra for La…",
+      "Top News & Discussions",
+      "Introducing System One Models and Jev · HN：The launch of Ty…",
+      "Infinite-Parameter LLMs: Generating and Adapting Weights fr…",
+      "Breaking the 1.58-bit Barrier for Ternary LLMs · HN：Pushing…"
     ],
     "ai-arxiv": [
       "Today's Highlights",
-      "The most significant research directions today center on th…",
+      "The landscape is shifting toward the mechanistic interpreta…",
+      "Key Papers",
       "Infinite-Parameter LLMs: Generating and Adapting Weights fr…",
-      "Preventing Model Collapse: A Fisher-Rao Perspective on the…",
-      "Higher-order pruning of experts in mixture-of-experts langu…",
-      "Probabilistic Linear Explanations：The paper presents a meth…"
+      "Preventing Model Collapse: A Fisher-Rao Perspective：Utilize…",
+      "A Zeroth-Order Paradigm for LLM Preference Alignment：Introd…"
     ],
     "ai-hf": [
-      "Today's Highlights",
-      "The Qwen3.8-27B family dominates the trending lists, with b…",
-      "Trending Models",
-      "Edge0-35B-A3B-preview：This preview model is an Mixture-of-E…",
-      "Qwen3.8-27B：A mid-sized open-weight LLM supporting both tex…",
-      "Qwen3.8-Flash-Next：An experimental variant of the Qwen3.8 f…"
+      "Qwen3.8 dominates the trending lists with its base 27B mode…",
+      "Qwen3.8-27B：A large-scale multimodal language model capable…",
+      "Llama-3.1-8B-Instruct：Meta's instruction-tuned language mod…",
+      "DeepSeek-V4.1-Flash：A fast-inference variant of DeepSeek's…",
+      "NeoHorse-1-4B：A compact 4B parameter model built on the Qwe…",
+      "Qwen3.8-Flash-Next：An experimental next-generation fast mod…"
     ],
     "ai-community": [
-      "The community is deeply focused on the practical integratio…",
-      "Building PoCs with Codex and GitHub Copilot：The author desc…",
-      "How AI Actually Calls an API? Tool Calling Explained：This t…",
-      "Temp Squads: How to Organize Ephemeral and Mixed Teams：This…",
-      "Show a model your old code and it writes your old bugs：The…",
-      "AI Can Write the Code. Can It Prove the Fix?：This article a…"
+      "Today’s discussion centers on the System One model paradigm…",
+      "Show a model your old code and it writes your old bugs：Demo…",
+      "How I built an AI Coding Mentor (KODA)：A case study on buil…",
+      "AI Can Write the Code. Can It Prove the Fix?：Argues that ve…",
+      "I Let AI Plan 170 Changes. It Made the Same 3 Mistakes Ever…",
+      "How I Use MCP to Turn Product Feedback Into Development Tas…"
     ]
   }
 }

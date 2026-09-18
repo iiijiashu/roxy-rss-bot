@@ -1,6 +1,6 @@
 # AI CLI Tools Community Digest 2026-09-18
 
-> Generated: 2026-09-17 17:22 UTC | Tools covered: 2
+> Generated: 2026-09-18 00:20 UTC | Tools covered: 2
 
 - [Claude Code](https://github.com/anthropics/claude-code)
 - [OpenAI Codex](https://github.com/openai/codex)
@@ -10,61 +10,37 @@
 
 ## Cross-Tool Comparison
 
-# Cross-Tool Comparison Report: AI Developer CLI Ecosystem
-**Date:** 2026-09-18
+1. **Ecosystem Overview**
+The AI CLI tool landscape is transitioning from simple chat interfaces to complex, extensible agent orchestration systems. Both Claude Code and OpenAI Codex are now focused on deepening developer workflows through plugin architectures, persistent session management, and multi-agent coordination. A significant portion of community energy is directed toward resolving platform-specific instability, particularly on Windows, which remains a primary friction point for both ecosystems. Simultaneously, both projects are expanding beyond their native model providers, signaling a shift toward provider-agnostic tooling and robust multi-modal integration.
 
-## 1. Ecosystem Overview
-The AI CLI tool ecosystem is currently transitioning from simple chat interfaces to complex, sandboxed development environments, with both major players heavily investing in extension systems and operational stability. A significant portion of community feedback across both Claude Code and OpenAI Codex focuses on platform-specific reliability issues, particularly on Windows, where sandbox provisioning and update mechanisms remain fragile. Simultaneously, a strong demand for multi-account management and granular cost/limit visibility is emerging, reflecting a user base that is increasingly enterprise-oriented and power-user focused. The industry is moving toward deeper integration of "hooks" and extension systems (e.g., Claude's "Mods" vs. Codex's "Skills/Guardians") to enhance flexibility, though this complexity is introducing new bugs in state management and discovery.
-
-## 2. Activity Comparison
+2. **Activity Comparison**
 
 | Metric | Claude Code | OpenAI Codex |
 | :--- | :--- | :--- |
-| **Issues Tracked** | 10 | 10 |
-| **PRs Tracked** | 4 | 10 |
-| **Release Activity** | **v2.1.274** (Stable: Config/Safety fixes) | **0.155.0-alpha.12–16** (Rapid Alpha: Windows Sandbox/Guardian) |
-| **Primary Focus** | Extension System ("Mods"), Memory/MCP Stability | Windows Sandbox Repair, Rate-Limit/Quota Bugs, Guardian Safety |
+| **Issues Tracked** | 10 Hot Issues | 10 Hot Issues |
+| **PRs Updated** | 3 PRs | 10 PRs |
+| **Release Status** | v2.1.275 | v0.155.0 + 5 Alpha Pre-releases |
+| **Primary Focus** | Extensibility ("Mods") & Windows Stability | Voice UI & Windows Sandbox Repair |
 
-*Note: Counts reflect the specific high-signal items provided in the digest for the day.*
+3. **Shared Feature Directions**
+*   **Windows Platform Stability:** Both communities report critical, recurring regressions specific to Windows. Claude Code users face launch failures due to orphaned Job Objects (#53247), while Codex users encounter execution blocks from corrupted `deny_read_acl_state.json` files (#45302).
+*   **Permission & Context Management:** Developers across both ecosystems are demanding granular, persistent permission states to reduce approval fatigue. This includes "Allow always" options in Claude Code's browser pane (#93156) and the need for standard, callable MCP namespaces in Codex for alternative providers (#26234).
+*   **Session Continuity & Persistence:** Both tools are facing pressure to improve long-running agent workflows. Claude Code has high traction for "Session Handoff" between machines (#11455), while Codex users are requesting event-driven wakeups to support autonomous background tasks without polling (#32188).
 
-## 3. Shared Feature Directions
+4. **Differentiation Analysis**
+*   **Technical Approach & Extensibility:** Claude Code is moving toward a modular "Mods" architecture with explicit function hooks and plugin decoupling (#91870). OpenAI Codex is focusing on native multi-modality (experimental voice conversations #43581) and improving headless/CI-CD execution reliability.
+*   **Target Users & Workflow:** Claude Code's community feedback is heavily influenced by IDE extension (VS Code) parity and multi-agent "Conductor" patterns (#93438). OpenAI Codex's community is increasingly driven by local/alternative model usage (Ollama, Bedrock) and a push for provider agnosticism, moving away from a strictly proprietary ecosystem.
+*   **Release Cadence:** OpenAI Codex maintains a higher-velocity, multi-track release process (simultaneous GA and alpha releases), whereas Claude Code operates on a more consolidated single-version release cycle.
 
-*   **Multi-Account & Workspace Switching:**
-    *   **Claude Code:** High demand (378 upvotes) for supporting multiple Connector accounts in a single session to avoid context loss.
-    *   **OpenAI Codex:** Strong request (22 upvotes) for in-app account/workspace switching without signing out.
-    *   *Insight:* Both ecosystems are moving toward "pro-grade" workflows where users juggle multiple contexts.
+5. **Community Momentum & Maturity**
+*   **Maturity & Scale:** Claude Code exhibits higher community maturity and scale, evidenced by long-standing, high-volume issues with over 90 comments (#53247). Its feature requests are deeply embedded in enterprise integration and orchestration patterns.
+*   **Rapid Iteration:** OpenAI Codex is in a faster, more rapid iteration phase, characterized by a dense cluster of 10 PRs addressing architectural fixes, OAuth gateway management, and experimental UI features within a single 24-hour window. This indicates a project actively refining its core infrastructure to support newer capabilities.
 
-*   **Infrastructure Control & Daemon Management:**
-    *   **OpenAI Codex:** Introduction of `--no-daemon` flag and opt-in auto-start for background servers.
-    *   **Claude Code:** Tunable MCP startup latency (`CLAUDE_CODE_MCP_STARTUP_WAIT_MS`) and safe restart mechanisms.
-    *   *Insight:* Developers are demanding explicit control over background processes and startup overhead to integrate these CLIs into CI/CD or constrained environments.
-
-*   **State Persistence & Caching Issues:**
-    *   **OpenAI Codex:** Stale skill resolution bugs where new installs don't override old caches.
-    *   **Claude Code:** Truncated skill descriptions and session data loss due to invisible cost limits.
-    *   *Insight:* Both tools struggle with local state management, leading to inconsistent user experience between sessions or updates.
-
-## 4. Differentiation Analysis
-
-| Aspect | Claude Code | OpenAI Codex |
-| :--- | :--- | :--- |
-| **Extension Model** | **"Mods" System:** Focus on making Claude "10x more extensible" via function hooks and pane-based UI integration. | **Guardian/Skills:** Focus on safety delegation (Guardian) and marketplace-based skill plugins. |
-| **Platform Pain Point** | **macOS Resource Leaks:** Unbounded `rootfs.img` growth and memory warnings. | **Windows Sandbox Fragility:** Helper failures, registry cleanup, and permission inheritance on Win 10/11. |
-| **User Base Signal** | **Power User/Enterprise:** Concerns about "Cost Transparency," subscription limits, and complex monorepo directory traversal. | **Developer/Productivity:** Concerns about "Capacity Limits," auto-resolution timeouts, and tiled/split-view UI. |
-| **Technical Approach** | **Safety & Visibility:** Emphasis on visible warnings for memory/cost and explicit configuration for MCP. | **Atomicity & Performance:** Emphasis on atomic publishing of safety scores, reducing stack usage in TUI, and fast sandbox setup. |
-
-## 5. Community Momentum & Maturity
-
-*   **OpenAI Codex (Rapid Iteration):** The release cycle is faster, with 5 distinct alpha releases (`v0.155.0-alpha.12` to `alpha.16`) targeted specifically at fixing Windows sandbox issues and Guardian logic. This suggests a high-velocity iteration process focused on stabilizing the new architecture.
-*   **Claude Code (Mature Ecosystem):** The activity is centered around a major architectural shift ("Mods") with 192 comments of feedback, indicating a large, engaged community shaping the next version. The presence of high-upvote issues (378 upvotes for multi-account) suggests a very active user base with deep needs.
-*   **Maturity Indicator:** Both tools are maturing beyond "chat completion" into "agentic workspaces." Claude Code is dealing with the complexity of that shift (memory leaks, directory traversal), while Codex is dealing with the infrastructure of that shift (daemons, sandbox permissions).
-
-## 6. Trend Signals
-
-1.  **Windows is the New Bottleneck:** Both tools have significant, unresolved Windows-specific issues (Codex sandbox helpers, Claude update loops). As enterprise adoption grows, Windows reliability will be a primary differentiator for adoption.
-2.  **Safety as a Feature, Not a Bug:** OpenAI's "Guardian" delegation and Claude's "Cyber Guardrails" (even when causing false positives) show that safety review is becoming a core, complex subsystem that impacts usability and speed.
-3.  **Cost & Limit Transparency is Critical:** The "invisible handoff" problem (Claude) and "quota drain" bugs (Codex) are top-priority user complaints. Developers are no longer just measuring token count; they are measuring *effective utility per dollar* and are demanding transparent limit management.
-4.  **From Monolithic to Modular:** The push for "Mods" in Claude and "Skills" in Codex indicates the end of the monolithic CLI era. The future will likely be defined by how well these tools support third-party extension marketplaces and local customization without breaking core stability.
+6. **Trend Signals**
+*   **Provider Agnosticism is Standard:** The push in Codex's community for reliable MCP tool support on non-OpenAI providers, alongside new OAuth gateway credential management, signals that AI CLI tools are becoming standardized interfaces for multiple LLMs rather than exclusive wrappers.
+*   **Windows as the Lingering Bottleneck:** Despite rapid feature development on macOS/Linux, the ecosystem's next growth frontier depends on resolving deep OS-level sandboxing and job-object management issues on Windows.
+*   **From Polling to Event-Driven Agents:** The request for event-driven wakeups in Codex (#32188) represents a maturing shift in agent design. Developers are moving away from model-driven polling (wasting API tokens) toward system-level callbacks for long-running autonomous tasks.
+*   **Security & Cost Transparency:** Growing friction around context leaks, token waste, and accidental premium model billing indicates that developers are prioritizing strict cost-containment and security sandboxes as a prerequisite for high-velocity agent workflows.
 
 ---
 
@@ -78,172 +54,211 @@ The AI CLI tool ecosystem is currently transitioning from simple chat interfaces
 > Source: [anthropics/skills](https://github.com/anthropics/skills)
 
 # Claude Code Skills Community Highlights Report
-**Data as of:** 2026-09-18
-**Source:** [anthropics/skills](https://github.com/anthropics/skills)
+**Data as of 2026-09-18 | Source: [anthropics/skills](https://github.com/anthropics/skills)**
 
 ## 1. Top Skills Ranking
-*Note: The provided data does not include specific comment counts for Pull Requests (all listed as "undefined"), so ranking is based on activity level, recency, and thematic significance of the top 20 listed PRs.*
 
-| Skill / Component | Functionality | Status | Highlights & Links |
-| :--- | :--- | :--- | :--- |
-| **skill-creator** | Meta-skill for generating and optimizing other skills. | [OPEN](https://github.com/anthropics/skills/pull/1298) | Active fixes addressing Windows runtime failures, trigger evaluation false misses, and YAML parsing issues. <br>• [PR #1298: Fix trigger evals & Windows](https://github.com/anthropics/skills/pull/1298)<br>• [PR #1769: Fix 0% recall reporting](https://github.com/anthropics/skills/pull/1769)<br>• [PR #539: YAML validation](https://github.com/anthropics/skills/pull/539) |
-| **mcp-builder** | Tools for building and evaluating Model Context Protocol servers. | [OPEN](https://github.com/anthropics/skills/pull/1742) | Ongoing maintenance for compatibility with `mcp>=2.0.0` (import renames, custom headers) and default model updates to `claude-sonnet-5`. <br>• [PR #1742: Fix streamable_http_client](https://github.com/anthropics/skills/pull/1742)<br>• [PR #1724: Update default model](https://github.com/anthropics/skills/pull/1724) |
-| **docx / office** | Document creation, editing, and redlining for Word/Excel/PowerPoint. | [OPEN](https://github.com/anthropics/skills/pull/1765) | Critical fixes for document corruption (bookmark ID collisions), UTF-8 decoding of diffs on non-UTF8 locales, and detecting orphaned comments. <br>• [PR #1765: UTF-8 decode redlining](https://github.com/anthropics/skills/pull/1765)<br>• [PR #541: Fix w:id collision](https://github.com/anthropics/skills/pull/541)<br>• [PR #1734: Detect orphaned comments](https://github.com/anthropics/skills/pull/1734) |
-| **claude-api** | Reference skill for Claude API models and capabilities. | [OPEN](https://github.com/anthropics/skills/pull/1607) | Community is actively correcting outdated information regarding retired model IDs (e.g., `claude-opus-4-1`). <br>• [PR #1607: Mark retired models](https://github.com/anthropics/skills/pull/1607) |
-| **pdf** | PDF generation and manipulation. | [OPEN](https://github.com/anthropics/skills/pull/538) | Fixing case-sensitivity mismatches in file references that break on Linux/macOS. <br>• [PR #538: Case-sensitive file refs](https://github.com/anthropics/skills/pull/538) |
-| **frontend-design** | UI/UX design and frontend implementation guidance. | [OPEN](https://github.com/anthropics/skills/pull/210) | Improvement PR focused on clarity, actionability, and internal coherence to ensure instructions are followable in a single conversation. <br>• [PR #210: Improve clarity/actionability](https://github.com/anthropics/skills/pull/210) |
-| **odt / odf** | OpenDocument Format creation, parsing, and conversion. | [OPEN](https://github.com/anthropics/skills/pull/486) | New community-proposed skill for creating, filling, and reading `.odt`/`.ods` files. <br>• [PR #486: Add ODT skill](https://github.com/anthropics/skills/pull/486) |
+The following skills from the most-active Pull Requests are ranked by sustained community attention and engagement:
+
+*   **skill-creator** (Trigger Evaluation & Windows Fix)
+    *   **Functionality:** Core meta-skill for creating and evaluating other Skills; currently undergoing fixes for trigger evaluation false misses and Windows runtime failures.
+    *   **Discussion Highlights:** Active debugging of per-worker command probe competition and `select()` subprocess pipe failures on Windows.
+    *   **Status:** [Open PR #1298](https://github.com/anthropics/skills/pull/1298)
+*   **mcp-builder** (Import & Model Updates)
+    *   **Functionality:** Toolkit for building and evaluating Model Context Protocol servers.
+    *   **Discussion Highlights:** Addressing breaking changes in `mcp>=2.0.0` regarding `streamable_http_client` imports and updating the default evaluation model from `claude-3-7-sonnet` to `claude-sonnet-5`.
+    *   **Status:** [Open PR #1742](https://github.com/anthropics/skills/pull/1742), [Open PR #1724](https://github.com/anthropics/skills/pull/1724)
+*   **docx / office** (Redlining & Encoding)
+    *   **Functionality:** Document generation and validation for Office formats.
+    *   **Discussion Highlights:** Fixing document corruption from tracked change `w:id` collisions with bookmarks and ensuring redlining diffs are properly decoded as UTF-8 on Windows/non-UTF-8 locales.
+    *   **Status:** [Open PR #541](https://github.com/anthropics/skills/pull/541), [Open PR #1765](https://github.com/anthropics/skills/pull/1765)
+*   **pdf** (Case-Sensitivity Fix)
+    *   **Functionality:** PDF manipulation and generation.
+    *   **Discussion Highlights:** Resolving 8 case-sensitivity mismatches in `SKILL.md` file references that break on case-sensitive file systems.
+    *   **Status:** [Open PR #538](https://github.com/anthropics/skills/pull/538)
+*   **claude-api** (Model Retirement & Context Window)
+    *   **Functionality:** API integration skill for Claude models.
+    *   **Discussion Highlights:** Updating documentation to reflect four retired model IDs and addressing a critical issue where the skill eagerly injects ~156k tokens, exhausting the context window.
+    *   **Status:** [Open PR #1607](https://github.com/anthropics/skills/pull/1607), [Open Issue #1487](https://github.com/anthropics/skills/issues/1487)
 
 ## 2. Community Demand Trends
-Based on the most-commented Issues, the community is demanding:
-*   **Security & Trust Boundaries:** The top issue ([#492](https://github.com/anthropics/skills/issues/492), 43 comments) highlights a critical demand for clear namespace separation between official Anthropic skills and community skills to prevent impersonation and unauthorized permission escalation.
-*   **Enterprise/Team Sharing:** High demand ([#228](https://github.com/anthropics/skills/issues/228), 16 comments) for natively shareable skill libraries within an organization (Claude.ai), moving beyond manual file uploads.
-*   **Skill Lifecycle Management:** Requests for meta-skills that analyze skill quality, security, and governance ([#83](https://github.com/anthropics/skills/pull/83), [#412](https://github.com/anthropics/skills/issues/412)), as well as "compact-memory" skills to manage context limits in long-running agent tasks ([#1329](https://github.com/anthropics/skills/issues/1329)).
-*   **Performance/Context Optimization:** Urgent need to address skills that inject excessive tokens, such as the `claude-api` skill exhausting the context window ([#1487](https://github.com/anthropics/skills/issues/1487)).
+
+Analysis of community Issues reveals the following anticipated Skill directions:
+
+*   **AI Agent Governance & Safety:** Users are requesting "agent-governance" Skills to handle policy enforcement, threat detection, trust scoring, and audit trails for AI agent systems ([Issue #412](https://github.com/anthropics/skills/issues/412)). Relatedly, there is growing concern over security boundaries, specifically regarding community Skills distributed under the `anthropic/` namespace which can enable trust boundary abuse ([Issue #492](https://github.com/anthropics/skills/issues/492)).
+*   **Workflow Automation & Multi-Agent Orchestration:** There is strong demand for zero-cost multi-agent orchestration (delegating mechanical work to headless workers) and portable API skills for social media scheduling ([PR #1628](https://github.com/anthropics/skills/pull/1628), [PR #1627](https://github.com/anthropics/skills/pull/1627)).
+*   **Documentation & Memory Management:** Developers are proposing Skills for "compact-memory" (symbolic notation for compact agent state) to manage long-running agent context, as well as "Reasoning Quality Gate Pipelines" for pre-task calibration and delivery verification ([Issue #1329](https://github.com/anthropics/skills/issues/1329), [Issue #1385](https://github.com/anthropics/skills/issues/1385)).
+*   **Enterprise Integration:** Ongoing work on connecting to enterprise systems like SCNet HPC clusters and Buffer GraphQL APIs, with attention to organizational skill sharing capabilities ([PR #1615](https://github.com/anthropics/skills/pull/1615), [Issue #228](https://github.com/anthropics/skills/issues/228)).
 
 ## 3. High-Potential Pending Skills
-Active, recently updated Pull Requests that indicate likely near-term integrations:
-*   **Hivemind** ([PR #1628](https://github.com/anthropics/skills/pull/1628)): A multi-agent orchestration skill that delegates mechanical work to headless `opencode` workers on free models, preserving the main model's context.
-*   **md2video-audio** ([PR #1703](https://github.com/anthropics/skills/pull/1703)): A zero-cost skill to compile Markdown directly into MP4 videos with voiceovers via Marp.
-*   **proofcore-contract-auditor** ([PR #1771](https://github.com/anthropics/skills/pull/1771)): Web3 skill for static analysis of Solidity/Rust contracts and anchoring audit proofs to the TON blockchain.
-*   **buffer-api** ([PR #1627](https://github.com/anthropics/skills/pull/1627)): A portable skill for managing social media scheduling via Buffer's GraphQL API across multiple AI agents.
-*   **scnet-hpc** ([PR #1615](https://github.com/anthropics/skills/pull/1615)): Skill for operating High-Performance Computing clusters via SSH and Slurm workflows.
-*   **pyxel** ([PR #525](https://github.com/anthropics/skills/pull/525)): Skill for retro game development in Python, including headless testing and frame inspection.
+
+These active, recently updated PRs represent new Skills likely to land soon:
+
+*   **proofcore-contract-auditor:** An Agent Skill for Web3 developers performing automated static analysis of Solidity and Rust smart contracts, anchoring cryptographic audit proofs onto the TON Blockchain. [PR #1771](https://github.com/anthropics/skills/pull/1771)
+*   **md2video-audio:** A zero-cost skill that compiles Markdown documents into professional-grade MP4 videos with realistic human-like voiceovers via Marp. [PR #1703](https://github.com/anthropics/skills/pull/1703)
+*   **pyxel:** A skill for creating, debugging, and verifying retro games in Python, featuring deterministic headless runs and frame inspection. [PR #525](https://github.com/anthropics/skills/pull/525)
+*   **document-typography:** Typographic quality control for generated documents, preventing orphan word wrap, widow paragraphs, and numbering misalignment. [PR #514](https://github.com/anthropics/skills/pull/514)
 
 ## 4. Skills Ecosystem Insight
-The community's most concentrated demand at the Skills level is **enterprise-grade security, trust, and organization-wide sharing mechanisms**, alongside the urgent need to optimize token efficiency and fix foundational tooling bugs (like `skill-creator` and `mcp-builder`) to ensure the reliability of the agent ecosystem.
+
+The community's most concentrated demand at the Skills level is improving the reliability and context efficiency of meta-skills (like `skill-creator` and `claude-api`) to prevent evaluation failures and context window exhaustion.
 
 ---
 
-**Today's Highlights**
-Community activity remains centered on the "Mods" extension system, which is nearing a shipping milestone after 192 comments of high-signal feedback, alongside critical operational fixes in v2.1.274 for memory warnings and MCP startup latency. On the stability front, developers are reporting severe platform-specific regressions, including a Windows update loop preventing app launch and a macOS memory leak in the local agent VM that silently consumes disk space.
+# Claude Code Community Digest — 2026-09-18
 
-**Releases**
-**v2.1.274** introduced critical safety and configuration updates:
-*   Added a visible warning and safe restart steps when memory usage is critical.
-*   Introduced `CLAUDE_CODE_MCP_STARTUP_WAIT_MS` to control how long the first non-interactive turn waits for MCP servers to connect (setting to `0` bypasses waiting).
-*   Added an `effort` attribute to the `cl` command (details truncated in source).
-[View Release](https://github.com/anthropics/claude-code/releases/tag/v2.1.274)
+### Today's Highlights
+Claude Code v2.1.275 introduced a "send-now" keybind (ctrl+enter / ctrl+x ctrl+s) to interrupt current turns and dispatch queued messages, alongside new account confirmation logic for the Claude apps gateway. Community attention remains heavily concentrated on the upcoming "Mods" extensibility system, which promises function hooks and rapid shipping timelines, as well as persistent Windows launch bugs caused by orphaned Job Objects.
 
-**Hot Issues**
-1.  **[FEATURE] Support multiple Connector accounts** [#27302](https://github.com/anthropics/claude-code/issues/27302)
-    *   **Why it matters:** 378 upvotes highlight a critical lack of multi-account support for web-based connectors, forcing users to juggle sessions or lose context.
-2.  **Mods - make Claude 10x more extensible** [#91870](https://github.com/anthropics/claude-code/issues/91870)
-    *   **Why it matters:** The "Mods" extension proposal is shipping in weeks. 192 comments indicate active community collaboration is shaping the function hook design.
-3.  **Windows desktop: stealth update leaves orphaned processes** [#89680](https://github.com/anthropics/claude-code/issues/89680)
-    *   **Why it matters:** A blocking issue for Windows users; auto-updates leave old AppX containers active, causing error `0x80070020` and requiring a reboot to launch new versions.
-4.  **skills/, agents/, commands/ should traverse parent directories** [#26489](https://github.com/anthropics/claude-code/issues/26489)
-    *   **Why it matters:** 49 upvotes for a logical consistency fix; developers expect local resources to behave like `CLAUDE.md` by inheriting from parent directories.
-5.  **AskUserQuestion dialog auto-submits on mouse click** [#71547](https://github.com/anthropics/claude-code/issues/71547)
-    *   **Why it matters:** 22 upvotes for a UX bug where a single click confirms an answer without an explicit "Enter" or "Confirm" action, leading to unintended inputs.
-6.  **Session-start skill listing silently truncates descriptions** [#81081](https://github.com/anthropics/claude-code/issues/81081)
-    *   **Why it matters:** A visibility bug where the size budget truncates most skill descriptions, reducing discoverability of installed capabilities.
-7.  **Claude desktop local-agent VM grows unboundedly** [#65577](https://github.com/anthropics/claude-code/issues/65577)
-    *   **Why it matters:** The sandboxed `rootfs.img` in `~/Library/Application Support/Claude/vm_bundles/` is never reclaimed, causing out-of-space failures on macOS.
-8.  **Cowork (macOS): new projects bind ONE folder only** [#92710](https://github.com/anthropics/claude-code/issues/92710)
-    *   **Why it matters:** A regression since Sept 6 that breaks multi-folder projects; the UI silently removes the ability to link multiple documents/folders.
-9.  **Hitting the weekly limit cost me a second subscription** [#93799](https://github.com/anthropics/claude-code/issues/93799)
-    *   **Why it matters:** Cost visibility gap; users on Max subscriptions lose work mid-task because session costs are invisible and handoffs are not automated before limit resets.
-10. **Monitor tool: doesn't respect persistent flag and timeout_ms** [#94393](https://github.com/anthropics/claude-code/issues/94393)
-    *   **Why it matters:** 10 upvotes for a schema mismatch where the 1-hour timeout cap is ignored, and persistent flags fail, limiting long-running monitoring tasks to ~30 minutes.
+### Releases
+*   **v2.1.275**: Added signed-in account verification to the Claude apps gateway sign-in process; users must confirm the gateway-named account before credentials are saved, with details now visible in `/status`. Introduced a send-now keybind (ctrl+enter or ctrl+x ctrl+s) that interrupts the active turn and sends all queued messages immediately.
+    *   [Release v2.1.275](https://github.com/anthropics/claude-code/releases)
 
-**Key PR Progress**
-*Note: Only 4 open PRs were provided in the source data; the digest reflects all available items.*
+### Hot Issues
+1.  **#91870: Mods - make Claude 10x more extensible**
+    The most active issue in the tracker. The maintainer confirmed a commitment to shipping "function hooks" within weeks, directly responding to high-signal community feedback regarding the modular architecture.
+    *   [Issue #91870](https://github.com/anthropics/claude-code/issues/91870)
+2.  **#53247: Claude Desktop fails to launch on Windows**
+    A critical regression where app crashes leave orphaned Silo/Job Objects, requiring a full logoff or reboot to recover. This remains a top-3 friction point for Windows users with 90+ comments.
+    *   [Issue #53247](https://github.com/anthropics/claude-code/issues/53247)
+3.  **#11455: Session Handoff / Continuity Support**
+    A long-standing request for the ability to transfer active sessions between machines or restarts without losing context, gaining significant traction from systems integrators.
+    *   [Issue #11455](https://github.com/anthropics/claude-code/issues/11455)
+4.  **#25128: Drag and drop not working in VS Code extension**
+    A persistent regression since v2.1.6 where drag-and-drop works in the terminal CLI but is completely broken in the VS Code chat panel, affecting file attachment workflows.
+    *   [Issue #25128](https://github.com/anthropics/claude-code/issues/25128)
+5.  **#15921: VSCode Extension: `.claude/settings.local.json` permissions not respected**
+    Users report that `bypassPermissions` and specific Bash/Write/Edit restrictions are ignored in the VS Code extension, creating security and friction issues compared to the CLI.
+    *   [Issue #15921](https://github.com/anthropics/claude-code/issues/15921)
+6.  **#81081: Session-start skill listing silently truncates descriptions**
+    A subtle bug where skill descriptions are cut off due to a size budget, causing users to lose context about available capabilities without warning.
+    *   [Issue #81081](https://github.com/anthropics/claude-code/issues/81081)
+7.  **#93156: Browser pane: no way to grant persistent site permission**
+    The in-app browser pane lacks an "Allow always" option, forcing users to re-authenticate or approve actions for trusted sites on every interaction.
+    *   [Issue #93156](https://github.com/anthropics/claude-code/issues/93156)
+8.  **#94225: ECONNRESET on direct ISP path**
+    A networking issue where Anthropic ingress resets TLS 1.3 handshakes carrying X25519MLKEM768, specifically affecting Movistar/Telefónica users in Spain; VPNs mitigate the issue.
+    *   [Issue #94225](https://github.com/anthropics/claude-code/issues/94225)
+9.  **#93438: Agent dispatch with isolation:"worktree" causes cwd state bleed**
+    A bug in Conductor-style patterns where isolated worktree agents leak their `cwd` state back into the parent session, causing path errors.
+    *   [Issue #93438](https://github.com/anthropics/claude-code/issues/93438)
+10. **#93680: Bash tool creates session directory via `/proc/self/fd/N/`**
+    A regression in 2.1.263 where the Bash tool fails on Linux environments where `procfs` is absent or incomplete, as it relies on `/proc/self/fd/N/` instead of `mkdirat()`.
+    *   [Issue #93680](https://github.com/anthropics/claude-code/issues/93680)
 
-1.  **mods/diff: type openPane's answer as unknown** [#95198](https://github.com/anthropics/claude-code/pull/95198)
-    *   **Description:** Updates the host contract for the diff mod so `openPane` returns `Promise<unknown>`. This allows the richer `$.ui.open` result object to compile against both current and next engine typings without breaking existing callers.
-2.  **diff: the first edit opens the pane only when it has a file to list** [#94847](https://github.com/anthropics/claude-code/pull/94847)
-    *   **Description:** Fixes the diff pane's auto-open behavior to prevent empty panes when editing files outside the repository, ignored files, or different worktrees. The pane now only opens when there is actually content to list.
-3.  **fix(pr-review-toolkit): repair invalid YAML frontmatter in all agents** [#87077](https://github.com/anthropics/claude-code/pull/87077)
-    *   **Description:** Corrects invalid YAML parsing where dialogue lines in agent descriptions were interpreted as nested mappings. This ensures agents load with correct name, description, and model frontmatter.
-4.  **diff: the prompt hint reads the viewport's layout through a type that may lack it** [#94843](https://github.com/anthropics/claude-code/pull/94843)
-    *   **Description:** Resolves a typecheck failure in `mods/diff` where the prompt hint hook accessed `viewport.isFullscreen`. The fix ensures compatibility with engines where `RenderViewport` does not yet declare that field, while maintaining runtime correctness.
+### Key PR Progress
+*Note: Only 3 Pull Requests were updated in the last 24 hours.*
+1.  **#95198: mods/diff: type openPane's answer as unknown**
+    Adjusts the `diff` mod's host contract to accept `Promise<unknown>` for `openPane`, preparing for the next engine typings where `$.ui.open` resolves with a richer result object.
+    *   [PR #95198](https://github.com/anthropics/claude-code/pull/95198)
+2.  **#94847: diff: the first edit opens the pane only when it has a file to list**
+    Fixes a UX issue where the diff pane would auto-open on the first successful Edit/Write even if it was outside the repository or to an ignored file, resulting in an empty "No tracked changes" pane.
+    *   [PR #94847](https://github.com/anthropics/claude-code/pull/94847)
+3.  **#87077: fix(pr-review-toolkit): repair invalid YAML frontmatter in all agents**
+    Repairs invalid YAML frontmatter in agent descriptions where unquoted dialogue lines were being parsed as nested mappings, causing agents to load with empty metadata.
+    *   [PR #87077](https://github.com/anthropics/claude-code/pull/87077)
 
-**Feature Request Trends**
-*   **Multi-Environment & Multi-Account Support:** Strong demand for managing multiple accounts/connectors within a single session or web interface, particularly for enterprise or multi-project workflows.
-*   **Advanced Customization (Mods/Plugins):** The community is actively shaping the "Mods" extension system, with specific interest in function hooks and making Claude 10x more extensible.
-*   **Cost Transparency & Limit Management:** Users are requesting better visibility into session costs and automated handoff mechanisms when approaching or hitting subscription limits.
-*   **Directory Hierarchy Consistency:** A recurring request for `skills/`, `agents/`, and `commands/` to traverse parent directories, matching the behavior of `CLAUDE.md` for monorepos.
-*   **Cross-Platform Hook Consistency:** Demand for hooks (specifically path-guard and shell execution) to behave identically on Windows and Linux, currently causing shared config files to fail on one platform.
+### Feature Request Trends
+*   **Extensibility & Hooks:** The "Mods" issue (#91870) dominates the roadmap discussion, with the community pushing for function hooks and plugin architectures to decouple features from the core loop.
+*   **Session Management:** Requests for Session Handoff (#11455) and continuity across restarts/machines are gaining momentum, driven by remote work and multi-device usage.
+*   **Permission Control:** Users are demanding granular, persistent permission states (e.g., "Allow always" for browser origins in #93156) to reduce approval fatigue in high-velocity workflows.
+*   **Cost & Model Transparency:** There is friction around model scoping, with users requesting clearer safeguards against accidental premium billing when using session-wide model switches vs. per-task overrides (#79478).
 
-**Developer Pain Points**
-*   **Windows Instability:** A cluster of issues points to significant Windows reliability problems, including installation hangs with zero network activity, hook execution failures when `pwsh` is missing, and update processes that leave orphaned system resources.
-*   **macOS Resource Leaks:** The local agent VM and desktop app are causing disk space exhaustion due to unbounded growth of `rootfs.img` and lack of reclamation mechanisms.
-*   **Session Management Friction:** Users are losing work due to lack of automatic handoffs when limits are hit, and "Esc" key behavior in agent views is irrecoverably killing background subagents.
-*   **Security Guardrail False Positives:** Legitimate defensive security tooling (domain trust auditing, subdomain takeover detection) is triggering cyber guardrails, blocking valid research workflows.
-*   **Plugin/State Removal:** Account-synced plugins and knowledge-work plugins cannot be effectively removed or disabled from any surface (CLI or Desktop), leading to persistent unwanted configurations.
+### Developer Pain Points
+*   **Windows Instability:** The "orphaned Job Object" bug (#53247) continues to plague Windows users, requiring reboots for recovery. Additionally, local environment attachments in Cowork are failing on Windows while working on macOS (#88632).
+*   **VS Code Extension Parity:** The IDE extension lags behind the CLI in critical features like drag-and-drop (#25128) and permission handling (#15921), creating a two-tier experience.
+*   **Context & Token Waste:** Developers are frustrated by context leaks, such as MCP tool schemas consuming tokens even when disabled (#92255) and deferred tools wasting ~20k tokens per session (#83363).
+*   **Agent Orchestration Bugs:** Conductor-style multi-agent setups are hitting state bleed issues (#93438) and lack safeguards against bulk-creating PRs on external repos (#79399), posing significant workflow risks.
 
 </details>
 
 <details>
 <summary><strong>OpenAI Codex</strong> — <a href="https://github.com/openai/codex">openai/codex</a></summary>
 
+# OpenAI Codex Community Digest — 2026-09-18
+
 ## 1. Today's Highlights
-The community focus remains heavily centered on **Windows sandbox and provisioning stability**, with multiple active issues and corresponding PRs addressing helper failures, registry cleanup, and permission inheritance. Simultaneously, users are reporting widespread **rate-limit and capacity errors** on Pro/Plus accounts, describing consistent "Selected model is at capacity" or unusual usage drains. **Guardian delegation and TUI performance** are also undergoing significant refinements to improve safety review context and reduce stack usage.
+OpenAI released **Codex CLI v0.155.0**, introducing experimental voice conversations and live TUI reasoning summaries, alongside five alpha pre-releases. The community’s attention is heavily divided between a critical, recurring **Windows sandbox failure** that blocks Computer Use and basic CLI tools, and a cluster of reports regarding **missing Computer Use features on Intel macOS**. Notable engineering work includes the stabilization of OAuth gateway credentials, preservation of web-search data in JSON execution logs, and fixes to project trust persistence for projectless directories.
 
 ## 2. Releases
-Several alpha releases for `codex-cli` were published on the 0.155.0 branch:
-*   **rust-v0.155.0-alpha.16** - Latest alpha build.
-*   **rust-v0.155.0-alpha.15** - Alpha build.
-*   **rust-v0.155.0-alpha.14** - Alpha build.
-*   **rust-v0.155.0-alpha.13** - Alpha build.
-*   **rust-v0.155.0-alpha.12** - Alpha build.
-*   **rust-v0.155.0-alpha.2.6** - Alpha build.
+**Codex CLI v0.155.0**
+- Introduced experimental `/voice` conversations with live transcripts and microphone controls, available on supported builds via `/experimental` ([#43581, #43651, #44331]).
+- The TUI now displays live reasoning summaries in the status row and shows completion timestamps after successful turns.
+
+*Note: v0.155.0-alpha.15 through v0.155.0-alpha.18 were also released in the 24-hour window, serving as stable stepping-stones to the GA release.*
 
 ## 3. Hot Issues
-1.  [#25178] **Windows Computer Use screenshot fails on Windows 10 22H2**
-    A highly engaging issue (65 comments, 27 👍) detailing how `SetIsBorderRequired` calls fail on Windows 10 22H2, blocking Computer Use screenshots despite basic window activation working.
-2.  [#29702] **Add a setting to disable timed auto-resolution**
-    A strong feature request (40 👍) for users to prevent the app from automatically resolving AI questions after a timeout, allowing longer thinking times.
-3.  [#30684] **Add account/workspace switching support**
-    A widely upvoted request (22 👍) to support quick switching between multiple accounts or workspaces rather than signing out and back in.
-4.  [#41779] **Local API launch rejected with "blocked by policy"**
-    A critical bug where Codex Desktop rejects local development API launches through `exec_command` with a policy block before the command even executes.
-5.  [#44736] **Windows ChatGPT project prewarming locks local mirrors**
-    A complex setup issue where desktop startup erases workarounds, and project prewarming locks `node_repl` working directories, causing persistent startup failures.
-6.  [#45613] **GPT-5.3-Codex-Spark quota visible but model unavailable**
-    Users are reporting that their Pro accounts show quota for `gpt-5.3-codex-spark`, but the model itself cannot be selected or used in Codex.
-7.  [#46185] & [#46231] **Account-level "Selected model is at capacity" errors**
-    Multiple Pro accounts are experiencing 100% failure rates with "at capacity" errors across all models. Cross-over testing suggests the block is account-scoped rather than machine or network-related.
-8.  [#45073] **Severe 5-hour usage drain**
-    A Plus user reports that 86% of their 5-hour usage quota was consumed in just 26 minutes with only 2 prompts, indicating a potential billing or token-consumption bug.
-9.  [#44696] **Windows sandbox helper fails with `helper_unknown_error`**
-    A persistent bug affecting Windows 11 where every `exec_command` and even plain file reads fail during sandbox initialization due to setup refresh errors.
-10. [#30993] **$skill invocation resolves stale cached plugin skill**
-    Users who install newer marketplace versions (like Superpowers) are experiencing "stale" behavior where the CLI still resolves old cached skills, conflicting with the new version.
+1. **[#26234] MCP tools uncallable for non-OpenAI providers (48 reactions)**
+   Users running Codex against Ollama, LM Studio, OpenRouter, or AWS Bedrock report that tools from MCP servers are not callable by the model. This remains one of the highest-prioritized blockers for local and alternative model ecosystems.
+   [View Issue](https://github.com/openai/codex/issues/26234)
+2. **[#24287] Codex Desktop UI stuck in "Thinking" and turns become invisible (31 comments)**
+   Prompts are accepted, but the UI freezes on the "Thinking" state. The Stop button fails, and sessions can become permanently invisible after a restart, severely degrading the desktop experience.
+   [View Issue](https://github.com/openai/codex/issues/24287)
+3. **[#40905] 5-hour usage limit interrupts long-running GPT-5.6 Sol tasks (15 comments)**
+   The rolling 5-hour window frequently terminates multi-hour autonomous agent tasks. The community argues the limit is incompatible with the sustained reasoning capabilities of the GPT-5.6 Sol model.
+   [View Issue](https://github.com/openai/codex/issues/40905)
+4. **[#42739] Local projects disappear from Windows sidebar post-update (14 comments)**
+   Following a desktop app update on Windows, the "Projects" section shows "No projects" despite the source folders and chat history still existing on disk.
+   [View Issue](https://github.com/openai/codex/issues/42739)
+5. **[#24437] Intel macOS x64 missing Computer Use / Appshots (10 comments)**
+   A persistent packaging issue where the x64 macOS build lacks the `computer-use` plugin and `Codex Computer Use.app` helper, leaving Intel Mac users without Appshots or locked-screen capabilities.
+   [View Issue](https://github.com/openai/codex/issues/24437)
+6. **[#32188] Feature: Event-driven wakeup for background exec (13 reactions)**
+   Currently, monitoring long-running commands requires the model to poll `write_stdin` inside a tool call. Users are requesting a true event-driven callback to reduce model turns and API costs.
+   [View Issue](https://github.com/openai/codex/issues/32188)
+7. **[#33171] Remote-compaction capacity error terminalizes persistent goals (9 comments)**
+   On Windows Desktop, remote-compaction capacity errors permanently break persistent `/goal` tasks, while other concurrent tasks in the app remain healthy.
+   [View Issue](https://github.com/openai/codex/issues/33171)
+8. **[#44848] "Daybreak" false positive labels active goals as stalled (8 comments)**
+   The Daybreak safety check triggers false positives, incorrectly labeling perfectly active and running goals as "stalled," confusing users and breaking agent workflows.
+   [View Issue](https://github.com/openai/codex/issues/44848)
+9. **[#45302] Windows sandbox blocks execution: invalid deny_read_acl_state.json (8 comments)**
+   The `.codex/.sandbox/deny_read_acl_state.json` file is generated with 22 bytes of NULs, causing parse failures that completely block the elevated sandbox on Windows 11.
+   [View Issue](https://github.com/openai/codex/issues/45302)
+10. **[#38185] No opt-out for recommended_plugins injection (7 comments, 3 reactions)**
+    The `<recommended_plugins>` block containing ~38 third-party plugins is unconditionally injected on the first turn of every session. Removing the feature flag leaves no way to suppress it.
+    [View Issue](https://github.com/openai/codex/issues/38185)
 
 ## 4. Key PR Progress
-1.  [#46241] **Repair Windows sandbox access to existing runtime children**
-    Fixes an issue where read/execute access at the root directory did not correctly inherit permissions for files and subdirectories, making them inaccessible to the sandbox.
-2.  [#46239] **Prefer the provisioning service for automatic Windows sandbox setup**
-    Updates the setup flow to prioritize the installed provisioning service over the elevated helper, falling back only when the service is unavailable to improve reliability.
-3.  [#46237] **Improve Windows sandbox error details and registry cleanup**
-    Enhances provisioning by including underlying error chains in failure logs and ensures empty registry keys are properly cleaned up during legacy installation removal.
-4.  [#46245] **Publish Guardian cached scores and coverage atomically**
-    Resolves an inconsistency where approval checks could read out-of-sync risk scores and tool-call coverage. Now, the score, authorization, and coverage are published atomically.
-5.  [#46122] **Route filesystem reads and writes by their own sandbox permissions**
-    Optimizes sandboxing by decoupling read permissions from write restrictions, preventing permitted reads from failing when the sandbox is unavailable for writes.
-6.  [#46107] **Box app-server request handler futures to reduce stack usage**
-    Addresses a performance bottleneck by using `Box::pin` for request handling, significantly reducing stack temporaries and memory usage during high-queue scenarios.
-7.  [#46117] **Add opt-in automatic background server startup**
-    Introduces `features.daemon_auto_start`, allowing the shared local server to automatically start for eligible sessions, with a fallback to prevent forced startup on incompatible systems.
-8.  [#46125] **Fix daemon socket isolation checks for private tmp mounts**
-    Resolves a Linux sandbox bug where private `/tmp` bind mounts caused false-positive rejection of safe socket isolation layouts during preflight checks.
-9.  [#46179] **Include sender user messages in Guardian delegation reviews**
-    Updates the safety engine to capture context from the sender's user messages, ensuring Guardian has full context when reviewing delegated tasks in receiving threads.
-10. [#46088] **Add `--no-daemon` to bypass the shared background server**
-    Adds a new CLI flag to explicitly prevent the startup or probing of the shared background server, ensuring isolated execution even if a daemon is already running.
+1. **[#46328] Avoid persisting project trust for projectless directories**
+   Fixes a trust-model loophole where starting a thread in a directory without a project would persist trust and preapprove future project configurations.
+   [View PR](https://github.com/openai/codex/pull/46328)
+2. **[#46324] Broaden compaction fallback to the current model**
+   Ensures that if a model switch occurs mid-stream, compaction falls back to the new selected model instead of failing with the previous model's stream retries.
+   [View PR](https://github.com/openai/codex/pull/46324)
+3. **[#46319] Preserve web search actions and results in exec JSON output**
+   Fixes `codex exec --json` so that web search events no longer collapse into generic `{"type": "other"}` payloads; structured URLs and outcomes are now preserved.
+   [View PR](https://github.com/openai/codex/pull/46319)
+4. **[#46318] Add OAuth credential management for model provider gateways**
+   Introduces `GatewayAuthManager` to handle PKCE browser sign-in, loopback callbacks, and encrypted storage of gateway credentials for non-OpenAI providers.
+   [View PR](https://github.com/openai/codex/pull/46318)
+5. **[#46310] Defer environment selection changes until the next turn**
+   Prevents mid-turn tool redirection when a user updates environment selections, ensuring the current turn's pending environment setup completes successfully.
+   [View PR](https://github.com/openai/codex/pull/46310)
+6. **[#46309] Preserve plugin caches across display metadata refreshes**
+   Stops unnecessary invalidation of loaded MCP and skill caches by comparing plugin metadata by identity rather than image URLs and other transient display data.
+   [View PR](https://github.com/openai/codex/pull/46309)
+7. **[#46302] Validate network socket policies using the executor OS**
+   Resolves false rejections of absolute paths (e.g., Windows paths on a Linux controller) by validating socket policies against the executor's OS.
+   [View PR](https://github.com/openai/codex/pull/46302)
+8. **[#46300] Centralize OAuth login and refresh handling with safer diagnostics**
+   Consolidates separate OAuth login/refresh logic to prevent token and credential values from being exposed in JSON decoding error diagnostics.
+   [View PR](https://github.com/openai/codex/pull/46300)
+9. **[#46294] Separate thread startup metadata from replay history**
+   Reduces memory cloning by storing `ThreadStartupMetadata` independently, allowing callers that only need thread IDs to avoid loading the full `SessionConfiguredEvent` replay history.
+   [View PR](https://github.com/openai/codex/pull/46294)
+10. **[#46288] Add opt-in overhead timing to code-mode responses**
+    Introduces `experimental_show_cell_overhead` to display time spent outside the host (such as app-server waiting), providing crucial insights into agent latency.
+    [View PR](https://github.com/openai/codex/pull/46288)
 
 ## 5. Feature Request Trends
-*   **Multi-account & Workspace Management:** Strong demand for in-app account switching and clearly identifying which workspace is active.
-*   **Granular UI & Interaction Control:** Requests to disable timed auto-resolution for prompts and to support tiled/split-view for multiple independent chats.
-*   **Opt-in Infrastructure Features:** Demand for more control over the daemon (e.g., `--no-daemon`) and background server behaviors.
-*   **Custom Tool/Skill Resolution:** Users want better ways to manage skill discovery, including symlink support and explicit uninstalls for stale plugins.
+- **Autonomous Task Persistence:** There is a strong push to make event-driven, long-running agent tasks robust against rate limits and transient network failures, requiring better memory context (e.g., `#32188`).
+- **Provider Agnosticism:** Developers using Ollama, Bedrock, and OpenRouter are heavily requesting standard, callable MCP namespaces and first-class OAuth support ([#26234]), moving beyond OpenAI's proprietary Responses API.
+- **Sandbox Transparency:** Users are requesting more granular control over `deny_read_acl` states and sandboxing to prevent hard failures during local execution ([#45302], [#46114]).
 
 ## 6. Developer Pain Points
-*   **Windows Sandbox Fragility:** A high volume of issues (e.g., #44696, #44736, #32315) highlight that Windows sandboxing is prone to path-length limits, registry errors, and permission inheritance failures.
-*   **Capacity & Rate-Limit Uncertainty:** Pro/Plus users are struggling with unexplained "at capacity" errors and massive, sudden drops in their weekly or 5-hour usage quotas.
-*   **Stale Caching:** The combination of skill marketplace updates and plugin resolution is leading to developers using outdated logic instead of their newly installed versions.
-*   **Session Persistence Bugs:** Reports of "failed to read thread" (CRC errors) and hooks silently failing when working directories are deleted are disrupting long-form workflows.
+- **Windows Sandbox Instability:** The most frequent and disruptive complaint. A corrupted `deny_read_acl_state.json` file causes a cascading failure that blocks Computer Use, terminal access, and basic CLI execution ([#45302], [#44034], [#42958]).
+- **Intel macOS Feature Gap:** Multiple issues ([#24437], [#46327], [#25045]) highlight that x64 Intel Macs are still missing the Computer Use / Appshots service, creating a frustrating disparity compared to Apple Silicon users.
+- **CLI `exec` Headless Friction:** Automators are hitting silent no-ops and broken JSON structures when attempting to use hooks (`SessionStart`) and web-search tools headlessly, hindering CI/CD integrations ([#45999], [#46210]).
 
 </details>
