@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态正处于从“单一交互”向“多智能…",
+      "注：数据基于 2026-09-19 提供的动态摘要统计。",
+      "沙箱与本地环境稳定性：",
+      "Claude Code：关注 excludedComman…",
+      "OpenAI Codex：焦点在于 Windows/mac…",
+      "共同诉求：开发者均要求在不破坏自动化流程的前提下，确保本地…"
+    ],
+    "ai-agents": [
+      "今日 OpenClaw 项目保持高活跃度，过去 24 小时…",
+      "今日主要进展集中在 Gateway 服务的可靠性修复与 U…",
+      "Gateway 服务定义修复：PR #152120 和 #…",
+      "性能优化：PR #152005 和 #152270 将 P…",
+      "UI 体验修复：PR #152256 修复了小窗口下命令面…",
+      "构建工具优化：PR #152297 优化了 commit…"
+    ],
+    "ai-trending": [
+      "今日 GitHub Trending 榜单中 AI 相关项…",
+      "今日该维度关注点在于 Agent 的底层执行环境与辅助基础…",
+      "anthropics/claude-code：Anthro…",
+      "cloudflare/security-audit-ski…",
+      "supermemoryai/supermemory：专为…",
+      "coder/coder：为开发者及其 Agent 提供安全…"
+    ],
+    "ai-web": [
+      "2026年9月18日至19日，AI 领域呈现明显的差异化发…",
+      "在安全领域，Anthropic 宣布与埃森哲（Accent…",
+      "在科研领域，Anthropic 公布 Claude 在生物…",
+      "整体来看，Anthropic 正试图通过构建“企业级安全标…",
+      "分类：News（新闻 / 合作）",
+      "内容标题：Partnering with Accentur…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 AI 基础设施的供应链安全极度敏感，O…",
+      "Qwen 3.8 Omni Flash · HN：通义实验…",
+      "OpenAI models secretly genera…",
+      "Introducing System One Models…",
+      "Two parallel neural ectoderm…",
+      "Claude Code now reads AGENTS…"
+    ],
+    "ai-arxiv": [
+      "今日投稿显示 AI 研究重心正从单纯的能力增强转向可靠性、…",
+      "dQwen3.5: Hybrid-Attention Di…",
+      "On-Demand Attention: Language…",
+      "Harm Laundering in GPT Models…",
+      "RetireOPD: Self-Retiring On-P…",
+      "What Does Privileged Informat…"
+    ],
+    "ai-hf": [
+      "今日 Hugging Face 榜首由 Edge0/Edg…",
+      "该类别涵盖了通用文本生成、对话及指令遵循模型。",
+      "Edge0/Edge0-35B-A3B-preview：基…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "Qwen/Qwen3.8-27B：本期下载量冠军，Qwen…",
+      "TokenRhythm/NeoHorse-1-4B：基于…"
+    ],
+    "ai-community": [
+      "今日技术社区的关注点正从单纯的模型能力展示转向AI 系统的…",
+      "The Bottleneck Moved From Wri…",
+      "I Built an AI Agent That Audi…",
+      "How to make a fool of yoursel…",
+      "Serving Gemma 4 on an AMD MI3…",
+      "Compute as Currency: The IAM…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI tool ecosystem is currently defined by a race to…",
+      "Cross-Platform Sandbox Stability: Both tools face critical…",
+      "Desktop/UI Consistency: Both communities are frustrated wit…",
+      "Advanced Agent Capabilities: Both are expanding beyond simp…",
+      "Quota and Rate-Limit Transparency: Both user bases are expe…",
+      "Technical Approach: Claude Code is currently focused on int…"
+    ],
+    "ai-agents": [
+      "Today's Overview",
+      "OpenClaw demonstrated exceptionally high engineering throug…",
+      "No new releases were published for OpenClaw on September 19…",
+      "Project Progress",
+      "Activity across 50 updated PRs highlights significant forwa…",
+      "Community Hot Topics"
+    ],
+    "ai-trending": [
+      "Step 1 (Filter)",
+      "Excluded Non-AI/General Tools: rustfs/rustfs, supabase/supa…",
+      "Excluded General ML/DL Frameworks (Standard Infrastructure)…",
+      "Selected AI-Relevant Projects: All other listed repositorie…",
+      "Step 2 (Categorize)",
+      "🔧 AI Infrastructure: ollama, open-webui, langchain-ai/langc…"
+    ],
+    "ai-web": [
+      "Anthropic has intensified its safety infrastructure strateg…",
+      "News / Company Strategy",
+      "Partnering with Accenture on embedded evaluation (Published…",
+      "Anthropic is integrating third-party safety audits directly…",
+      "Unlike traditional external audits, this model grants evalu…",
+      "Both companies have committed to an investment of at least…"
+    ],
+    "ai-hn": [
+      "Community attention is sharply divided between high-stakes…",
+      "Introducing System One Models and Jev · HN：Typesafe AI has…",
+      "Qwen 3.8 Omni Flash · HN：This release highlights Qwen's con…",
+      "An empirical study of harness design for coding agents · HN…",
+      "Cache-to-Cache: Direct Semantic Communication Between LLMs…",
+      "Claude Code now reads AGENTS.md if there is no Claude.md ·…"
+    ],
+    "ai-arxiv": [
+      "Today’s research demonstrates a maturation of Large Languag…",
+      "dQwen3.5: Hybrid-Attention Diffusion Language Models：Introd…",
+      "On-Demand Attention: Language Models Know When to Recall：Pr…",
+      "Quantifying Overclaiming Propensity in Frontier LLM Agents…",
+      "Harm Laundering in GPT Models：Provides evidence that safety…",
+      "An Empirical Study of Harness Design for Coding Agents：Deco…"
+    ],
+    "ai-hf": [
+      "Qwen3.8-27B remains the dominant force in the trending list…",
+      "Qwen/Qwen3.8-27B：A flagship 27B multimodal LLM designed for…",
+      "Qwen/Qwen3.8-Flash-Next：An experimental fast-inference vari…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：A high-speed image-text-to…",
+      "zai-org/GLM-5.3-Flash：A conversational LLM with strong imag…",
+      "XingChen-AGI/Xing4.0-29B-A4B：A 29B active-parameter MoE mod…"
+    ],
+    "ai-community": [
+      "Today's Highlights",
+      "The AI development community is increasingly focused on shi…",
+      "Dev.to Highlights",
+      "The Bottleneck Moved From Writing Code to Proving It：The pr…",
+      "I Built an AI Agent That Audits AWS (And It Can't Touch Any…",
+      "How to make a fool of yourself 101：The author shares a pers…"
+    ]
+  }
+}
