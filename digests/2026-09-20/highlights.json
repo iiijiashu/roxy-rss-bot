@@ -1,0 +1,118 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态已从单纯的“代码补全”演进为重…",
+      "基于提供的 2026-09-20 数据汇总：",
+      "注：Claude Code 提供了 1 个稳定版更新，侧重…",
+      "UI 响应性与渲染性能：",
+      "Claude Code：解决 macOS WindowSe…",
+      "Codex：解决 macOS Renderer 白屏及 1…"
+    ],
+    "ai-agents": [
+      "OpenClaw 今日活跃度较高，过去24小时内处理了7条…",
+      "最新发布：v2026.9.5",
+      "更新内容：该版本包含64个直接提交，由4,179个PR和5…",
+      "发布形式：提供 AppImage 和 Debian 包。",
+      "迁移注意事项：根据社区反馈，从 2026.9.4 升级至…",
+      "今日合并/关闭的PR主要集中于修复近期CI失败引发的竞争条…"
+    ],
+    "ai-trending": [
+      "今日 AI 开源社区的核心热点集中在Coding Agen…",
+      "pytorch/pytorch：领先的动态神经网络框架，提…",
+      "huggingface/transformers：Hugg…",
+      "ollama/ollama：本地运行开源大模型的极简工具…",
+      "cloudflare/quiche：QUIC 传输协议和…",
+      "cactus-compute/needle：针对微小设备的…"
+    ],
+    "ai-web": [
+      "今日增量更新极为有限，仅捕捉到 OpenAI 于 2026…",
+      "分类：news / research / engineer…",
+      "条目数量：0",
+      "说明：今日增量更新中，Anthropic（claude.c…",
+      "分类：safety",
+      "条目数量：1"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 AI 的讨论呈现两极分化：一方面，AI…",
+      "Qwen 3.8 Omni Flash · HN：阿里发布…",
+      "How OpenAI Used Its Own LLMs…",
+      "Cache-to-Cache: Direct Semant…",
+      "Claude Code now reads AGENTS…",
+      "Show HN: I created an open so…"
+    ],
+    "ai-hf": [
+      "《Hugging Face 热门模型日报》",
+      "今日 Hugging Face 热门榜由 Qwen3.8…",
+      "Qwen/Qwen3.8-27B：原生多模态文本生成模型…",
+      "meta-llama/Llama-3.1-8B-Instr…",
+      "Qwen/Qwen3.8-Flash-Next：Qwen4…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…"
+    ],
+    "ai-community": [
+      "今日 AI 社区讨论热度集中在安全与合规及新架构探索两大方…",
+      "Your AI Coding Agent Can Be A…",
+      "What Do You Do While AI Codes…",
+      "I got rejected for using AI i…",
+      "I Let AI Write My Tests for 6…",
+      "OpenAI monorepo reached via l…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI tool ecosystem on 2026-09-20 is defined by a hig…",
+      "Note: Data reflects specific items highlighted in the 2026…",
+      "Several user pain points appear across both tool communitie…",
+      "Cross-Device Sync & Session Continuity: Codex users explici…",
+      "OS-Specific Integration Flaws: Both tools suffer from high…",
+      "UI Stability & Race Conditions: Claude Code is fixing diff…"
+    ],
+    "ai-agents": [
+      "OpenClaw released v2026.9.5 for both core and the Linux sta…",
+      "v2026.9.5 & linux-stable",
+      "OpenClaw shipped v2026.9.5 and a corresponding Linux stable…",
+      "In the last 24 hours, 4 PRs were merged/closed while 46 rem…",
+      "UI Fixes: PR #153198 adds the ability to navigate multiple…",
+      "Core Stability: PR #153280 ensures Testbox command shells m…"
+    ],
+    "ai-trending": [
+      "The AI agent ecosystem is currently dominated by a surge in…",
+      "trycua/cua：An open-source driver framework for scaling \"Com…",
+      "cactus-compute/needle：A highly optimized automation foundat…",
+      "anthropics/claude-code：A terminal-based agentic coding tool…",
+      "coder/coder：Provides secure, ephemeral development environm…",
+      "higgsfield-ai/higgsfield：A fault-tolerant GPU orchestration…"
+    ],
+    "ai-web": [
+      "Today’s incremental update reveals a distinct asymmetry in…",
+      "The incremental update for Anthropic (claude.com / anthropi…",
+      "Category: Safety / Policy",
+      "Item: Australian Youth Safety Blueprint",
+      "Note: ⚠️ Data Limitation: This entry is metadata-only. The t…",
+      "Technical Priorities: With no new model or engineering rele…"
+    ],
+    "ai-hn": [
+      "The Hacker News community is currently polarized between th…",
+      "Two parallel neural ectoderm progenitors contribute to the…",
+      "NASA-IBM Lunar Foundation open-Source Geospatial AI Model ·…",
+      "Alibaba open-sources AI model that can detect cancer and ne…",
+      "Qwen 3.8 Omni Flash · HN：A new multimodal model release fro…",
+      "Claude Code now reads AGENTS.md if there is no Claude.md ·…"
+    ],
+    "ai-hf": [
+      "Qwen's Qwen3.8-27B continues to dominate the trending chart…",
+      "Qwen3.8-27B：This top-tier image-text model is the backbone…",
+      "DeepSeek-V4.1-Flash：A highly anticipated multimodal release…",
+      "Llama-3.1-8B-Instruct：An evergreen instruction-tuned model…",
+      "MiniCPM5-2B：This compact Llama-architectured model targets…",
+      "GLM-5.3-Flash：A conversational multimodal model offering st…"
+    ],
+    "ai-community": [
+      "Security vulnerabilities and supply chain attacks on AI cod…",
+      "Your AI Coding Agent Can Be Attacked by the Repository It O…",
+      "What Do You Do While AI Codes? I Make Mine Argue With Itsel…",
+      "I got rejected for using AI in an interview. Then I watched…",
+      "I Let AI Write My Tests for 6 Months. Here Is What Actually…",
+      "AI Is Making You a Worse Engineer and a Better Employee：A c…"
+    ]
+  }
+}
