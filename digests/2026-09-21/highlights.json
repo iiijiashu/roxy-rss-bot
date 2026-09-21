@@ -1,0 +1,102 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态正从单纯的“代码生成”向高度自…",
+      "注：数据基于提供的日报摘要统计，PR 数量仅统计摘要中明确…",
+      "无头/服务器环境认证与支持：",
+      "Claude Code：强烈需求支持 RFC 8628 设…",
+      "OpenAI Codex：在 VS Code Remote…",
+      "沙箱与系统底层兼容性："
+    ],
+    "ai-agents": [
+      "过去 24 小时内，OpenClaw 项目保持高强度开发状…",
+      "注：由于过去 24 小时内无已合并 PR，此处列出待合并（…",
+      "Gateway 性能深度重构：多个高评分（Platinum…",
+      "#150237：将审批查找和历史记录移出 Gateway…",
+      "#150270：异步准备会话放置元数据，确保会话读取响应迅…",
+      "#148560：将库资源元数据读取移至工作线程，避免阻塞…"
+    ],
+    "ai-trending": [
+      "今日 GitHub 热榜呈现鲜明的“Agent 基础设施化…",
+      "affaan-m/ECC：针对 Claude Code 等…",
+      "anthropics/claude-code：Anthro…",
+      "trycua/cua：开源 Computer-Use 2…",
+      "higgsfield-ai/higgsfield：专注于千…",
+      "vercel-labs/json-render：Verce…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 AI 的讨论呈现出显著的批判性反思与工…",
+      "Qwen Image 2.1 · HN：通义千问发布新版本…",
+      "Qwen 3.8 Omni Flash · HN：阿里推出…",
+      "Cache-to-Cache: Direct Semant…",
+      "Introducing System One Models…",
+      "Claude Code now reads AGENTS…"
+    ],
+    "ai-hf": [
+      "本次榜单展示了 Hugging Face 生态中 Qwen…",
+      "Qwen/Qwen3.8-27B：多模态图文对话模型，凭借…",
+      "Qwen/Qwen3.8-Flash-Next：强调高效思…",
+      "meta-llama/Llama-3.1-8B-Instr…",
+      "zai-org/GLM-5.3-Flash：基于 GLM…",
+      "openbmb/MiniCPM5-2B：专为端侧设计的 2…"
+    ],
+    "ai-community": [
+      "今日技术社区对 AI 的关注焦点正从单纯的大模型性能转向…",
+      "Architecting a Resilient DevS…",
+      "Your AI Knows How to Answer…",
+      "Traditional Coding vs Agentic…",
+      "OpenAI monorepo reached via l…",
+      "No Moat in Model Architecture…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI tools landscape on 2026-09-21 is characterized b…",
+      "Note: Counts reflect items explicitly highlighted in the pr…",
+      "Headless/Remote Reliability: Both communities are strugglin…",
+      "Terminal UI (TUI) Ergonomics: Both tools are moving the ter…",
+      "Sandboxing & OS Integration: Both tools face significant te…",
+      "Feature Focus:"
+    ],
+    "ai-agents": [
+      "Focus: AI Agent & Personal Assistant Open-Source Project (g…",
+      "OpenClaw demonstrates intense development velocity today, w…",
+      "Merged/Closed PRs: 0 PRs were merged or closed today. All 5…",
+      "Key Architectural Advances:",
+      "Gateway Performance: A cluster of high-priority PRs address…",
+      "Search & Provider Compatibility: PR #154084 ensures native…"
+    ],
+    "ai-trending": [
+      "1. Today's Highlights",
+      "The open-source AI ecosystem today is defined by a massive…",
+      "2. Top Projects by Category",
+      "Frameworks, SDKs, inference engines, and developer tools.",
+      "affaan-m/ECC：A performance optimization system for agent ha…",
+      "builderio/agent-native：A TypeScript framework specifically…"
+    ],
+    "ai-hn": [
+      "The community is currently grappling with the tension betwe…",
+      "Introducing System One Models and Jev · HN：This release fro…",
+      "Qwen 3.8 Omni Flash · HN：A new multimodal release from the…",
+      "Cache-to-Cache: Direct Semantic Communication Between LLMs…",
+      "The Implications of Linguistic Illegibility for LLM Securit…",
+      "A heap overflow and SSO misconfiguration to compromise Open…"
+    ],
+    "ai-hf": [
+      "Qwen continues to dominate the trending charts, with multip…",
+      "Qwen3.8-27B：A high-performance image-text-to-text model fro…",
+      "Llama-3.1-8B-Instruct：Meta's widely used 8B instruction-tun…",
+      "Qwen3.8-Flash-Next：An experimental iteration of the Qwen Fl…",
+      "Xing4.0-29B-A4B：A 29B parameter model utilizing an A4B acti…",
+      "openjev：A cross-encoder model built on the Qwen3.5 base, sp…"
+    ],
+    "ai-community": [
+      "Today's Highlights",
+      "The conversation around TypeSafe’s \"Jev\" model has exploded…",
+      "Dev.to Highlights",
+      "Architecting a Resilient DevSecOps Pipeline for Enterprise…",
+      "Traditional Coding vs Agentic Coding: The Flow State Proble…",
+      "Orca: The Agent Development Environment for Running AI Codi…"
+    ]
+  }
+}
