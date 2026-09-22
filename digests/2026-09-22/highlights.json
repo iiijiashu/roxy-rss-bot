@@ -1,0 +1,118 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态正处于从“基础代码生成”向“多…",
+      "注：Claude Code 数据基于其日报中明确给出的“4…",
+      "MCP 协议集成的稳定性与安全",
+      "Claude Code: 反馈 MCP elicitati…",
+      "OpenAI Codex: 重点优化 Linux 下 MC…",
+      "诉求: 开发者需要 MCP 作为标准扩展接口具备更强的隔离…"
+    ],
+    "ai-agents": [
+      "OpenClaw 项目在今日保持了极高的开发活跃度，过去…",
+      "v2026.7.35 (extended-stable /…",
+      "性质：这是一个网关专用的扩展稳定版（gateway-onl…",
+      "内容：基于 2026 年 7 月底的代码基础，集成了关键安…",
+      "注意事项：该版本面向需要最高稳定性的生产环境用户。目前最新…",
+      "今日合并/关闭的重要 PR 主要集中在稳定性修复与性能优化："
+    ],
+    "ai-trending": [
+      "今日 AI 开源领域呈现“Agent 基础设施化”的显著趋…",
+      "builderio/agent-native：构建 Age…",
+      "trycua/cua：开源计算机使用驱动与基准测试平台。支…",
+      "akitaonrails/ai-memory：为 Agen…",
+      "coder/coder：为开发者及其 Agent 提供安全…",
+      "yynxxxxx/Codex-X：OpenAI Codex…"
+    ],
+    "ai-web": [
+      "今日增量更新显示 Anthropic 在生物分子建模领域取…",
+      "核心观点: 该文章展示了 Claude 在“Claude…",
+      "业务意义: 此举不仅降低了生物分子模拟的硬件门槛（从昂贵的…",
+      "状态说明: 仅元数据模式。基于 URL 路径推断标题，无正…",
+      "Anthropic (垂直深耕 vs. 通用广度): An…",
+      "OpenAI (生态构建 vs. 科学验证): OpenA…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 AI 的讨论呈现出“工程落地”与“伦理…",
+      "Grok 4.7 · HN：xAI 发布的最新模型引发广泛…",
+      "Qwen Image 2.1 · HN：阿里通义千问图像生…",
+      "Two parallel neural ectoderm…",
+      "Frontier AI on Your Own Hardw…",
+      "AI coding has made CI a bottl…"
+    ],
+    "ai-hf": [
+      "本期榜单中，Qwen 系列模型占据主导地位，不仅包括旗舰版…",
+      "Qwen3.8-27B：本期榜单最高人气模型，支持多模态输…",
+      "DeepSeek-V4.1-Flash：集成了文本与图像理…",
+      "Qwen3.8-Flash-Next：Qwen 系列的实验…",
+      "Xing4.0-29B-A4B：来自 XingChen-A…",
+      "MiniCPM5-2B：基于 Llama 架构的小型模型…"
+    ],
+    "ai-community": [
+      "今日 Dev.to 社区聚焦于 AI Agent 工程化落…",
+      "What If Your AI Agent Never H…",
+      "Dev log #22 Tearing out the o…",
+      "Are you good enough? Who sets…",
+      "How to stop AI from confident…",
+      "How monday.com Runs Agent Eva…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Tools Analyzed: Claude Code (Anthropic), OpenAI Codex",
+      "The AI CLI tool landscape is currently defined by a sharp d…",
+      "Agent Cost & Control Visibility: Both communities demand ha…",
+      "Repository-Scoped Configuration: Both tools face pressure t…",
+      "Windows Platform Stability: A major pain point for both too…",
+      "Desktop App Parity & Accessibility: Both desktop applicatio…"
+    ],
+    "ai-agents": [
+      "OpenClaw demonstrated high development activity on Septembe…",
+      "v2026.7.35 (Extended-Stable / LTS Equivalent)",
+      "Key Changes: Includes critical security updates, reliabilit…",
+      "Migration Note: This release is intended for users prioriti…",
+      "Six pull requests were merged or closed on 2026-09-22, adva…",
+      "Gateway Shutdown Safety: Merged/Closed work includes a fix…"
+    ],
+    "ai-trending": [
+      "Today’s trending list is dominated by agent-native infrastr…",
+      "ollama/ollama：The go-to local model runner supporting Qwen…",
+      "firecrawl/firecrawl：Web data API for agents to scrape and i…",
+      "headroomlabs-ai/headroom：Compresses tool outputs and RAG ch…",
+      "Mirrowel/LLM-API-Key-Proxy：Universal LLM gateway with multi…",
+      "affaan-m/ECC：Agent harness performance optimization system…"
+    ],
+    "ai-web": [
+      "Scope: Incremental update (Anthropic & OpenAI)",
+      "Anthropic released a major research update demonstrating th…",
+      "How Claude is uplifting biomolecular modeling (Link)",
+      "Published/Updated: 2026-09-21",
+      "Core Insights: This post details how Claude, operating with…",
+      "Business Significance: Anthropic is open-sourcing all optim…"
+    ],
+    "ai-hn": [
+      "1. Today's Highlights",
+      "The Hacker News community is currently split between techni…",
+      "2. Top News & Discussions",
+      "Qwen Image 2.1 · HN：This release of Qwen's image generation…",
+      "Grok 4.7 · HN：xAI's latest model release is a major hot top…",
+      "How to Write with an LLM · HN：A highly discussed guide on e…"
+    ],
+    "ai-hf": [
+      "The Qwen3.8 ecosystem is dominating the trending lists, wit…",
+      "Qwen/Qwen3.8-27B：A flagship image-text-to-text model that h…",
+      "Qwen/Qwen3.8-Flash-Next：A next-generation experimental vari…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：An image-text-to-text model…",
+      "XingChen-AGI/Xing4.0-29B-A4B：A conversational text-generati…",
+      "openbmb/MiniCPM5-2B：A compact 2B parameter language model o…"
+    ],
+    "ai-community": [
+      "Today’s discussion centers heavily on the reliability and e…",
+      "What If Your AI Agent Never Had to Leave the Browser? (Demo…",
+      "Dev log #22 Tearing out the old: Deleting 3,800 lines of le…",
+      "Are you good enough? Who sets the bar?：Discusses the changi…",
+      "How to stop AI from confidently shipping broken code (a pat…",
+      "Building Bivack: A Cloud Dev Sandbox for Coding Agents on A…"
+    ]
+  }
+}
