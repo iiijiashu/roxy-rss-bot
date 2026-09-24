@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "2026年9月24日，AI CLI工具生态呈现明显的“平台…",
+      "MCP (Model Context Protocol)…",
+      "Claude Code：社区强烈要求解决 MCP 工具因…",
+      "Codex：虽然今日热点未直接指向MCP，但PR #476…",
+      "共性：两工具均处于 MCP 规范迭代期，开发者亟需更好的错…",
+      "Windows 平台深度适配："
+    ],
+    "ai-agents": [
+      "过去24小时内，OpenClaw 项目保持极高活跃度，共新…",
+      "严重缺陷：macOS 应用在每次启动时都会崩溃，导致 Op…",
+      "影响范围：所有通过应用内更新从 2026.9.4/9.5…",
+      "官方建议：若应用无法启动，需重装 2026.9.5 mac…",
+      "相关链接：",
+      "今日有 2 个 PR 被合并/关闭，主要涉及文档与发布流程："
+    ],
+    "ai-trending": [
+      "今日 Trending 榜单呈现“Agent 基础设施全面…",
+      "google/ax：Google 推出的 Agentic…",
+      "builderio/agent-native：专为 Age…",
+      "strands-agents/harness-sdk：生产…",
+      "deusdata/codebase-memory-mcp…",
+      "davila7/claude-code-templates…"
+    ],
+    "ai-web": [
+      "Anthropic 公布重大科学突破：宣布成立“生命科学研…",
+      "OpenAI 发布多项更新：今日新增 4 篇索引内容，包括…",
+      "数据局限性提示：OpenAI 部分条目当前仅有元数据（标题…",
+      "核心观点: Anthropic 正式推出面向基础生物学的研…",
+      "技术细节: 在科学家提供高层级方向指引下，Claude 在…",
+      "业务意义: 该成果是 AI for Science 领域的…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区焦点集中在 Anthropic 与 Ope…",
+      "Claude Opus 5.5 · HN：该帖子今日分数极…",
+      "GPT-6 Sol and Luna · HN：OpenA…",
+      "Claude discovers a novel enzy…",
+      "Claude Opus 5.5 Intelligence…",
+      "[Claude Code reads AGENTS.md…"
+    ],
+    "ai-arxiv": [
+      "今日投稿显著聚焦于智能体（Agents）的可扩展性与工程落…",
+      "Flash-dLLM: IO-Aware KV Cachi…",
+      "The Sirens' Song: When Proxim…",
+      "Greedy Decoding Is Not Precis…",
+      "Receptiveness, Not Sycophancy…",
+      "Capable yet Parsimonious: Ext…"
+    ],
+    "ai-hf": [
+      "今日 Hugging Face 热榜由 Qwen 生态与…",
+      "Qwen/Qwen3.8-27B：当前榜单最热的基础语言模…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "Qwen/Qwen3.8-Flash-Next：基于 Qw…",
+      "XingChen-AGI/Xing4.0-29B-A4B…",
+      "yandex/AliceAI-Foundation-80B…"
+    ],
+    "ai-community": [
+      "数据源: Dev.to (30篇), Lobste.rs…",
+      "今日技术社区围绕 AI 的讨论主要集中在三大维度：",
+      "多 Agent 成本控制与效率：如何追踪隐形费用、减少 T…",
+      "模型竞争与落地：Claude Opus 5.5 与 GPT…",
+      "Agent 可靠性工程：从单纯的“能跑”转向强调“做对”…",
+      "Per-Agent Cost Tracking for M…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Tools Analyzed: Claude Code, OpenAI Codex",
+      "The AI developer tools landscape is rapidly maturing, shift…",
+      "Granular Configuration & Control: Both communities demand f…",
+      "Extension & Interception Hooks: Both are expanding their ex…",
+      "Context & Memory Management: Both tools face challenges in…",
+      "MCP Integration Robustness: Both are dealing with MCP proto…"
+    ],
+    "ai-agents": [
+      "OpenClaw Project Digest: 2026-09-24",
+      "OpenClaw is in a state of high operational activity with 50…",
+      "v2026.9.6 (Released): This release introduced a critical re…",
+      "Critical Issue: The macOS app can crash on every launch aft…",
+      "Action Taken: The version has been withdrawn from the Spark…",
+      "Migration Note: Users experiencing launch failures should r…"
+    ],
+    "ai-trending": [
+      "Excluded from Trending List (Non-AI or Peripheral):",
+      "Open-Dev-Society/OpenStock: Financial data tracking, not co…",
+      "mvt-project/mvt: Mobile forensics tool, not AI.",
+      "harry7557558/spirula-studio: 3D Gaussian Splatting is compu…",
+      "Filtered AI Projects:",
+      "🔧 AI Infrastructure"
+    ],
+    "ai-web": [
+      "The most significant development in today's incremental upd…",
+      "Category: Science & News",
+      "Claude discovers a novel enzyme system",
+      "Core Insights: Anthropic is formally introducing a new life…",
+      "Business Significance: This marks a pivot from pure digital…",
+      "⚠️ Data Limitation: OpenAI data for this period consists of…"
+    ],
+    "ai-hn": [
+      "The Hacker News community is heavily focused on the rapid p…",
+      "Claude Opus 5.5 · HN：Anthropic’s new flagship model continu…",
+      "GPT-6 Sol and Luna · HN：OpenAI’s latest model release is th…",
+      "OpenAI GPT–6 Astra breaks Enigma message that has resisted…",
+      "Gemini 3.8 text-to-speech · HN：Google’s latest TTS model hi…",
+      "Mercury 2.5 LLM hits 770 tokens per second · HN：A specializ…"
+    ],
+    "ai-arxiv": [
+      "The research landscape today shifts decisively toward the o…",
+      "Flash-dLLM: IO-Aware KV Caching and Parallel Decoding for F…",
+      "Greedy Decoding Is Not Precision-Invariant: Cross-Precision…",
+      "The Sirens' Song: When Proximal Background Context Overshad…",
+      "Type-Safe Is Not Error-Free: A Constrained Decision Head Fo…",
+      "Capable yet Parsimonious: Extracting and Characterizing Hid…"
+    ],
+    "ai-hf": [
+      "The dominant trend this week is the massive surge in commun…",
+      "Qwen/Qwen3.8-27B：A flagship image-text-to-text model that d…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：A high-performing flash var…",
+      "XingChen-AGI/Xing4.0-29B-A4B：A conversational text-generati…",
+      "Qwen/Qwen3.8-Flash-Next：The next-generation experimental fl…",
+      "yandex/AliceAI-Foundation-80B-A3B-Base：A large-scale base m…"
+    ],
+    "ai-community": [
+      "Today's Highlights",
+      "The AI developer community is currently focused on the imme…",
+      "Dev.to Highlights",
+      "Per-Agent Cost Tracking for Multi-Agent AI on AWS：This arti…",
+      "I Turned DEV.to Into a Walkable 3D Library — Debugging It H…",
+      "Something About Coding Stopped Feeling Good — and It Took M…"
+    ]
+  }
+}
