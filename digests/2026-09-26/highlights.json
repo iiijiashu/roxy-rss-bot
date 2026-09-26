@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态正从“基础交互”向“企业级可靠…",
+      "企业级认证与多租户支持：Claude Code 用户强烈要…",
+      "Windows 平台完善与进程管理：Claude Code…",
+      "安全沙箱与权限边界：Claude Code 讨论安全过滤器…",
+      "远程/无人值守可靠性：Claude Code 用户反馈 C…",
+      "功能侧重：扩展性与模块化。通过“函数式 Hooks”和 M…"
+    ],
+    "ai-agents": [
+      "当前线上稳定版为 2026.9.5，目标升级为 2026…",
+      "过去 24 小时，OpenClaw 社区活跃度高，共更新…",
+      "今日有 9 个 PR 被合并或关闭，主要推进了以下核心模块：",
+      "计算机工具 (Computer Tool) 修复",
+      "关闭了 #155072：修复了当模型将可选字段（targe…",
+      "性能优化（Gateway & Auth）"
+    ],
+    "ai-trending": [
+      "AI 开源趋势日报 (2026-09-26)",
+      "今日 AI 开源生态的核心焦点从单一的模型推理强烈向Age…",
+      "NVIDIA/Model-Optimizer：提供量化、蒸…",
+      "pytorch/pytorch：深度学习标准框架，今日无显…",
+      "langchain-ai/langchain：从通用框架转…",
+      "ollama/ollama：本地 LLM 运行标准工具，支…"
+    ],
+    "ai-web": [
+      "报告日期：2026-09-26",
+      "类型：增量更新（仅分析今日新增内容）",
+      "核心关键词：生命科学研究、多智能体市场、高复杂度物理计算、…",
+      "Anthropic 战略全面向“硬科学”深水区转移：通过发…",
+      "多智能体协作进入经济行为验证阶段：通过 \"Project…",
+      "OpenAI 商业化边界突破至长尾市场：基于元数据，Ope…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区围绕“AI 模型能力跃升”与“安全失控风险…",
+      "GPT-6 Sol and Luna · HN：OpenA…",
+      "Claude Opus 5.5 · HN：Anthropi…",
+      "MentalHealthBench · HN：OpenAI…",
+      "Claude discovers a novel enzy…",
+      "Linux support is coming to Sn…"
+    ],
+    "ai-arxiv": [
+      "今日投稿呈现出对 AI 智能体安全性与可靠性 的深层审视…",
+      "The Alignment Illusion in Mul…",
+      "Does a model's stated reason…",
+      "PoEM: Predicting RL Outcomes…",
+      "PrivDrift: Auditing User-Secr…",
+      "LLM Agents Can Easily Tamper…"
+    ],
+    "ai-hf": [
+      "本期榜单中，阿里通义千问系列占据绝对主导，Qwen3.8…",
+      "XingChen-AGI/Xing4.0-29B-A4B…",
+      "Altworld/Hemmingway-1：基于 Qwen…",
+      "XiaomiMiMo/MiMo-V2.6-Pro-RL：小…",
+      "XiaomiMiMo/MiMo-V2.6-Flash-RL…",
+      "Qwen/Qwen3.8-27B：通义千问旗舰级多模态模型…"
+    ],
+    "ai-community": [
+      "今日技术社区对 AI 的讨论重心从“能否使用 AI 写代码…",
+      "Your API's newest users are a…",
+      "I Trusted My Agent Demos for…",
+      "I Think AI Is Making Coding E…",
+      "AI doesn't need a new Git wor…",
+      "Escalating to the better mode…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "1. Ecosystem Overview",
+      "The AI developer CLI landscape in late 2026 is characterize…",
+      "2. Activity Comparison",
+      "3. Shared Feature Directions",
+      "Enterprise Auth Robustness: Both communities report critica…",
+      "Remote & Headless Development: There is a shared demand for…"
+    ],
+    "ai-agents": [
+      "OpenClaw activity on 2026-09-26 was characterized by high p…",
+      "No new releases were published on 2026-09-26.",
+      "Note: Active development is targeting version 2026.9.6, wit…",
+      "The day was defined by significant merge activity in perfor…",
+      "Performance Optimization: Merged PR #158425 optimized authe…",
+      "Gateway Performance: Merged PRs #158368 and #155072 address…"
+    ],
+    "ai-trending": [
+      "The open-source AI ecosystem is currently dominated by the…",
+      "google/ax：Google's open agentic orchestration runtime that…",
+      "NVIDIA/Model-Optimizer：A unified library for SOTA model opt…",
+      "obra/superpowers：An agentic skills framework and software d…",
+      "mattpocock/skills：A collection of \"Skills for Real Engineer…",
+      "paperclipai/paperclip：An open-source application for managi…"
+    ],
+    "ai-web": [
+      "Sources: Anthropic (claude.com / anthropic.com), OpenAI (op…",
+      "Anthropic has aggressively expanded its research frontier i…",
+      "Claude computes a nine-loop amplitude in N=4 super-Yang-Mil…",
+      "Insights: This guest post by theoretical physicist Matt von…",
+      "Project Swap: What happens when agents trade for us?",
+      "Insights: As a sequel to \"Project Deal,\" this research expl…"
+    ],
+    "ai-hn": [
+      "The Hacker News community is currently obsessed with the op…",
+      "GPT-6 Sol and Luna · HN：OpenAI’s latest flagship release tr…",
+      "Claude Opus 5.5 · HN：Anthropic’s new model release sparks o…",
+      "Claude discovers a novel enzyme system with CRISPR-like rep…",
+      "Revealing the details of how OpenAI agents hacked Hugging F…",
+      "Strands Harness · HN：A new framework for orchestrating AI a…"
+    ],
+    "ai-arxiv": [
+      "Today's Highlights",
+      "Today’s research landscape is defined by a critical pivot t…",
+      "Key Papers",
+      "🧠 Large Language Models",
+      "Minimally Invasive Steering of Language Models：Proposes a m…",
+      "The Alignment Illusion in MLLMs：Demonstrates that standard…"
+    ],
+    "ai-hf": [
+      "Qwen Dominance: The Qwen family commands the most slots in…",
+      "Compressed AI: There is a significant surge in quantized an…",
+      "Multimodal Push: Several new vision-language and image-text…",
+      "Qwen/Qwen3.8-27B：The most popular model on the list, offeri…",
+      "Qwen/Qwen3.8-Flash-Next：A new, faster experimental release…",
+      "XingChen-AGI/Xing4.0-29B-A4B：A 29B conversational model tha…"
+    ],
+    "ai-community": [
+      "The dominant theme in today's AI discourse is the shift fro…",
+      "Your API's newest users are agents...：APIs now require dual…",
+      "Does an AI Trust Itself More Than It Trusts You? A Benchmar…",
+      "I Trusted My Agent Demos for Years. Then I Built a Gate Tha…",
+      "I Think AI Is Making Coding Easier and Learning Harder：Whil…",
+      "How European Startups Are Cutting AI Data Center Energy Dem…"
+    ]
+  }
+}
