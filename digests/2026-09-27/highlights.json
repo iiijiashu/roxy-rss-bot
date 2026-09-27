@@ -1,0 +1,118 @@
+{
+  "zh": {
+    "ai-cli": [
+      "2026-09-27 的 AI CLI 工具生态呈现出“底…",
+      "多平台桌面端一致性：两者社区均强烈关注非 Linux 桌面…",
+      "长程任务与资源管理：Claude Code 用户关注 Op…",
+      "基础交互可靠性：两者均出现基础 UI/UX 回归。Clau…",
+      "功能侧重：Claude Code 更侧重于模型行为一致性与…",
+      "技术路线：Claude Code 当前处于版本稳定与模型行…"
+    ],
+    "ai-agents": [
+      "OpenClaw 项目今日保持高活跃度，过去 24 小时内…",
+      "今日主要进展体现在 48 个待合并的 PR 中，其中 2…",
+      "核心架构重构与清理：维护者 steipete 提交了多组大…",
+      "性能优化：多个 PR 聚焦于降低资源消耗，包括网关流式传输…",
+      "通道与代理逻辑修复：修复了 Telegram Webhoo…",
+      "Zalo 媒体文件处理缺陷：Issue #[159249]…"
+    ],
+    "ai-trending": [
+      "今日 AI 开源生态呈现“Agent 基建化”与“记忆层爆…",
+      "NVIDIA/Model-Optimizer：提供量化、蒸…",
+      "mobile-next/mobile-mcp：为移动端自动…",
+      "anthropics/claude-code-action…",
+      "paperclipai/paperclip：开源的 Age…",
+      "dream-num/univer：“Office Harn…"
+    ],
+    "ai-web": [
+      "报告日期： 2026-09-27",
+      "今日增量追踪显示，AI 前沿阵地出现显著非对称动态：Ant…",
+      "分类：Research (研究)",
+      "标题： Claude has improved on a…",
+      "核心解读： 研究人员向 Claude 提出了一个不切实际的…",
+      "技术细节： 该结果由一个未发布的 Claude 研究版本得…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区围绕 AI 的讨论高度集中在模型能力边界（…",
+      "Claude Opus 5.5 · HN：Anthropi…",
+      "GPT-6 Sol and Luna · HN：OpenA…",
+      "Claude discovers a novel enzy…",
+      "Contrastive Language Models ·…",
+      "Show HN: A Claude Code skill…"
+    ],
+    "ai-hf": [
+      "Hugging Face 热门模型日报（2026-09-2…",
+      "今日 Hugging Face 榜单被 Qwen 家族全面…",
+      "Qwen3.8-27B：基于 Qwen3.5 架构的高性能…",
+      "DeepSeek-V4.1-Flash：面向快速推理和视觉…",
+      "Xing4.0-29B-A4B：新一代 29B 激活 4B…",
+      "MiMo-V2.6-Pro-RL：采用强化学习（RL）技术…"
+    ],
+    "ai-community": [
+      "当前技术社区的核心争论集中在“开发者在 AI 辅助编程中的…",
+      "If AI Writes the Code and AI…",
+      "Everyone's learning to prompt…",
+      "A Field Guide to AI Documenta…",
+      "I Built a VS Code Extension t…",
+      "I Built an AI Agent That Coul…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Here is the cross-tool comparison report for the AI CLI dev…",
+      "The AI CLI development ecosystem in late 2026 is characteri…",
+      "Several requirements are trending across both tool communit…",
+      "Windows Platform Reliability: Both tools report significant…",
+      "Cost & Resource Transparency: Claude Code users are demandi…",
+      "Sandbox & Security Hardening: Both ecosystems are dealing w…"
+    ],
+    "ai-agents": [
+      "Today's Overview",
+      "OpenClaw demonstrated high activity with 50 pull requests u…",
+      "Releases",
+      "No new releases were published for OpenClaw in the last 24…",
+      "Project Progress",
+      "Two pull requests were merged/closed in the last 24 hours."
+    ],
+    "ai-trending": [
+      "Step 1 & 2 Filtered and Categorized:",
+      "Step 3 Output Report",
+      "Today's GitHub trending list is dominated by tooling design…",
+      "paperclipai/paperclip：An open-source app designed to manage…",
+      "NVIDIA/Model-Optimizer：A unified library for model optimiza…",
+      "mobile-next/mobile-mcp：An MCP server enabling agents to aut…"
+    ],
+    "ai-web": [
+      "Today’s most significant development is Anthropic’s announc…",
+      "Claude has improved on a longstanding lower bound for the f…",
+      "Core Insights & Technical Details: An unreleased research v…",
+      "Business Significance: This demonstrates that current AI mo…",
+      "Data Limitation: The incremental update for OpenAI on 2026…",
+      "Anthropic’s Technical Priorities: Anthropic is aggressively…"
+    ],
+    "ai-hn": [
+      "The Hacker News community is currently fixated on the rapid…",
+      "GPT-6 Sol and Luna · HN：OpenAI's latest flagship model rele…",
+      "Claude Opus 5.5 · HN：Anthropic's new release commands the h…",
+      "Claude discovers a novel enzyme system with CRISPR-like rep…",
+      "How to keep enjoying programming in a world of LLMs · HN：A…",
+      "Show HN: A Claude Code skill to analyze your chess games ·…"
+    ],
+    "ai-hf": [
+      "Today's Highlights",
+      "The release of Qwen/Qwen3.8-27B dominates the leaderboard w…",
+      "Trending Models",
+      "Qwen/Qwen3.8-27B：A flagship image-text-to-text model that t…",
+      "XingChen-AGI/Xing4.0-29B-A4B：A transformers-based text-gene…",
+      "Altworld/Hemmingway-1：An instruction-tuned model built on t…"
+    ],
+    "ai-community": [
+      "The developer community is intensely scrutinizing the role…",
+      "If AI Writes the Code and AI Reviews the Code, What Exactly…",
+      "Everyone's learning to prompt better. That's the wrong skil…",
+      "A Field Guide to AI Documentation: Model Cards, Eval Report…",
+      "I Built a VS Code Extension to Paste Your Project into Free…",
+      "AI Promoted Every Developer to Reviewer. Nobody Measured Wh…"
+    ]
+  }
+}
