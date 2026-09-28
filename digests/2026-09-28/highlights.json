@@ -1,0 +1,102 @@
+{
+  "zh": {
+    "ai-cli": [
+      "以下是基于 2026-09-28 各主流 AI CLI 工…",
+      "当前 AI CLI 工具生态正经历从“基础可用性”向“深度…",
+      "注：Claude Code 未发布新版本，但 Issues…",
+      "Windows 平台一等公民待遇：",
+      "Claude Code：社区强烈要求修复 Bash 路径解…",
+      "OpenAI Codex：焦点在于修复 Windows 终…"
+    ],
+    "ai-agents": [
+      "OpenClaw 项目动态日报 (2026-09-28)",
+      "OpenClaw 社区今日活跃度极高，尽管过去24小时内无…",
+      "过去 24 小时内仅合并/关闭 1 个 PR，但绝大多数…",
+      "架构深度重构 (Deslop 系列)：推进了针对 Agen…",
+      "核心状态与内存管理：修复了 memory-core 侧边栏…",
+      "网关与性能优化：针对大历史记录页面的主线程内存分配进行了优…"
+    ],
+    "ai-trending": [
+      "今日 GitHub Trending 榜单呈现出显著的 “…",
+      "爆发性关注点：Agent 记忆层与多智能体编排 成为社区最…",
+      "新兴技术栈：端侧本地化 AI 语音栈 首次以高性能开源替代…",
+      "行业事件关联：Vercel 官方发布的 scriptc（T…",
+      "huggingface/transformers：模型定义…",
+      "vercel-labs/scriptc：官方发布的 Typ…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 AI 大模型迭代保持高度关注，Open…",
+      "GPT-6 Sol and Luna · HN：OpenA…",
+      "Claude Opus 5.5 · HN：Anthropi…",
+      "There are no \"rogue\" AI agent…",
+      "Claude discovers a novel enzy…",
+      "Drawgent: Coding agent on a l…"
+    ],
+    "ai-hf": [
+      "Qwen3.8-27B 以 16,424 点赞和近 670…",
+      "XingChen-AGI/Xing4.0-29B-A4B…",
+      "yandex/AliceAI-Foundation-80B…",
+      "netease-youdao/Confucius4-R2T…",
+      "fastino/GLiNER2.5-Decide：面向意图…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…"
+    ],
+    "ai-community": [
+      "今日社区热点高度集中在AI Agent 的安全性与可靠性上…",
+      "Prompt Injection Is the New S…",
+      "Chain-of-Thought Faithfulness…",
+      "Your AI Coding Agent Says “Te…",
+      "Plugin4Shell Hit 26,000 Agent…",
+      "OpenAI Paused Model Training…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI tools landscape in late 2026 is characterized by…",
+      "Platform Parity & Reliability (Windows/WSL2): Both communit…",
+      "Resource Management & Long-Running Sessions: Both tools str…",
+      "Context & Memory Management: Codex explicitly requests scop…",
+      "Event-Driven & Daemon Interaction: Codex requests native pr…",
+      "Technical Approach to Stability: Codex is currently in a st…"
+    ],
+    "ai-agents": [
+      "1. Today's Overview",
+      "OpenClaw maintains a high-velocity development cycle with 5…",
+      "No new releases were published on 2026-09-28.",
+      "3. Project Progress",
+      "Merged PRs: 1",
+      "PR #159981: fix(test): include manifest-only plugins in ext…"
+    ],
+    "ai-trending": [
+      "The open-source AI ecosystem is currently experiencing a ma…",
+      "affaan-m/ECC：A performance optimization system for agent ha…",
+      "vercel-labs/scriptc：A TypeScript-to-Native compiler that br…",
+      "0xPlaygrounds/rig：A modular and scalable framework for buil…",
+      "paperclipai/paperclip：An open-source app specifically desig…",
+      "mvschwarz/openrig：A multi-agent harness that runs Claude Co…"
+    ],
+    "ai-hn": [
+      "The Hacker News community is currently focused on the dual…",
+      "GPT-6 Sol and Luna · HN：This release signals OpenAI's next…",
+      "Claude Opus 5.5 · HN：Anthropic’s latest flagship model is t…",
+      "\"As a Language Model\": Chat Template Switches LLM Self-Refe…",
+      "Calling the AI bluff: Adding \"Do not guess\" cut made-up cla…",
+      "Claude discovers a novel enzyme system with CRISPR-like rep…"
+    ],
+    "ai-hf": [
+      "Today's Highlights",
+      "The Qwen ecosystem continues to dominate the Hugging Face h…",
+      "Trending Models",
+      "🧠 Language Models (LLMs, chat models, instruction-tuned)",
+      "Qwen/Qwen3.8-27B：A top-tier open-weight LLM serving as a fo…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：A fast, optimized variant o…"
+    ],
+    "ai-community": [
+      "Security and reliability are dominating the AI conversation…",
+      "Prompt Injection Is the New SQL Injection (and We're Not Re…",
+      "Chain-of-Thought Faithfulness: Toggling 'Reasoning Mode' Ma…",
+      "Your AI Coding Agent Says “Tests Pass.” But Did It Actually…",
+      "A Certification That Changes Every Run Is a Coin Flip With…",
+      "Salesforce Gave Its AI Agent Full CRM Access. An Attacker W…"
+    ]
+  }
+}
