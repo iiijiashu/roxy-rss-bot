@@ -1,0 +1,118 @@
+{
+  "zh": {
+    "ai-cli": [
+      "2026 年 9 月下旬，AI CLI 工具进入深度工程化…",
+      "基于 2026-09-29 社区公开数据汇总如下：",
+      "MCP 生态与安全集成：两个工具均在强化 MCP 连接能力…",
+      "TUI/终端交互体验：OpenAI Codex 重点修复复…",
+      "沙箱与权限控制粒度：社区均对“误拦截”和“信任机制”提出批…",
+      "跨端同步与资源管理：Claude Code 呼声最高的是…"
+    ],
+    "ai-agents": [
+      "OpenClaw 项目今日呈现高活跃度的开发维护状态，过去…",
+      "无新版本发布。今日无 Release 动态。",
+      "今日合并/关闭的 PR 虽数量不多，但涉及关键重构与测试基…",
+      "测试基建优化：PR #160754 已关闭（CLOSED）…",
+      "其他合并状态：数据中未详细列出另外 2 条已合并 PR 的…",
+      "今日讨论最活跃且关注度最高的 PR 主要集中在大规模重构和…"
+    ],
+    "ai-trending": [
+      "今日 AI 开源生态呈现“基础设施深化 + 应用爆发”的双…",
+      "vllm-project/vllm：高吞吐量且内存高效的…",
+      "ollama/ollama：支持 Kimi、GLM、Dee…",
+      "pytorch/pytorch：强大的动态神经网络框架，拥…",
+      "huggingface/transformers：定义了文…",
+      "mvschwarz/openrig：一个多智能体运行框架…"
+    ],
+    "ai-web": [
+      "今日（2026-09-29）增量更新显示，Anthropi…",
+      "核心观点与业务意义：Anthropic 与 Infosys…",
+      "发布/更新时间：2026-09-28",
+      "核心观点与技术细节：作为“Project Deal”的续作…",
+      "注：本次 OpenAI 数据仅提供 URL 路径推断的标题…",
+      "数据状态：仅元数据"
+    ],
+    "ai-hn": [
+      "今日 HN 社区围绕 AI 的讨论呈现出明显的“安全与监管…",
+      "Sonnet 5.5 · HN：Anthropic 新模型…",
+      "Ember-1 · HN：Fireworks.ai 发布的…",
+      "Calling the AI bluff: Adding…",
+      "The problem is not AI code, b…",
+      "ESP32S3 cluster running 1.58…"
+    ],
+    "ai-hf": [
+      "《Hugging Face 热门模型日报》",
+      "Qwen 生态本周爆发力极强，其旗舰模型 Qwen3.8…",
+      "🧠 语言模型（LLM、对话模型、指令微调）",
+      "Qwen3.8-27B：Qwen 最新旗舰级多模态语言模型…",
+      "Xing4.0-29B-A4B：支持文本生成与对话的大语言…",
+      "MiMo-V2.6-Pro-RL：小米 MiMo 系列采用…"
+    ],
+    "ai-community": [
+      "2026年9月29日，技术社区的关注点从单一的模型竞赛转向…",
+      "Dear Coder: Open This If You'…",
+      "ToolTrap: “tool results are d…",
+      "Half the AI agents in product…",
+      "I Replaced a Gate That Accept…",
+      "AI Can Fix the Bug Before You…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Scope: Claude Code (Anthropic), OpenAI Codex",
+      "The AI CLI development landscape is currently defined by a…",
+      "Based on the 2026-09-29 digest data:",
+      "Several critical requirements are emerging across both comm…",
+      "MCP Resilience & Auto-Reconnect: Both toolbases lack automa…",
+      "Sandbox & Permission Management: Both ecosystems are grappl…"
+    ],
+    "ai-agents": [
+      "OpenClaw exhibited high development velocity on 2026-09-29…",
+      "No new releases were published on 2026-09-29.",
+      "Three Pull Requests were merged or closed in the last 24 ho…",
+      "Refactoring & Cleanup: Major progress is being made on \"des…",
+      "PR #160552: Refactoring diagnostic, tool, search, and media…",
+      "PR #159549: Fourth pass of UI pages cleanup, removing retir…"
+    ],
+    "ai-trending": [
+      "AI Open Source Trends Report – 2026-09-29",
+      "The open-source AI ecosystem is currently pivoting aggressi…",
+      "vllm-project/vllm：High-throughput and memory-efficient infe…",
+      "huggingface/transformers：The model-definition framework for…",
+      "ollama/ollama：A tool for getting up and running with variou…",
+      "langchain-ai/langchain：A comprehensive agent engineering pl…"
+    ],
+    "ai-web": [
+      "Scope: Incremental Update (Anthropic & OpenAI)",
+      "Today’s incremental updates highlight a stark divergence in…",
+      "Article: Project Swap: What happens when agents trade for u…",
+      "Core Insights: This research, described as a sequel to \"Pro…",
+      "Article: Anthropic and Infosys build AI agents",
+      "Core Insights: Anthropic has formalized a strategic collabo…"
+    ],
+    "ai-hn": [
+      "The HN community is heavily focused on the commercial and r…",
+      "Sonnet 5.5 · HN：Anthropic's release of Sonnet 5.5 is domina…",
+      "Ember-1 · HN：Fireworks.ai's new model release is generating…",
+      "Thinking fast and slow in AI: The role of metacognition (20…",
+      "The problem is not AI code, but not knowing about system ar…",
+      "MicroLLM Lab – Try 7 tiny LLM's in the browser · HN：This op…"
+    ],
+    "ai-hf": [
+      "Qwen3.8-27B dominates the trending landscape with 16,495 li…",
+      "LLMs, chat models, instruction-tuned",
+      "Qwen/Qwen3.8-27B：This is a 27-billion parameter multimodal…",
+      "XingChen-AGI/Xing4.0-29B-A4B：A 29-billion parameter model d…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：This is a fast, instruction…",
+      "Convaiinnovations/Laya：A specialized text classification mo…"
+    ],
+    "ai-community": [
+      "AI skepticism and infrastructure maturity are defining them…",
+      "Dear Coder: Open This If You're Feeling AI FOMO：A comfortin…",
+      "Claude e Obsidian - Como uma QA utiliza essas ferramentas n…",
+      "I Replaced a Gate That Accepted Everyone With a Gate That A…",
+      "ToolTrap: “tool results are data” wasn’t enough：An analysis…",
+      "Half the AI agents in production are if-statements with a G…"
+    ]
+  }
+}
