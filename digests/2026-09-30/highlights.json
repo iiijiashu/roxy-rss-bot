@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "基于 2026-09-30 Claude Code 与 O…",
+      "当前 AI CLI 工具生态已从单纯的代码生成竞争进入企业…",
+      "Windows 平台稳定性：",
+      "Claude Code：社区强烈关注 MSIX 更新导致的…",
+      "Codex：核心痛点在于控制台窗口闪烁（#48074）、守…",
+      "共同诉求：开发团队需提供更健壮的 Windows 异常处理…"
+    ],
+    "ai-agents": [
+      "OpenClaw 项目今日保持高活跃度，过去 24 小时内…",
+      "发布性质：网关专用的 extended-stable 发布…",
+      "更新内容：基于 2026 年 8 月底的代码库，包含了关键…",
+      "注意事项：",
+      "该版本适用于追求稳定性的用户，而非最新的 2026.9.6…",
+      "官方提示当前最新开发/稳定版本为 2026.9.6，此版本…"
+    ],
+    "ai-trending": [
+      "今日 AI 开源领域最大亮点是 Agent 基础设施 的爆…",
+      "NVIDIA/OpenShell：NVIDIA 推出的安全…",
+      "vllm-project/vllm：高吞吐、内存高效的 L…",
+      "0xPlaygrounds/rig：模块化、可扩展的 Ru…",
+      "skyzh/tiny-llm：面向系统工程师的苹果芯片 L…",
+      "paperclipai/paperclip：开源 Agen…"
+    ],
+    "ai-web": [
+      "2026年9月29日至30日，AI 前沿实验室在网络安全风…",
+      "核心观点：",
+      "这是对 Zhipu AI (Z.ai) 模型 GLM-5…",
+      "关键发现是 GLM-5.3 在发布时缺乏限制滥用的有效安全…",
+      "该发布背景源于 Anthropic 此前通过 Projec…",
+      "Anthropic 启动了新的社会影响研究，利用其 \"An…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区 AI 讨论呈现高度分化：一方面，Open…",
+      "GPT 6.1 Sol: Near-Astra intel…",
+      "Sonnet 5.5 · HN：Anthropic 发布最…",
+      "Language models for text clas…",
+      "Thinking fast and slow in AI…",
+      "Show HN: TurboGPT: train 22Ki…"
+    ],
+    "ai-arxiv": [
+      "ArXiv AI 研究日报 (2026-09-30)",
+      "今日研究重心显著向“智能体效能与可靠性”倾斜，大量论文聚焦…",
+      "Telescopic Language Models：提出…",
+      "How to Loop MoE: Flatten the…",
+      "Distillation Defenses Easily…",
+      "Which the Eye Fears: Writing…"
+    ],
+    "ai-hf": [
+      "Qwen/Qwen3.8-27B 以 16,565 个赞和…",
+      "注：多模态 VLM 归入下一分类，此处仅包含纯文本生成、排…",
+      "XingChen-AGI/Xing4.0-29B-A4B…",
+      "Altworld/Hemmingway-1：基于 Qwen…",
+      "Contrastive-LM/CLM-v0.1-8B：8B…",
+      "SupersonicLabs/Julia-1：多语言文本分…"
+    ],
+    "ai-community": [
+      "今日技术社区对 AI 的讨论重心从单纯的能力展示转向了治理…",
+      "AI Agent Governance on AWS: B…",
+      "Who's Accountable When the AI…",
+      "I Gave ChatGPT My Full Codeba…",
+      "Pausing an agent mid-task and…",
+      "Meta's prompt-injection detec…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI tools landscape has matured into a phase focused…",
+      "Based on the 2026-09-30 community digests:",
+      "Despite different architectures, several requirements are c…",
+      "Session & Authentication Stability: Both tools struggle wit…",
+      "Context & Resource Management: Developers on both platforms…",
+      "Platform-Specific Compatibility: Both ecosystems are invest…"
+    ],
+    "ai-agents": [
+      "OpenClaw demonstrated high development velocity on 2026-09…",
+      "v2026.8.33 (Extended-Stable): A gateway-only release descri…",
+      "Merged PRs: 12 PRs were merged/closed in the last 24 hours.",
+      "Documentation Fixes: Restored broken Control UI feature anc…",
+      "Update Reliability: Fixed an issue where older updaters rej…",
+      "CI Hygiene: Unblocked update checks and ensured heartbeat t…"
+    ],
+    "ai-trending": [
+      "The AI open-source landscape is increasingly prioritizing a…",
+      "NVIDIA/OpenShell：A safe, private runtime engineered specifi…",
+      "willfaust/Madeira：A system for running x86-64 Windows games…",
+      "0xPlaygrounds/rig：A modular framework for building scalable…",
+      "vllm-project/vllm：A high-throughput and memory-efficient in…",
+      "mvschwarz/openrig：A multi-agent harness that integrates Cla…"
+    ],
+    "ai-web": [
+      "Today’s most significant strategic development involves Ope…",
+      "Category: Research / Safety",
+      "Title: GLM-5.3 and the spread of advanced cyber capabilities",
+      "Key Insights: Anthropic’s Red Team Policy research team ana…",
+      "Category: Societal Impacts / Research",
+      "Title: What Do You Want from AI?"
+    ],
+    "ai-hn": [
+      "The HN community is currently dominated by intense debate s…",
+      "GPT 6.1 Sol: Near-Astra intelligence for a fifth of the pri…",
+      "Sonnet 5.5 · HN：Anthropic’s release of Sonnet 5.5 is one of…",
+      "GLM-5.3 and the spread of advanced cyber capabilities · HN…",
+      "Thinking fast and slow in AI: The role of metacognition (20…",
+      "Show HN: TurboGPT: train 22KiB transformer in 13s · HN：This…"
+    ],
+    "ai-arxiv": [
+      "Today’s research highlights a maturing focus on efficient m…",
+      "Telescopic Language Models：Introduces a nested-capacity Tra…",
+      "How to Loop MoE: Flatten the Experts, Untie the Attention：B…",
+      "MeqMuon: Matrix-Equilibrating Muon for LLM Pretraining：Prop…",
+      "SANTA++: Sampling Attention through Representative Keys：Pre…",
+      "Failure-Transparent Agents: Benchmarking Post-Failure Repor…"
+    ],
+    "ai-hf": [
+      "The ecosystem is currently dominated by the Qwen 3.8 and Qw…",
+      "Qwen/Qwen3.8-27B：This is a large multimodal language model…",
+      "XingChen-AGI/Xing4.0-29B-A4B：A conversational text-generati…",
+      "Altworld/Hemmingway-1：A text-generation model based on the…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：An efficient variant of the…",
+      "nvidia/Nemotron-3-Diarization：A voice-activity-detection mo…"
+    ],
+    "ai-community": [
+      "Today's Highlights",
+      "The most significant AI topic today is the \"Goodbye Google\"…",
+      "Dev.to Highlights",
+      "AI Agent Governance on AWS: Block Agents, Prove EU AI Act C…",
+      "Who's Accountable When the AI Was Just Following Instructio…",
+      "I Gave ChatGPT My Full Codebase. The Results Scared Me — Bu…"
+    ]
+  }
+}
