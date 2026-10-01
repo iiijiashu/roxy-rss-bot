@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "2026年10月1日，AI CLI 工具生态呈现出深度交互…",
+      "尽管两家工具架构不同，社区反馈呈现出高度一致的痛点：",
+      "跨设备与远程工作流可靠性：",
+      "Codex: 远程配对（Remote Pairing）在…",
+      "Claude Code: 云端会话的调度异常及无限扣费风险…",
+      "共同诉求: 开发者需要更健壮的跨终端身份认证链路和断网重连…"
+    ],
+    "ai-agents": [
+      "过去24小时内，OpenClaw 项目保持高度活跃，共记录…",
+      "v2026.9.7 正式发布",
+      "更新规模：本次版本整合了 518 个直接提交、2,818…",
+      "状态与影响：该版本上线后迅速暴露出若干严重的运行时缺陷（详…",
+      "今日项目持续推进了底层架构优化与功能完善，多条重要 PR…",
+      "macOS 架构演进：PR #161709 正在推进在 M…"
+    ],
+    "ai-trending": [
+      "今日 AI 开源社区呈现出向“Agent 基础设施层”深度…",
+      "NVIDIA/OpenShell：专为自主 AI 智能体设…",
+      "t8y2/dbx：支持 100+ 数据库的 25MB 轻量…",
+      "colbymchenry/codegraph：为 Clau…",
+      "mksglu/context-mode：针对 AI 编码智…",
+      "meilisearch/meilisearch：快速搜索引…"
+    ],
+    "ai-web": [
+      "数据源：Anthropic (claude.com / a…",
+      "今日 Anthropic 密集发布了四篇内容，核心动向集中…",
+      "核心观点：Anthropic 推出 LSVP，允许经过验证…",
+      "业务意义：采用“验证+分级授权”模式（Standard v…",
+      "核心观点：研究构建了“机器人暴露指数”，发现机器人可执行美…",
+      "技术细节：预测若价格按历史趋势下降，需40年才能使10%的…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区围绕 AI 的讨论高度聚焦于前沿大模型的最…",
+      "Gemini 4 Argon · HN：Google 发布…",
+      "GPT 6.1 Sol: Near-Astra intel…",
+      "Thinking fast and slow in AI…",
+      "Language models for text clas…",
+      "Launch HN: Magnitude (YC S25)…"
+    ],
+    "ai-arxiv": [
+      "今日 ArXiv 投稿显示，推理时计算与测试时扩展（Tes…",
+      "LeapQuant: Efficient Linear A…",
+      "Pretraining Latent Informatio…",
+      "Correct Answers, Invalid Trac…",
+      "Breaking the Uniformity Trap…",
+      "Thinking Before Thinking: Sca…"
+    ],
+    "ai-hf": [
+      "2026 年 10 月 1 日，Hugging Face…",
+      "以 Qwen/Qwen3.8-27B 为代表的旗舰模型获得…",
+      "图像生成领域则由 Qwen/Qwen-Image-2.1…",
+      "此外，DeepSeek-V4.1-Flash 的发布也带来…",
+      "Qwen/Qwen3.8-27B：基于 Qwen3.5 架…",
+      "convaiinnovations/laya：一个专注于系…"
+    ],
+    "ai-community": [
+      "今日技术社区的核心讨论集中在 AI 生成代码的安全性与可靠…",
+      "1 in 5 Packages Your AI Sugge…",
+      "The Data Was Public. The Agen…",
+      "I've been a developer for 10…",
+      "AI Helps You Code Faster. So…",
+      "Your AI guardrail is green. I…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI developer tools landscape is rapidly maturing, s…",
+      "The following table summarizes the public GitHub activity t…",
+      "Several critical requirements and development trends are co…",
+      "Data Reliability & Crash Recovery: Both tools face signific…",
+      "Cost & Resource Predictability: Developers in both ecosyste…",
+      "Security & Sandboxing Hardening: Both teams are aggressivel…"
+    ],
+    "ai-agents": [
+      "OpenClaw released v2026.9.7, bringing 518 commits, 2,818 hi…",
+      "v2026.9.7 was published recently.",
+      "Scope: The release incorporates 518 direct commits spanning…",
+      "Documentation: Release notes are available via the docs-v1…",
+      "Immediate Impact: While the release marks a massive integra…",
+      "Merged or closed PRs in the last 24 hours total 13 out of 5…"
+    ],
+    "ai-trending": [
+      "Here is the structured AI Open Source Trends Report based o…",
+      "The open-source AI ecosystem is currently experiencing a ma…",
+      "Frameworks, SDKs, inference engines, and development tools",
+      "NVIDIA/OpenShell：A safe, private runtime designed for auton…",
+      "t8y2/dbx：A lightweight cross-platform database client that…",
+      "headroomlabs-ai/headroom：Compresses tool outputs and RAG ch…"
+    ],
+    "ai-web": [
+      "Sources: Anthropic (claude.com / anthropic.com), OpenAI (op…",
+      "Anthropic is actively expanding its domain-specific enterpr…",
+      "Introducing the Life Sciences Verification Program (LSVP)",
+      "Core Insights: Anthropic is transitioning from generalized…",
+      "Business Significance: Signals a premium, high-compliance B…",
+      "Can we predict the jobs robots will do? (What work can robo…"
+    ],
+    "ai-hn": [
+      "The Hacker News community is dominated by a major model rel…",
+      "GPT 6.1 Sol: Near-Astra intelligence for a fifth of the pri…",
+      "Gemini 4 Argon · HN：Google’s new model launch is the top-ra…",
+      "Language models for text classification: From bag-of-words…",
+      "Thinking fast and slow in AI: The role of metacognition (20…",
+      "MicroLLM Lab – Try 7 tiny LLM's in the browser · HN：This in…"
+    ],
+    "ai-arxiv": [
+      "This batch of research strongly emphasizes the evolution of…",
+      "🧠 Large Language Models (architecture, training, alignment…",
+      "Pretraining Latent Information Feedback Transformers with T…",
+      "Gender bias across LLMs is common and highly heterogenous：A…",
+      "Probability is Not Enough: Exploring and Counting Divergent…",
+      "Correct Answers, Invalid Traces: What Verifiable Grade-Scho…"
+    ],
+    "ai-hf": [
+      "Today's Highlights",
+      "Qwen3.8-27B leads the rankings with 16,652 likes and over 7…",
+      "Trending Models",
+      "🧠 Language Models (LLMs, chat models, instruction-tuned)",
+      "Qwen/Qwen3.8-27B：A flagship multimodal language model from…",
+      "XingChen-AGI/Xing4.0-29B-A4B：A conversational text-generati…"
+    ],
+    "ai-community": [
+      "The AI security landscape is the dominant concern, with sig…",
+      "1 in 5 Packages Your AI Suggests Don't Exist. Attackers Kno…",
+      "The Data Was Public. The Agent Path Wasn't. So His Mock Bec…",
+      "I've been a developer for 10 years. AI just showed me I onl…",
+      "What Science Fiction Tells Us About Our Changing Relationsh…",
+      "How to Moderate Live Chat in Real Time with Jev and Composi…"
+    ]
+  }
+}
