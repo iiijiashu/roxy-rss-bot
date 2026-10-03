@@ -1,0 +1,59 @@
+# ArXiv AI Research Digest 2026-10-03
+
+> Source: [ArXiv](https://arxiv.org/) (cs.AI, cs.CL, cs.LG) | 50 papers | Generated: 2026-10-03 00:20 UTC
+
+---
+
+## Today's Highlights
+Research is increasingly focused on making LLMs and multimodal agents more efficient and reliable, with several papers addressing the high computational cost of fine-tuning and inference. A major trend is the move toward specialized, high-fidelity benchmarks that test "executable" capabilities—such as cybersecurity tool use, enterprise data workflows, and humanoid robot actions—rather than just static knowledge. Furthermore, there is a strong push into the theoretical and mathematical underpinnings of optimization, with new work on quasi-Newton methods, discrete diffusions, and Schrödinger bridges aimed at improving both convergence and sampling. Researchers are also deeply analyzing the "black box" of LLMs, investigating whether they possess true mathematical reasoning or if they are merely pattern-matching, and developing tools to diagnose catastrophic forgetting and interpret internal mechanisms.
+
+## Key Papers
+
+### 🧠 Large Language Models (architecture, training, alignment, evaluation)
+
+| Paper | Authors | Summary |
+| :--- | :--- | :--- |
+| [The Missing Primitive: Diagnosing and Repairing Mathematical Reasoning in Large Language Models](http://arxiv.org/abs/2610.02191v1) | Shuo Xing, Zilin Dai, Chengyuan Qian et al. | The authors systematically study whether LLMs possess structural mathematical understanding or merely rely on pattern matching. This work is critical for diagnosing the limitations of current models on frontier mathematical problems. |
+| [Finetuning with Sampling: SFT Learns Better Than You Think](http://arxiv.org/abs/2610.02140v1) | Aayush Karan, Sitan Chen, Yilun Du | Challenges the conventional wisdom that Reinforcement Learning is necessary for new capabilities by demonstrating that Supervised Fine-Tuning (SFT) can generalize more effectively. This offers a more efficient and stable path for post-training frontier models. |
+| [Every Ablation Is a Dose: Counterweights and the Semblance of Self-Repair](http://arxiv.org/abs/2610.02173v1) | Areeb Ahmad, Pratinav Seth, Vinay Kumar Sankarapu | Investigates the "self-repair" phenomenon where ablated components in LLMs appear to compensate for one another. It clarifies that this is often a noisy counterweight effect rather than a singular, meaningful learning mechanism. |
+| [LLM2Jev: LLMs Are Already Jev-Style Decision Models -- When and How to Fine-Tune Them](http://arxiv.org/abs/2610.02076v1) | Yinheng Li, Justin Wagle | Explores the potential of LLMs to function as direct decision models that output categorical probabilities rather than free-form text. This allows for more predictable software integration and direct action on outputs. |
+| [Are We Recovering Mechanisms? Objective-Level Recovery Gaps in Mechanistic Interpretability](http://arxiv.org/abs/2610.02098v1) | Chuqin Geng, Li Zhang, Haolin Ye et al. | Identifies "recovery gaps" where attribution methods fail to identify the true underlying mechanisms of model behavior. It is an essential step toward ensuring that interpretability tools are actually recovering the correct causal circuits. |
+
+### 🤖 Agents & Reasoning (planning, tool use, multi-agent, chain-of-thought)
+
+| Paper | Authors | Summary |
+| :--- | :--- | :--- |
+| [KaliBench: A Fine-Grained Benchmark for Cybersecurity Tool Use on Kali Linux](http://arxiv.org/abs/2610.02206v1) | Pengfei Li, Naufal Suryanto, Sicheng Zhang et al. | Measures the ability of LLMs to generate executable cybersecurity commands using runtime-free verifiable rewards. This is significant for bridging the gap between high-level intent and low-level tool execution in critical systems. |
+| [AutoCompact: Learning When to Compact Context in Long-Horizon Coding Agents](http://arxiv.org/abs/2610.02163v1) | Xuan Zhang, Longtao Zheng, Cunxiao Du et al. | Proposes an approach where agents learn to dynamically manage their context by deciding when to compact stale information. This is vital for enabling reliable software engineering in long-horizon, multi-step trajectories. |
+| [DuoMind: Enabling Distributed Multi-Robot Coordination with Semantic Communication](http://arxiv.org/abs/2610.02161v1) | Hanchu Zhou, Dechen Gao, Hang Wang et al. | Extends Vision-Language models to multi-robot settings by using semantic communication for long-horizon coordination. This helps robots coordinate complex tasks that are too large for a single unit to manage. |
+| [Reconstruct, Practice, Go Real: Guided Self-Improvement for Embodied Agents](http://arxiv.org/abs/2610.02204v1) | Yen-Jen Wang, Haozhe Jiang, Shuying Deng et al. | Presents a framework for autonomous improvement of robot execution systems that bypasses traditional reward design. This allows for the reliable development of robot capabilities across diverse tasks with less human effort. |
+| [Watch, Infer, Coordinate: Inferring Robot Partner Constraints for Zero-Shot Coordination](http://arxiv.org/abs/2610.02170v1) | Suyu Ye, Zheyuan Zhang, Vaishnav Tadiparthi et al. | Focuses on how robots can infer the physical limitations and constraints of partner robots to coordinate effectively. This is a key step toward collaborative manipulation in environments with hardware degradation or faults. |
+
+### 🔧 Methods & Frameworks (new techniques, benchmarks, efficiency improvements)
+
+| Paper | Authors | Summary |
+| :--- | :--- | :--- |
+| [TACO: Ternary Absolute-max Column-wise One-sparse Optimizer for LLM Fine-Tuning](http://arxiv.org/abs/2610.02199v1) | Jichao Jiang, Cristian McGee, El Houcine Bergou et al. | Introduces an optimizer that drastically reduces the memory overhead of full-parameter fine-tuning. This allows for training significantly larger models on modern GPU hardware by compressing the optimizer state. |
+| [SoftServe: A Scalable Quasi-Newton Method for Deep Learning](http://arxiv.org/abs/2610.02182v1) | Joohwan Ko, Tetiana Parshakova, Diana Cai et al. | Overcomes the non-convexity and parameter-size obstacles that have historically limited Quasi-Newton methods in deep learning. It provides a more effective path for large-scale unconstrained optimization tasks. |
+| [Hierarchical Continuous Diffusion Language Models](http://arxiv.org/abs/2610.02193v1) | Hui Ren, Zihan Li, Chang Liu et al. | Tackles the "structural bottleneck" in discrete diffusion models where tokens are sampled independently. This approach is better suited for tasks requiring bidirectional reasoning and global constraint satisfaction. |
+| [DMAD: Distribution Matching as Adversarial Distillation for Fast Visual Generation](http://arxiv.org/abs/2610.02188v1) | Zhengming Yu, Junkun Yuan, Haotian Yang et al. | Improves upon Distribution Matching Distillation by using adversarial techniques to train few-step students. This significantly reduces the memory and computation costs associated with fast visual generation. |
+| [ScholarCatalyst: A Benchmark for Retrieving Papers That Inspire New Research](http://arxiv.org/abs/2610.02202v1) | Sohyeon Kim, Yoonho Lee, Bo Liu et al. | Evaluates AI systems' ability to "sense" which buried, prior research ideas are necessary to solve new problems. This benchmark moves beyond simple retrieval to test the scientific intuition of AI models. |
+| [Local Support Learning](http://arxiv.org/abs/2610.02126v1) | Assaf Ben-Kish, Akarsh Kumar, James Glass et al. | Frames catastrophic forgetting as a geometric problem in input space to develop a natural retention objective. This allows for better preservation of knowledge during the updates of large pre-trained models. |
+
+### 📊 Applications (domain-specific, multimodal, code generation)
+
+| Paper | Authors | Summary |
+| :--- | :--- | :--- |
+| [Argo-Bench: Evaluating Data Agents on Enterprise-Scale Workflows](http://arxiv.org/abs/2610.02122v1) | Gabriel Tomitsuka, Arman Raayatsanati, Emma Xing et al. | Assesses data agents on complex, multi-table enterprise workflows rather than just simple text-to-SQL queries. This provides a more realistic and rigorous measure of AI performance in business analytics. |
+| [HumanoidToolBench: Benchmarking Humanoid Tool Use from Selection to Mobile Execution](http://arxiv.org/abs/2610.02089v1) | Kyochul Jang, Seohyeon Park, Ohchul Kwon et al. | Evaluates the joint ability of humanoids to select tools and coordinate both manipulation and locomotion. This is a necessary step for robots to perform tasks that exceed their inherent physical limits. |
+| [AI Emulation of Stochastic Sudden Stratospheric Warming with Interpretable Latent Structure](http://arxiv.org/abs/2610.02069v1) | C. Daniel Boscu, Daniel Hernandez, Fabio Alvarez Ventura et al. | Develops a probabilistic deep learning emulator to handle rare weather regime transitions that are difficult due to class imbalance. It allows for the study of the internal structure of these complex atmospheric phenomena. |
+| [Faynt: Scaling and Optimizing Policies for Competitive Melee](http://arxiv.org/abs/2610.02144v1) | Ali Janati, Nikita Kuzmin, Rohit Swamy et al. | Introduces Transformer policies that control all 26 characters in Super Smash Bros. Melee with a single checkpoint. The 10M parameter model achieves a 98.4% win rate against specialized opponents. |
+| [PyPottery: an AI-powered end-to-end suite for pottery processing and publication](http://arxiv.org/abs/2610.02072v1) | Lorenzo Cardarelli | An open-source suite designed to semi-automate the documentation of ceramic materials for archaeological research. It aims to reduce the labor-intensive publication bottlenecks common in archaeological studies. |
+
+## Research Trend Signal
+A clear trend is emerging toward "executable" AI: instead of simple text generation or static benchmarks, the focus is on systems that perform high-stakes actions, such as cyber tool use, multi-robot coordination, and enterprise data management. The research community is also shifting from heuristic approaches to rigorous mathematical analysis, particularly in optimization and sampling. We see new theoretical work on discrete diffusions, Schrödinger bridges, and Quasi-Newton methods that aim to make these processes more robust and efficient. Furthermore, there is a growing emphasis on "agent memory" and context management, where models must learn when to compact information to remain effective over long-horizon tasks. Finally, interpretability research is moving beyond surface-level "circuits" to investigate whether AI systems actually possess the underlying primitive knowledge necessary for true reasoning and mathematics.
+
+## Worth Deep Reading
+*   **[The Missing Primitive: Diagnosing and Repairing Mathematical Reasoning in Large Language Models](http://arxiv.org/abs/2610.02191v1)**: This paper is fundamental to understanding the "why" behind LLM successes. By determining whether models have structural mathematical understanding or just pattern matching, it sets the stage for the next generation of reasoning models.
+*   **[Argo-Bench: Evaluating Data Agents on Enterprise-Scale Workflows](http://arxiv.org/abs/2610.02122v1)**: As AI moves into the enterprise, this benchmark addresses a critical gap: the difference between solving a single SQL query and navigating dozens of tables for a statistical analysis. It provides a realistic roadmap for building reliable business agents.
+*   **[Reconstruct, Practice, Go Real: Guided Self-Improvement for Embodied Agents](http://arxiv.org/abs/2610.02204v1)**: This framework is highly relevant to the future of physical AI. By proposing a way to improve robot execution without complex human-designed rewards, it could significantly accelerate the deployment of robots in diverse, real-world settings.

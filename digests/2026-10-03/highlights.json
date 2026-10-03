@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态已进入深度功能分化与稳定性攻坚…",
+      "注：Claude Code 的社区讨论深度（评论数/赞数）…",
+      "尽管两款工具技术路线不同，社区反馈在以下领域高度重合：",
+      "Windows 平台稳定性危机：",
+      "Claude Code: 终端标签页未报告就绪 (#989…",
+      "OpenAI Codex: WSL 执行失败 (#4973…"
+    ],
+    "ai-agents": [
+      "项目保持高度活跃状态，过去24小时内有50条PR更新和8条…",
+      "版本定位：当前等效于 LTS 的扩展稳定版，基于 2026…",
+      "核心更新：",
+      "包含关键安全更新。",
+      "修复可靠性与性能问题。",
+      "新增模型支持。"
+    ],
+    "ai-trending": [
+      "今日 GitHub 热门榜单被“AI Agent 技能与上…",
+      "DietrichGebert/ponytail：让 AI…",
+      "JuliusBrussee/caveman：通过模拟原始语…",
+      "mksglu/context-mode：专为 AI 编码代…",
+      "colbymchenry/codegraph：预索引的代码…",
+      "NVIDIA/OpenShell：NVIDIA 推出的安全…"
+    ],
+    "ai-web": [
+      "数据源: Anthropic (claude.com /…",
+      "今日最核心的战略动向是 Anthropic 正式推出“Cl…",
+      "核心观点:",
+      "这是首家由 AI 公司主导建立的“部署工程师”学院，旨在解…",
+      "Anthropic 承诺投入 1 亿美元，目标在 2027…",
+      "首批学员来自 Accenture、McKinsey、Mor…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 Google 发布的 Gemini 4…",
+      "Gemini 4 Argon · HN：Google 发布…",
+      "FLUX 3 Image · HN：Black Fores…",
+      "Context Language Models · HN…",
+      "With most information hidden…",
+      "From the creator of Redis; ru…"
+    ],
+    "ai-arxiv": [
+      "今日研究重心从单一的模型训练转向系统级可靠性与高效部署。重…",
+      "TACO: Ternary Absolute-max Co…",
+      "The Missing Primitive: Diagno…",
+      "Are We Recovering Mechanisms…",
+      "Keyword Harnesses Fail Open…",
+      "AutoCompact: Learning When to…"
+    ],
+    "ai-hf": [
+      "《Hugging Face 热门模型日报》",
+      "今日榜单呈现鲜明的 Qwen 生态主导特征，Qwen3.8…",
+      "🧠 语言模型（LLM、对话模型、指令微调）",
+      "Qwen/Qwen3.8-27B：榜单点赞数第一的多模态大…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "NaiveAI/Naive-N0.5-Flash：支持长上…"
+    ],
+    "ai-community": [
+      "2026 年 10 月 3 日，技术社区对 AI 的关注点…",
+      "I Gave 15 AI Models Proof The…",
+      "Repacked QAT Gemma 4 on One T…",
+      "They Learned to Code Before C…",
+      "I Poisoned One Test Per Probl…",
+      "OpenAI lawsuit: Microsoft's '…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Ecosystem Overview",
+      "The AI CLI developer tools landscape in early 2026 is chara…",
+      "Activity Comparison",
+      "Note: \"Issues Analyzed\" and \"PRs Analyzed\" reflect the coun…",
+      "Shared Feature Directions",
+      "Windows & WSL Stability: Both ecosystems report critical fa…"
+    ],
+    "ai-agents": [
+      "OpenClaw shipped a new extended-stable (LTS-equivalent) rel…",
+      "v2026.8.35 – gateway-only extended-stable (LTS-equivalent)",
+      "Content per release notes: OpenClaw from the end of August…",
+      "Migration/impact: The release note text was truncated in th…",
+      "Seven PRs were merged/closed in the last 24h, mostly test/C…",
+      "PR #163887 (CLOSED) – chore(ui): refresh control ui locales…"
+    ],
+    "ai-trending": [
+      "Step 1 (Filter)",
+      "Filtering the input data for AI/ML relevance:",
+      "Included: Agent harnesses, LLM tools, RAG engines, Vector D…",
+      "Excluded: getsentry/sentry (general dev tool), Effect-TS/ef…",
+      "Step 2 (Categorize)",
+      "🔧 AI Infrastructure: NVIDIA/OpenShell, mksglu/context-mode…"
+    ],
+    "ai-web": [
+      "Anthropic has significantly intensified its enterprise go-t…",
+      "Publication Date: 2026-10-02",
+      "Core Insights: Anthropic is addressing the \"enterprise AI t…",
+      "Publication Date: 2026-10-01",
+      "Core Insights: Barclays is expanding its strategic collabor…",
+      "Core Insights: A guest post by Prof. Matthew Schwartz descr…"
+    ],
+    "ai-hn": [
+      "The HN community is heavily focused on Gemini 4 Argon, whic…",
+      "Gemini 4 Argon · HN：This release of Google's latest model i…",
+      "Context Language Models · HN：This paper proposes a new para…",
+      "FLUX 3 Image · HN：The launch of a new image generation mode…",
+      "Decision models like Jev don't beat LLM-as-a-judge or tradi…",
+      "From the creator of Redis; run LLM locally with ds4 · HN：Th…"
+    ],
+    "ai-arxiv": [
+      "Research is increasingly focused on making LLMs and multimo…",
+      "The Missing Primitive: Diagnosing and Repairing Mathematica…",
+      "Finetuning with Sampling: SFT Learns Better Than You Think…",
+      "Every Ablation Is a Dose: Counterweights and the Semblance…",
+      "LLM2Jev: LLMs Are Already Jev-Style Decision Models -- When…",
+      "Are We Recovering Mechanisms? Objective-Level Recovery Gaps…"
+    ],
+    "ai-hf": [
+      "The Qwen family continues to dominate the leaderboard, with…",
+      "Qwen/Qwen3.8-27B：A dense 27B multimodal LLM capable of imag…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：An optimized flash variant…",
+      "Contrastive-LM/CLM-v0.1-8B：An 8B parameter contrastive lear…",
+      "NaiveAI/Naive-N0.5-Flash：A Mixture-of-Experts (MoE) archite…",
+      "fastino/GLiNER2.5-Decide：A token classification model that…"
+    ],
+    "ai-community": [
+      "The most discussed AI topics across Dev.to and Lobste.rs to…",
+      "I Gave 15 AI Models Proof Their Hacking Target Was a Real C…",
+      "How One \"Generate Draft\" Button Changed the Design of My Wr…",
+      "My Model-Swap Attack Worked. The Gate Was Right — My Test W…",
+      "Repacked QAT Gemma 4 on One TPU v5e: 12B Serves at 675 Toke…",
+      "I Built a Coding Agent That Runs on a 1.7B Model：A project…"
+    ]
+  }
+}
