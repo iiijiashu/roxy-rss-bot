@@ -1,0 +1,102 @@
+{
+  "zh": {
+    "ai-cli": [
+      "以下是基于 2026-10-04 社区动态生成的 AI C…",
+      "当前 AI CLI 工具生态已进入“深度集成与稳定性攻坚”…",
+      "IDE 扩展稳定性与可视化交互",
+      "Claude Code：VS Code 扩展缺乏可视化 D…",
+      "OpenAI Codex：VS Code 扩展存在严重的消…",
+      "共同诉求：均亟需解决 IDE 集成场景下的状态同步与交互效…"
+    ],
+    "ai-agents": [
+      "OpenClaw 今日开发活跃度极高，过去 24 小时内产…",
+      "OpenClaw v2026.9.8 已发布",
+      "基本信息：该版本包含 58 个 commits，由 21…",
+      "破坏性变更与迁移注意事项：基于今日 Issue 数据（#1…",
+      "今日项目推进主要集中在 网关生命周期修复、运行时性能优化…",
+      "网关激活失败修复（#164554）：修复了更新激活 Doc…"
+    ],
+    "ai-trending": [
+      "今日 AI 开源生态的热度已从单纯的模型下载转向“智能体工…",
+      "Effect-TS/effect：生产级 TypeScri…",
+      "cloudflare/cloudflare-os：基于 W…",
+      "getsentry/sentry：开发者优先的错误跟踪与性…",
+      "anthropics/claude-code：Anthro…",
+      "open-compass/opencompass：支持 O…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 Google Gemini 4 Arg…",
+      "Gemini 4 Argon · HN：今日最高热度。社区…",
+      "Context Language Models · HN…",
+      "FLUX 3 Image · HN：BFL 推出的新图像生…",
+      "[Greg Kroah-Hartman – Securit…",
+      "Getting the most out of Opus…"
+    ],
+    "ai-hf": [
+      "今日 Hugging Face 榜单被 Qwen 系列及其…",
+      "Qwen/Qwen3.8-27B：Qwen 官方最新 27…",
+      "Qwen/Qwen3.8-Flash-Next：实验性多模…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "convaiinnovations/laya：专注“系统一…",
+      "SupersonicLabs/Julia-1：多语言决策模…"
+    ],
+    "ai-community": [
+      "今日技术社区的讨论焦点从单纯的“AI 生成”转向了“AI…",
+      "I Made 866 Commits in 5 Weeks…",
+      "The More Context You Give You…",
+      "A junior asked me how I knew…",
+      "Your tool returned the rows…",
+      "I built a self-hosted AI agen…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Tools: Claude Code, OpenAI Codex",
+      "The AI developer tools landscape on 2026-10-04 is character…",
+      "Note: Counts reflect the \"Hot\" issues and \"Key\" PRs explici…",
+      "Requirements appearing across multiple tool communities ind…",
+      "Message Queue & Session Stability: Both communities report…",
+      "Context Management & Cost Control: Both tools face backlash…"
+    ],
+    "ai-agents": [
+      "OpenClaw remains in a phase of high-frequency, large-scale…",
+      "v2026.9.8: Release Notes",
+      "Scope: The release encompasses 58 commits, 43 pull requests…",
+      "Key Changes: This update primarily ships the architectural…",
+      "Migration Note: Users upgrading should monitor their local…",
+      "Today's merged and closed pull requests indicate strong int…"
+    ],
+    "ai-trending": [
+      "Step 1: Filtering & Categorization",
+      "Excluded: Effect-TS/effect, t3code, cloudflare-os (partial)…",
+      "Agent harness optimization has become the dominant trend, w…",
+      "🔧 AI Infrastructure",
+      "mksglu/context-mode：Context window optimization for AI codi…",
+      "headroomlabs-ai/headroom：Compresses tool outputs, logs, and…"
+    ],
+    "ai-hn": [
+      "The Hacker News community is currently engaged in a heated…",
+      "Gemini 4 Argon · HN：This release is the most significant mo…",
+      "Getting the most out of Opus 5.5 in Claude and Claude Code…",
+      "Context Language Models · HN：This paper addresses a key lim…",
+      "FLUX 3 Image · HN：This image generation release is being he…",
+      "From the creator of Redis; run LLM locally with ds4 · HN：De…"
+    ],
+    "ai-hf": [
+      "Qwen3.8 dominates the trend list, with its flagship 27B mod…",
+      "Qwen/Qwen3.8-27B：Flagship multimodal LLM from Qwen with mas…",
+      "Qwen/Qwen3.8-Flash-Next：Faster variant of the Qwen3.8 serie…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：High-speed multimodal model…",
+      "convaiinnovations/laya：Specialized text-classification mode…",
+      "Aleph-Alpha/Kolibri-1：MoE-based reasoning model released by…"
+    ],
+    "ai-community": [
+      "Today's Highlights",
+      "Today’s AI conversation is shifting from hype to operationa…",
+      "Dev.to Highlights",
+      "I Made 866 Commits in 5 Weeks. My Understanding Didn't Keep…",
+      "AI Coding Has Made Project-Switching Way Too Easy：This piec…",
+      "The More Context You Give Your AI Coding Agent, the Worse I…"
+    ]
+  }
+}
