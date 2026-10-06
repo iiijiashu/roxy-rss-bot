@@ -1,0 +1,118 @@
+{
+  "zh": {
+    "ai-cli": [
+      "2026年10月6日的AI CLI工具生态呈现出“稳定性优…",
+      "注：表格中的 Issues 和 PR 数量基于提供的摘要数…",
+      "跨平台一致性（尤其是 Windows）：",
+      "Claude Code 用户受困于 MSIX/AppX 进…",
+      "OpenAI Codex 社区热议终端闪烁（#48074）…",
+      "共性诉求：消除 Windows 环境特有的隔离机制带来的副…"
+    ],
+    "ai-agents": [
+      "OpenClaw 处于活跃的开发与测试阶段，过去 24 小…",
+      "主要内容:",
+      "会话与记忆优化: 在注册表变更时保留使用情况；从远程工作区…",
+      "注意事项: 该版本为 Beta 版，Issue #1658…",
+      "今日合并/关闭的 4 条 PR 集中在底层架构优化与安全修…",
+      "Worker 原生推理运行时: PR #163645 关闭…"
+    ],
+    "ai-trending": [
+      "今日速览",
+      "今日 AI 开源生态呈现向“智能体工程化”与“垂直场景落地…",
+      "各维度热门项目",
+      "Panniantong/Agent-Reach：一款开源…",
+      "cloudflare/cloudflare-os：基于 C…",
+      "thedotmack/claude-mem：专为 AI 编…"
+    ],
+    "ai-web": [
+      "今日速览",
+      "Anthropic 于 2026-10-05 发布了机器人…",
+      "Anthropic / Claude 内容精选",
+      "核心观点： Anthropic 团队发布了一项基于机器人当…",
+      "技术细节： 机器人能力与 LLM 互补，主要执行 LLM…",
+      "业务意义： 预测若要达到 10% 的成本竞争力覆盖率，需要…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 AI 的讨论呈现出深度焦虑与硬核探索并…",
+      "社区对 AI 伦理边界（如 LeCun 的\"零担忧\"言论）…",
+      "与此同时，模型层面的突破（Gemini 4 Argon 发…",
+      "工具链方面，关于 AI 代理的\"文档优于记忆\"理论以及开源…",
+      "Gemini 4 Argon · HN：谷歌发布新一代旗舰…",
+      "Opus 5.5 agents discover two…"
+    ],
+    "ai-hf": [
+      "本周 Hugging Face 生态中，Qwen 3.8…",
+      "convaiinnovations/laya：专注系统一（…",
+      "Qwen/Qwen3.8-27B：本周点赞最高的多模态基座…",
+      "Aleph-Alpha/Kolibri-1：基于 MoE…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "Contrastive-LM/CLM-v0.1-8B：专注…"
+    ],
+    "ai-community": [
+      "今日技术社区对 AI 的关注点正从单纯的模型能力转向工程可…",
+      "The Witness Was the Suspect…",
+      "I Built a Recipe Book for My…",
+      "Your bugs used to burn CPU. N…",
+      "Eight broken tool calls: how…",
+      "Knowing What Your AI Feature…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI tools landscape in early October 2026 is charact…",
+      "Note: Claude Code reported significantly lower PR activity…",
+      "Session Persistence & Context Control: Both communities are…",
+      "Cross-Device & Remote Management: There is a shared trend t…",
+      "Security & Safety Flexibility: Both tools face friction fro…",
+      "Technical Approach:"
+    ],
+    "ai-agents": [
+      "On 2026-10-06, OpenClaw released v2026.10.1-beta.1, focusin…",
+      "v2026.10.1-beta.1 was released on 2026-10-06.",
+      "Sessions and Memory: Preserved usage across registry change…",
+      "Worker Attachments: Delivered worker attachments from remot…",
+      "Stability: Prevented queued cancellations and transcript al…",
+      "Migration Notes: Users upgrading from 2026.7.x may encounte…"
+    ],
+    "ai-trending": [
+      "Today's open-source landscape is heavily skewed toward agen…",
+      "Frameworks, SDKs, inference engines, and developer tooling.",
+      "ollama/ollama：The de facto standard for local LLM inference…",
+      "huggingface/transformers：The core Python library for state…",
+      "langchain-ai/langchain：Positions itself as the \"agent engin…",
+      "JuliusBrussee/caveman：A viral skill and proxy for coding ag…"
+    ],
+    "ai-web": [
+      "Today’s AI official content cycle is defined by a stark con…",
+      "Title: Can we predict the jobs robots will do?",
+      "Published/Updated: 2026-10-05",
+      "Core Insights & Technical Details: This research introduces…",
+      "Business Significance & Comparative Analysis: The study pro…",
+      "⚠️ Data Limitation Notice: The following OpenAI items are me…"
+    ],
+    "ai-hn": [
+      "The Hacker News community is currently engaged in high-stak…",
+      "Gemini 4 Argon · HN：Google's latest model release has gener…",
+      "Beam: Reflection's 501B open-weight model · HN：This release…",
+      "FLUX 3 Image · HN：The latest iteration of the FLUX image ge…",
+      "GPT-6 Astra cracks 217-year-old Napoleonic code · HN：This d…",
+      "Opus 5.5 agents discover two room-temperature magnetic semi…"
+    ],
+    "ai-hf": [
+      "The Qwen family continues to dominate the landscape with bo…",
+      "Qwen/Qwen3.8-27B：A flagship conversational image-text-to-te…",
+      "Qwen/Qwen3.8-Flash-Next：An experimental flash variant of th…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：A fast, image-text-to-text…",
+      "Aleph-Alpha/Kolibri-1：A MoE-based text generation model foc…",
+      "nvidia/Nemotron-3-Diarization：A voice-activity-detection an…"
+    ],
+    "ai-community": [
+      "The developer community is deeply focused on the reliabilit…",
+      "The Witness Was the Suspect: Why AI Audit Logs Can't Be Tru…",
+      "I Built a Recipe Book for My Dadi, Using AI That Never Leav…",
+      "Your bugs used to burn CPU. Now they burn money.：The post h…",
+      "Eight broken tool calls: how six agent frameworks recover：A…",
+      "Better Prompts Aren't Enough for Reliable AI Coding：Brad Tr…"
+    ]
+  }
+}
