@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "基于 2026-10-07 的社区动态摘要，以下是针对 C…",
+      "当前 AI CLI 工具生态正从单纯的代码生成向全链路工程…",
+      "Windows 平台稳定性与进程管理：",
+      "Claude Code：遭遇 Git 孤儿进程导致内存耗尽…",
+      "OpenAI Codex：遭遇本地命令执行无限挂起（#50…",
+      "共性：两工具在 Windows 下的子进程生命周期管理、资…"
+    ],
+    "ai-agents": [
+      "今日项目保持中等活跃度，过去 24 小时内共有 50 条…",
+      "iOS 端体验优化：多个 PR 针对 iOS 原生聊天界面…",
+      "性能与底层优化：针对 SQLite 维护租约检查导致的主线…",
+      "渠道功能完善：修复了 Telegram 群组中斜杠命令在…",
+      "已关闭 PR：UI 本地化刷新等维护性工作已完成并合并 (…",
+      "升级链路故障 (P0)：这是当前讨论最激烈的领域。用户集中…"
+    ],
+    "ai-trending": [
+      "今日 GitHub AI 开源领域呈现明显的“智能体工具化…",
+      "🔧 AI 基础工具（框架、SDK、推理引擎、开发工具、CL…",
+      "主要涵盖提升 Agent 性能、开发工具链及底层 GPU…",
+      "deepseek-ai/DeepGEMM：DeepSeek…",
+      "pbakaus/impeccable：让 AI 框架更擅长…",
+      "cathrynlavery/diagram-design…"
+    ],
+    "ai-web": [
+      "数据范围: Anthropic (1 篇正文) & Ope…",
+      "今日 AI 前沿动态呈现明显的“安全分层”与“企业落地”双…",
+      "标题: Expanding the Cyber Verif…",
+      "Anthropic 推出了升级版的网络验证计划 (CVP)…",
+      "⚠️ 数据受限说明: 以下条目仅有 URL 推断的标题，无正…",
+      "分类: 产品/技术 (Index)"
+    ],
+    "ai-hn": [
+      "今日 HN 社区围绕 AI 的讨论呈现出“底层突破”与“应…",
+      "Mistral Large 4 · HN：高分高评，社区关…",
+      "Beam: Reflection's 501B open…",
+      "Sharing AI progress in mathem…",
+      "Dust: Pretraining Transformer…",
+      "Opus 5.5 agents discover two…"
+    ],
+    "ai-arxiv": [
+      "今日研究热点集中在智能体可靠性与混合架构优化上。一方面，针…",
+      "Towards Looped Models Done Ri…",
+      "Balancing Memory Pathways: An…",
+      "Sharpen Without Search: On-Po…",
+      "Conditional Rank Allocation f…",
+      "MatrixFormer: A Foundation Mo…"
+    ],
+    "ai-hf": [
+      "Hugging Face 本周生态焦点高度集中在 Qwen…",
+      "Qwen/Qwen3.8-27B：基于 qwen35 架构…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "Aleph-Alpha/Kolibri-1：支持推理（Re…",
+      "Qwen/Qwen3.8-Flash-Next：针对快速响…",
+      "Lightricks/LTX-2.5：领先的多模态视频生成…"
+    ],
+    "ai-community": [
+      "今日技术社区的焦点从单纯的大模型调用转向了 AI 代理（A…",
+      "Your AI Agent Will Do Somethi…",
+      "Five Things Release Day Caugh…",
+      "I Am 12. I Built an AI Ecosys…",
+      "You Can't Test Money Controls…",
+      "ChatGPT visual ads start test…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI developer tool landscape is undergoing a critica…",
+      "Process & Resource Isolation: Both tools face critical issu…",
+      "Windows Desktop/CLI Stability: A major shared pain point is…",
+      "Granular Permission Controls: Both communities are moving b…",
+      "Multi-Agent & Sub-Agent Management: Both tools are actively…",
+      "Feature Focus:"
+    ],
+    "ai-agents": [
+      "Today's Overview",
+      "The OpenClaw project remains highly active with 18 issues a…",
+      "Releases",
+      "No new releases were published on 2026-10-07.",
+      "Project Progress",
+      "Five pull requests were closed/merged in the last 24 hours…"
+    ],
+    "ai-trending": [
+      "Today's GitHub trending data reveals a sharp shift from fou…",
+      "affaan-m/ECC：A high-performance agent harness optimization…",
+      "headroomlabs-ai/headroom：Compresses tool outputs, logs, and…",
+      "deepseek-ai/DeepGEMM：A clean and efficient BLAS kernel libr…",
+      "0xPlaygrounds/rig：A framework for building modular and scal…",
+      "Picovoice/picollm：Enables on-device LLM inference powered b…"
+    ],
+    "ai-web": [
+      "The most significant development is Anthropic’s expansion o…",
+      "News & Safety Program",
+      "Expanding the Cyber Verification Program",
+      "Publication Date: 2026-10-06",
+      "Core Insights: Anthropic has launched an expanded version o…",
+      "Technical & Business Significance: The program grants acces…"
+    ],
+    "ai-hn": [
+      "The AI community on Hacker News is currently dominated by i…",
+      "Mistral Large 4 · HN：This major release signals a continued…",
+      "Opus 5.5 agents discover two room-temperature magnetic semi…",
+      "Dust: Pretraining Transformers Without Backpropagation · HN…",
+      "Sharing AI progress in mathematics · HN：OpenAI's push into…",
+      "Beam: Reflection's 501B open-weight model · HN：A large-scal…"
+    ],
+    "ai-arxiv": [
+      "The submitted papers highlight a strong convergence of agen…",
+      "Base Models Can Reason By Taking a Cue From Training Data：T…",
+      "Sharpen Without Search: On-Policy Distillation of Sequence…",
+      "Towards Looped Models Done Right, Part II: Rethinking at Fi…",
+      "Balancing Memory Pathways: Analyzing and Improving Memory U…",
+      "MemPilot: Orchestrating On-Demand Multimodal Memory Curatio…"
+    ],
+    "ai-hf": [
+      "Today's Highlights",
+      "The Qwen3.8 series is dominating the trend, with Qwen/Qwen3…",
+      "Specialized quantization workflows are maturing, evidenced…",
+      "Video generation continues to gain momentum with Lightricks…",
+      "The ecosystem shows a distinct shift toward \"Fast\" and \"Fla…",
+      "Trending Models"
+    ],
+    "ai-community": [
+      "AI agent security and reliability are dominating developer…",
+      "Your AI Agent Will Do Something Terrible. Here's How to Sur…",
+      "Five Things Release Day Caught That Six Weeks of Green Test…",
+      "The scarcest skill on my team has the lowest status: the 'n…",
+      "I Am 12. I Built an AI Ecosystem on a $150 Phone That Beats…",
+      "You Can't Test Money Controls With a Free Model：The author…"
+    ]
+  }
+}
