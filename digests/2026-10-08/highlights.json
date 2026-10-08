@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "2026 年 10 月 8 日，AI CLI 工具生态呈现…",
+      "跨平台沙箱与安全完整性校验：",
+      "Claude Code：修复 Hookify 插件忽略祖先…",
+      "OpenAI Codex：密集落地 Linux (bubb…",
+      "上下文与记忆管理优化：",
+      "Claude Code：社区强烈呼吁解决压缩后工作状态丢失…"
+    ],
+    "ai-agents": [
+      "OpenClaw 过去 24 小时表现出较高的开发活跃度…",
+      "今日合并或关闭的 8 个 PR 主要涉及测试稳定性、配置命…",
+      "构建性能优化：PR #157739 通过序列化统一 tsd…",
+      "配置 CLI 修复：PR #166830 修复了 open…",
+      "测试套件清理：PR #166818 移除了一批低价值的重复…",
+      "Doctor 测试修复：PR #166811 修复了 No…"
+    ],
+    "ai-trending": [
+      "今日 AI 开源领域最显著的动向是“Agent 技能工程化…",
+      "tensorflow/tensorflow：经典的开源机器…",
+      "pytorch/pytorch：动态图深度学习框架，在研究…",
+      "ollama/ollama：本地 LLM 运行首选工具，支…",
+      "browser-use/browser-use：让 Age…",
+      "trycua/cua：开源 Computer-Use 2…"
+    ],
+    "ai-web": [
+      "2026-10-08 增量更新显示，Anthropic 持…",
+      "核心观点/技术细节：Anthropic 正式推出生命科学研…",
+      "业务意义：展示 Claude 在基础科学领域的从“辅助工具…",
+      "核心观点/技术细节：扩容网络验证计划（CVP），建立三阶层…",
+      "业务意义：应对网络安全的双刃剑属性，在维持一般公众网络安全…",
+      "核心观点/技术细节：利用“Anthropic Interv…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 AI 前沿动态反应热烈，OpenAI…",
+      "Mistral Large 4 · HN：Mistral…",
+      "Sharing AI progress in mathem…",
+      "Claude Haiku 5.5 · HN：Anthrop…",
+      "GPT‑6 and Intelligent UI for…",
+      "An open vision-language model…"
+    ],
+    "ai-arxiv": [
+      "今日论文聚焦于智能体系统的安全性与可维护性（如提示注入防御…",
+      "IdeaAnchor: Teaching LLMs to…",
+      "Sherpa: Teaching LLMs to Teac…",
+      "Principled Under Pressure: Po…",
+      "The Missing Minimal Pair: Ste…",
+      "When Forgetting is not Catast…"
+    ],
+    "ai-hf": [
+      "《Hugging Face 热门模型日报》 | 2026…",
+      "今日 Hugging Face 榜首由 Qwen 家族的…",
+      "Qwen/Qwen3.8-27B：基于 qwen35 架构…",
+      "Aleph-Alpha/Kolibri-1：支持 MoE…",
+      "Qwen/Qwen3.8-Flash-Next：qwen4…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…"
+    ],
+    "ai-community": [
+      "今日技术社区对 AI 的关注点从单纯的“生成能力”转向了工…",
+      "I Think We're Forgetting How…",
+      "How to use the OpenAI Decisio…",
+      "I let my AI agents merge to p…",
+      "Your AI Agent Has a Context B…",
+      "Prompt Injection Is a Data-Fl…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Ecosystem Overview",
+      "The AI CLI tools landscape in late 2026 is defined by a piv…",
+      "Activity Comparison",
+      "Note: Counts reflect items explicitly highlighted in the 20…",
+      "Shared Feature Directions",
+      "Granular Agent Control: Both communities are demanding fine…"
+    ],
+    "ai-agents": [
+      "OpenClaw is in a period of high-intensity stabilization and…",
+      "There were no new releases published on 2026-10-08. Develop…",
+      "Gateway & Runtime Optimization: Significant effort was plac…",
+      "Native Integration: The iOS team advanced support for nativ…",
+      "Codebase Cleanup: Several large \"test hygiene\" PRs removed…",
+      "Startup Performance Regression (#159499): This issue highli…"
+    ],
+    "ai-trending": [
+      "Step 1 (Filter)",
+      "Included: morluto/rea, mattpocock/skills, ayghri/i-have-adh…",
+      "Excluded: boykopovar/AnyPS5 (gaming porting), EpicGames/rad…",
+      "Step 2 (Categorize)",
+      "🔧 AI Infrastructure: pytorch/pytorch, tensorflow/tensorflow…",
+      "🤖 AI Agents / Workflows: NousResearch/hermes-agent, HKUDS/n…"
+    ],
+    "ai-web": [
+      "The most significant strategic development is Anthropic's f…",
+      "Claude discovers a novel enzyme system",
+      "Core Insights: Anthropic has introduced a new life sciences…",
+      "What do you want from AI?",
+      "Core Insights: Anthropic is launching a new study using its…",
+      "Expanding the Cyber Verification Program"
+    ],
+    "ai-hn": [
+      "Today's Highlights",
+      "The Hacker News AI community is currently fixated on major…",
+      "Top News & Discussions",
+      "Claude Haiku 5.5 · HN：This release highlights Anthropic's e…",
+      "Mistral Large 4 · HN：As a major open-weight release, this m…",
+      "An open vision-language model for diverse medical applicati…"
+    ],
+    "ai-arxiv": [
+      "1. Today's Highlights",
+      "Recent submissions indicate a strong pivot toward robustnes…",
+      "2. Key Papers",
+      "3. Research Trend Signal",
+      "The research landscape is strongly emphasizing the agentic…",
+      "4. Worth Deep Reading"
+    ],
+    "ai-hf": [
+      "Qwen3.8 dominates the ecosystem with its 27B flagship model…",
+      "Standard LLMs, chat models, and general instruction-tuned m…",
+      "Qwen/Qwen3.8-27B：The flagship multimodal chat model from Al…",
+      "Qwen/Qwen3.8-Flash-Next：A next-generation lightweight varia…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：An efficient, flash-optimiz…",
+      "Aleph-Alpha/Kolibri-1：A Mixture-of-Experts (MoE) reasoning…"
+    ],
+    "ai-community": [
+      "Today's Highlights",
+      "The developer community is increasingly focused on the oper…",
+      "Dev.to Highlights",
+      "I Think We're Forgetting How to Be Bored：Explores the impac…",
+      "A Coding System That Refuses to Trust Its Own Output：Introd…",
+      "I let my AI agents merge to production. Once.：A developer r…"
+    ]
+  }
+}
