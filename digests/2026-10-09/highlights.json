@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "2026年10月9日，AI CLI工具生态进入“精细化治理…",
+      "注：Claude Code 数据集中 Issues 热度极…",
+      "3. 共同关注的功能方向",
+      "由于缺乏 OpenAI Codex 当日有效数据，以下基于…",
+      "跨会话状态连续性：重度用户普遍面临长会话上下文丢失或“变笨…",
+      "IDE/终端集成细粒度控制：用户强烈要求对自动行为（如自动…"
+    ],
+    "ai-agents": [
+      "过去24小时，OpenClaw 社区活跃度极高，共更新 I…",
+      "今日发布了两个重要版本，标志着 9 月迭代的收尾及 10…",
+      "v2026.9.9 (LTS/稳定版): 包含 185 个…",
+      "v2026.10.1-beta.2 (测试版): 针对 4…",
+      "今日有 11 个 PR 完成合并或关闭，核心推进了以下工作：",
+      "核心稳定性修复: 修复了导致 Agent 在整个 Gate…"
+    ],
+    "ai-trending": [
+      "今日 AI 开源生态热度显著向智能体（Agent）记忆管理…",
+      "ollama/ollama：本地大模型运行标准工具，支持多…",
+      "0xPlaygrounds/rig：Rust 编写的模块化…",
+      "Hugging Face Transformers：行业标…",
+      "lancedb/lancedb：嵌入式多模态 AI 检索库…",
+      "morluto/rea：今日最热。利用智能体从应用行为到原…"
+    ],
+    "ai-web": [
+      "《AI 官方内容追踪报告》",
+      "今日 Anthropic 密集发布了五篇重要内容，核心战略…",
+      "核心提炼: 这是 Anthropic 确立长期网络安全承诺…",
+      "业务意义: 该计划包含两大支柱：一是关键基础设施防御计划…",
+      "核心提炼: Anthropic 承诺在未来三年内向美国联邦…",
+      "战略信号: 此次增资是在白宫科学技术政策办公室（OSTP）…"
+    ],
+    "ai-hn": [
+      "《Hacker News AI 社区动态日报》",
+      "今日 HN 社区对 AI 在数学领域的突破性进展关注度极高…",
+      "Mistral Large 4)：分数最高的帖子，展示了…",
+      "Claude Haiku 5.5)：Anthropic 推…",
+      "Step 5 Preview, a 1M-context…",
+      "Sharing AI progress in mathem…"
+    ],
+    "ai-arxiv": [
+      "今日研究热点集中在具身智能的实时性优化（如Long-WAM…",
+      "Decoupling Exploration from O…",
+      "PHRBench: A Behavioral Evalua…",
+      "Training Parallel Speculative…",
+      "ResidualQuant: KV Cache Quant…",
+      "Composing What Each Teacher L…"
+    ],
+    "ai-hf": [
+      "本期榜单展示了开源多模态与大语言模型的持续火热，Qwen…",
+      "主要包含通用对话、逻辑推理及文本生成模型。",
+      "Qwen/Qwen3.8-27B：阿里最新旗舰级多模态语言…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "Qwen/Qwen3.8-Flash-Next：Qwen…",
+      "Aleph-Alpha/Kolibri-1：采用 MoE（…"
+    ],
+    "ai-community": [
+      "今日技术社区围绕 AI 编码代理的可靠性与成本控制 展开热…",
+      "To Retry or Not to Retry? Tha…",
+      "How Our Engineering Team Uses…",
+      "Shipping faster with AI isn't…",
+      "I Turned 149k Messy Images in…",
+      "AI Dev Weekly #29: Haiku 5.5…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI tools landscape in October 2026 is characterized…",
+      "Note: Counts reflect items explicitly detailed in the provi…",
+      "Several requirements are emerging independently across both…",
+      "Multi-Session & State Continuity: Both communities struggle…",
+      "Granular Security & Trust Controls: Claude Code is hardenin…",
+      "Windows Reliability & Packaging: Both tools report signific…"
+    ],
+    "ai-agents": [
+      "The OpenClaw project remains in a high-velocity maintenance…",
+      "v2026.9.9 (Stable): This release comprises 185 commits acro…",
+      "v2026.10.1-beta.2 (Beta): A hotfix beta covering 40 interve…",
+      "Recent merged and closed pull requests indicate a strong fo…",
+      "SQLite & Persistence Stability: PR #158094 (merged) address…",
+      "Performance Optimization: A series of refactors by maintain…"
+    ],
+    "ai-trending": [
+      "Step 1 (Filter)",
+      "Filtered AI-related projects:",
+      "Trending: morluto/rea, cathrynlavery/diagram-design, mattpo…",
+      "Topic Search: All projects under topics ai-agent, llm, rag…",
+      "Excluded: boykopovar/AnyPS5 (PS5 porting tool, non-AI), Epi…",
+      "Step 2 (Categorize)"
+    ],
+    "ai-web": [
+      "Scope: Incremental update (Anthropic: 5 articles; OpenAI: 2…",
+      "Anthropic is significantly pivoting its corporate strategy…",
+      "1. Introducing the Anthropic Cyber Mission",
+      "Core Insight: This is a major strategic expansion beyond ge…",
+      "Business Significance: Anthropic is positioning itself not…",
+      "2. Building on our commitment to American scientific discov…"
+    ],
+    "ai-hn": [
+      "Today's Highlights",
+      "The Hacker News community is currently divided between a hi…",
+      "Top News & Discussions",
+      "Mistral Large 4 · HN：The highest-scoring story of the cycle…",
+      "OpenAI, the Partition Principle, and Mathematics · HN：A tec…",
+      "Step 5 Preview, a 1M-context MoE from StepFun, shows up on…"
+    ],
+    "ai-arxiv": [
+      "The research landscape is increasingly focusing on the robu…",
+      "EngramEdit: Decoupled Knowledge Updates in LLMs through Con…",
+      "Training Parallel Speculative Draft Models by Directly Mini…",
+      "Before They Can Solve: Predicting Post-Training Coding-Agen…",
+      "PHRBench: A Behavioral Evaluation of Post-Hallucination Rea…",
+      "A Society of Researchers: Designing Institutions for Popula…"
+    ],
+    "ai-hf": [
+      "Here is the Hugging Face Trending Models Digest for 2026-10…",
+      "The Hugging Face ecosystem is currently dominated by a surg…",
+      "Qwen/Qwen3.8-27B：This large conversational model supports i…",
+      "Qwen/Qwen3.8-Flash-Next：A fast variant of the Qwen 3.8 seri…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：DeepSeek's latest flash mod…",
+      "convaiinnovations/laya：A specialized model for calibrated d…"
+    ],
+    "ai-community": [
+      "Today's Highlights",
+      "The developer community is currently grappling with the mat…",
+      "Dev.to Highlights",
+      "To Retry or Not to Retry? That Is the Question.：This submis…",
+      "How Our Engineering Team Uses AI, Part II: Meat Proxies：A f…",
+      "I got Jev to zero mistakes. I'm still using Flash-Lite.：The…"
+    ]
+  }
+}
