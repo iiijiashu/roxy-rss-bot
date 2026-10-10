@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态进入“稳定性与扩展性深度磨合期…",
+      "3. 共同关注的功能方向",
+      "企业级安全与合规加固",
+      "Claude Code：引入 HIPAA 配置示例，修复…",
+      "OpenAI Codex：修复 MITM 钩子绕过风险，验…",
+      "多设备/远程协同一致性"
+    ],
+    "ai-agents": [
+      "过去24小时，OpenClaw 保持高活跃状态，共处理 9…",
+      "今日主要进展集中在合并/关闭的少量 PR 及大量待合并的高…",
+      "核心稳定性与存储修复：合并了修复 SQLite 会话投递在…",
+      "Agent 运行时与上下文优化：关闭并合并了为隔离完成操作…",
+      "多渠道与 UI 体验提升：为 Discord 进度草稿工具…",
+      "新提供商支持：支持 Inworld 实时语音提供商的 PR…"
+    ],
+    "ai-trending": [
+      "过滤理由：剔除与 AI 无关的通用工具、前端、系统移植或纯…",
+      "剔除项：boykopovar/AnyPS5（系统移植）、c…",
+      "将剩余 AI 项目归类，优先归入最主要类别：",
+      "🔧 AI 基础工具：alibaba/open-code-r…",
+      "🤖 AI 智能体/工作流：morluto/rea、matt…",
+      "📦 AI 应用：Mintplex-Labs/anythin…"
+    ],
+    "ai-web": [
+      "报告日期: 2026-10-10",
+      "数据状态: 增量更新 (Anthropic 含正文摘要…",
+      "今日 Anthropic 发布了四篇具有高度战略意义的内容…",
+      "核心观点: 这是 Anthropic 发布的最新对齐报告…",
+      "技术/业务细节: 涉及部分美国联邦、州及地方政府机构的网站…",
+      "核心观点: 基于 Project Glasswing 的经…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 AI 的讨论呈现鲜明的两极分化：一方面…",
+      "OpenAI, the Partition Princip…",
+      "OpenAI withdraws three mathem…",
+      "OpenAI mistranslated mathemat…",
+      "Mistral Large 4 · HN：新模型发布获今日…",
+      "Port of the TypeScript compil…"
+    ],
+    "ai-arxiv": [
+      "今日 ArXiv 投稿呈现出 AI 系统从单体模型向多智能…",
+      "Predicting Alignment Generali…",
+      "OnTrack: Real-Time Monitoring…",
+      "Searching for \"Harmful Refusa…",
+      "Latent Core Tokenizer: Compre…",
+      "Ecology of AI Agents: Collabo…"
+    ],
+    "ai-hf": [
+      "Hugging Face 今日热点被 Qwen3.8 和…",
+      "Qwen/Qwen3.8-27B：支持图文对话的多模态大模…",
+      "Qwen/Qwen3.8-Flash-Next：主打高速响…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "jialinyyzz/humanizer：基于 Gemma…",
+      "Convaiinnovations/laya：用于系统决策…"
+    ],
+    "ai-community": [
+      "今日技术社区对 AI 的关注点正从“模型能力”转向“工程化…",
+      "Super-Intelligent Yes-Men: Ar…",
+      "AI Got Better While I Was Awa…",
+      "Zero-Screen Dungeon Master: T…",
+      "I built an offline AI that kn…",
+      "Docker just shipped the agent…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI developer tools landscape in late 2026 is characteri…",
+      "Subagent Context Management: Both tools are addressing the…",
+      "Claude Code: Introduced autoCompactWindow in subagent front…",
+      "Codex: Added opt-in clearing of inherited modelcontextwindo…",
+      "Security & Credential Integrity: Both communities are heavi…",
+      "Claude Code: Fixed silent bypasses in hookify and YAML inje…"
+    ],
+    "ai-agents": [
+      "Here is the project digest for OpenClaw (github.com/opencla…",
+      "OpenClaw remains in a high-velocity development phase, with…",
+      "No new releases were published on 2026-10-10.",
+      "Merged/Closed PRs: 3 PRs were merged or closed during the 2…",
+      "Key Fixes in Progress:",
+      "Session & State Management: Significant effort is going int…"
+    ],
+    "ai-trending": [
+      "The open-source AI ecosystem is currently pivoting sharply…",
+      "BerriAI/litellm：A Rust-core AI gateway that provides a unif…",
+      "alibaba/open-code-review：A battle-tested hybrid code review…",
+      "DietrichGebert/ponytail：An agent harness that encourages AI…",
+      "Graphify-Labs/graphify：A tool that turns codebases and PDFs…",
+      "morluto/rea：An agent-driven reverse engineering tool capabl…"
+    ],
+    "ai-web": [
+      "Focus: Incremental Update (Anthropic & OpenAI)",
+      "The most significant strategic development today is Anthrop…",
+      "Introducing Claude Corps",
+      "Core Insights: Anthropic is launching a national fellowship…",
+      "Using Claude Science to produce the first complete map of t…",
+      "Core Insights: Anthropic researchers utilized \"Claude Scien…"
+    ],
+    "ai-hn": [
+      "Today's Highlights",
+      "The HN community is currently consumed by the fallout from…",
+      "Top News & Discussions",
+      "🔬 Models & Research",
+      "Mistral Large 4 · HN：The release of Mistral Large 4 is the…",
+      "OpenAI withdraws three mathematical results · HN：This threa…"
+    ],
+    "ai-arxiv": [
+      "Today's research landscape is dominated by a critical shift…",
+      "VFold: Symmetry-Aware Cross-Layer Value Cache Compression：P…",
+      "Overcoming Prior Barriers: Supervised Fine-Tuning under Lon…",
+      "Predicting Alignment Generalization with Value Representati…",
+      "Latent Core Tokenizer: Compress, but Meaningfully：Introduce…",
+      "From Reactive Containment to Proactive Assurance: Lessons f…"
+    ],
+    "ai-hf": [
+      "The Qwen 3.8 series dominates the trending landscape, with…",
+      "Qwen/Qwen3.8-27B：A flagship 27B multimodal language model f…",
+      "Qwen/Qwen3.8-Flash-Next：An experimental qwen4exp variant de…",
+      "Aleph-Alpha/Kolibri-1：A reasoning-focused Mixture of Expert…",
+      "LiquidAI/d1-3B：A compact 3B parameter liquid multimodal mod…",
+      "Lightricks/LTX-2.5：A single-file diffusion model capable of…"
+    ],
+    "ai-community": [
+      "Today's AI conversation in the developer community is heavi…",
+      "Super-Intelligent Yes-Men: Are We Training AI to Ignore the…",
+      "AI Got Better While I Was Away. Software Didn't.：The author…",
+      "Docker just shipped the agent wall I wanted. It's off by de…",
+      "I Built an Offline AI That Knows Your Last Frost Date, No I…",
+      "Study: How AI Agent \"Skills\" Leak Your Credentials：An empir…"
+    ]
+  }
+}
