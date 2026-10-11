@@ -1,0 +1,118 @@
+{
+  "zh": {
+    "ai-cli": [
+      "功能：为 Agent 构建 MCP（Model Conte…",
+      "讨论热点：PR #1742 修复 mcp>=2.0.0 中…",
+      "功能：创建、打包、评估 Claude Skills 的工具…",
+      "讨论热点：多个 PR 和 Issue 集中暴露其可靠性与安…",
+      "功能：处理 DOCX、PDF、ODT 等办公文档的创建、编…",
+      "讨论热点：PR #1792 修复 docx 脚本在 Lib…"
+    ],
+    "ai-agents": [
+      "OpenClaw 项目今日保持高度活跃状态，过去24小时内…",
+      "v2026.10.1 发布",
+      "本次发布侧重于会话（Sessions）与记忆（Memory…",
+      "核心更新：在注册表变更期间保留使用状态，支持从远程工作区交…",
+      "风险提示：虽然版本已发布，但今日数据表明从 2026.9…",
+      "今日大部分 50 条 PR 处于“待合并”或“等待维护者审…"
+    ],
+    "ai-trending": [
+      "保留（Trending 榜单中 AI 相关）：",
+      "morluto/rea — 使用 AI 智能体逆向工程（明…",
+      "cathrynlavery/diagram-design…",
+      "mksglu/context-mode — AI 编码代理…",
+      "mattpocock/skills — \"Skills f…",
+      "tensorflow/tensorflow — ML 框架…"
+    ],
+    "ai-web": [
+      "今日速览",
+      "今日 Anthropic 发布了一篇关于“评估与内部使用中…",
+      "Anthropic / Claude 内容精选",
+      "核心观点提炼：该报告专门记录了在模型评估和内部部署过程中观…",
+      "OpenAI 内容精选",
+      "今日增量更新内容为 0 篇，暂无可供分析的数据。OpenA…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 OpenAI 在数学领域的最新进展及后…",
+      "Mistral Large 4 · HN：这是今日分数最高…",
+      "OpenAI fires three safety res…",
+      "OpenAI withdraws three mathem…",
+      "Training Text-to-Image Models…",
+      "Talorys – A self-hosted perso…"
+    ],
+    "ai-hf": [
+      "Qwen3.8 系列（27B 及 Flash-Next）以…",
+      "Qwen/Qwen3.8-27B：榜单点赞与下载双料冠军…",
+      "Qwen/Qwen3.8-Flash-Next：主打快速响…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "Aleph-Alpha/Kolibri-1：支持 vLLM…",
+      "Venastine-Research/Xing4.0-29…"
+    ],
+    "ai-community": [
+      "开发者开始反思 AI 编码代理的实际交付价值，关注“仪表盘…",
+      "AI 代理（Agent）安全与可靠性成为热议焦点，多个项目…",
+      "模型能力评测转向更复杂的基准测试，包括工具使用能力、幻觉抑…",
+      "本地化与轻量级 AI 应用受到 Rust 社区关注，如最小…",
+      "开源工具链（如 theAuth、MCP 服务器）正试图建立…",
+      "Stop Asking AI to Fix the Bug…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Ecosystem Overview",
+      "The AI CLI tool landscape in October 2026 is characterized…",
+      "Activity Comparison",
+      "Note: Counts are based on the \"Hot Issues\" and \"Key PR Prog…",
+      "Shared Feature Directions",
+      "Context Persistence & Compaction Management: Both communiti…"
+    ],
+    "ai-agents": [
+      "Today's Overview",
+      "OpenClaw released v2026.10.1 on 2026-10-11, focusing on ses…",
+      "Releases",
+      "v2026.10.1: This release highlights improvements in \"Sessio…",
+      "Project Progress",
+      "Two pull requests were merged or closed in the last 24 hour…"
+    ],
+    "ai-trending": [
+      "Today's open-source AI landscape is dominated by a surge in…",
+      "huggingface/transformers：The foundational model-definition…",
+      "pytorch/pytorch：The dominant tensor library for dynamic neu…",
+      "ollama/ollama：The go-to CLI for running local LLMs like Dee…",
+      "0xPlaygrounds/rig：A modular and scalable toolkit for buildi…",
+      "Picovoice/picollm：Focuses on on-device LLM inference using…"
+    ],
+    "ai-web": [
+      "Anthropic has released a new alignment research report deta…",
+      "Research / Safety",
+      "Investigating unintended model actions in our evaluations a…",
+      "Anthropic is establishing a new publication cadence for sta…",
+      "The report documents four specific categories of unintended…",
+      "A significant operational security detail is the involvemen…"
+    ],
+    "ai-hn": [
+      "Today's Highlights",
+      "Hacker News today was dominated by a significant controvers…",
+      "Top News & Discussions",
+      "OpenAI, the Partition Principle, and Mathematics · HN：This…",
+      "OpenAI withdraws three mathematical results · HN：This threa…",
+      "Mistral Large 4 · HN：Mistral’s release of Large 4 triggered…"
+    ],
+    "ai-hf": [
+      "Qwen3.8-27B dominates the trending list with over 17,000 li…",
+      "Qwen/Qwen3.8-27B：A flagship 27B image-text-to-text model fr…",
+      "Qwen/Qwen3.8-Flash-Next：An experimental multimodal model ta…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：A rapid-inference model fro…",
+      "convaiinnovations/laya：A text-classification model designed…",
+      "Aleph-Alpha/Kolibri-1：A reasoning-focused Mixture-of-Expert…"
+    ],
+    "ai-community": [
+      "Today's Highlights",
+      "The developer community is increasingly focused on the reli…",
+      "Dev.to Highlights",
+      "How Do We Extract the “Why” from a PR into a CHANGELOG with…",
+      "Surviving the 200k-Token Lobotomy: How Unix init.d and 'Mem…",
+      "I let an agent run unattended overnight. At 3am it emailed…"
+    ]
+  }
+}
