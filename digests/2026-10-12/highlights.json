@@ -1,0 +1,102 @@
+{
+  "zh": {
+    "ai-cli": [
+      "基于提供的 Claude Code 和 OpenAI Co…",
+      "AI CLI 工具生态正从单纯的“代码生成”向深度工作流集…",
+      "注：基于提供的摘要，Claude Code 今日 PR 活…",
+      "尽管底层协议不同，两大社区在工程化痛点上呈现出显著的趋同性：",
+      "资源与状态管理：",
+      "Claude Code：关注 MCP 服务器随会话启动导致…"
+    ],
+    "ai-agents": [
+      "OpenClaw 项目今日展现出极高的开发活跃度，过去 2…",
+      "版本: v2026.10.5-beta.1",
+      "发布链接: OpenClaw Releases",
+      "核心亮点（更安全的更新机制）:",
+      "增强了更新流程的鲁棒性，确保更新能在不同设备、文件系统以及…",
+      "优化了中断激活（interrupted activatio…"
+    ],
+    "ai-trending": [
+      "今日 GitHub Trending 榜单呈现显著分化，逆…",
+      "pytorch/pytorch：核心深度学习框架，提供张量…",
+      "huggingface/transformers：SOTA…",
+      "ollama/ollama：本地大模型运行引擎，支持 Ki…",
+      "lancedb/lancedb：嵌入式多模态检索库，旨在降…",
+      "meilisearch/meilisearch：高速搜索引…"
+    ],
+    "ai-hn": [
+      "《Hacker News AI 社区动态日报》",
+      "今日 HN 社区对 AI 的讨论热度极高，焦点集中在 Op…",
+      "OpenAI, the Partition Princip…",
+      "Retrofitting language models…",
+      "Distorted Intelligence at the…",
+      "Mxc: Microsoft Execution Cont…"
+    ],
+    "ai-hf": [
+      "今日 Hugging Face Hub 上，Qwen 模型…",
+      "Qwen/Qwen3.8-27B：强大的多模态大语言模型…",
+      "Qwen/Qwen3.8-Flash-Next：Qwen…",
+      "Aleph-Alpha/Kolibri-1：支持 vLLM…",
+      "LiquidAI/d1-3B：基于 Liquid Netw…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…"
+    ],
+    "ai-community": [
+      "今日 Dev.to 社区高度聚焦于 Hacktoberfe…",
+      "What LLMs 'Know' That You Don…",
+      "How 8-bit quantization shrink…",
+      "I Replaced My Entire Dev Work…",
+      "The Missing Piece: Why AI Mod…",
+      "canli-mcp: 306 free finance t…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI developer tool landscape in October 2026 is defi…",
+      "While the specific implementation details differ, both comm…",
+      "Granular Cost Optimization: Both user bases are requesting…",
+      "Enhanced Safety & Reversibility: There is a strong shared d…",
+      "Isolated Development Environments: Developers are seeking f…",
+      "Multi-Agent Orchestration: Both ecosystems are moving towar…"
+    ],
+    "ai-agents": [
+      "Today's Overview",
+      "OpenClaw released v2026.10.5-beta.1, focusing on resolving…",
+      "Releases",
+      "v2026.10.5-beta.1: The latest release highlights \"Safer upd…",
+      "Project Progress",
+      "Merged/Closed PRs: 7 PRs were merged or closed in the last…"
+    ],
+    "ai-trending": [
+      "Step 1 (Filter)",
+      "Trending List:",
+      "morluto/rea: Filtered out (Security/Reverse Engineering, no…",
+      "boykopovar/AnyPS5: Filtered out (Game Modding/Porting).",
+      "storytold/artcraft: Filtered out (Art/Crafting engine).",
+      "cathrynlavery/diagram-design: Included (AI Coding Tool)."
+    ],
+    "ai-hn": [
+      "The Hacker News community is intensely focused on the pract…",
+      "OpenAI shares progress in mathematics · HN：This announcemen…",
+      "Retrofitting language models to operate over bytes · HN：A p…",
+      "JulianFlux: Electrodynamic vector retrieval and causal rout…",
+      "Mxc: Microsoft Execution Containers version 1.0.0 · HN：Micr…",
+      "Talorys – A self-hosted personal AI agent on Cloudflare's f…"
+    ],
+    "ai-hf": [
+      "Today's Highlights",
+      "The Qwen 3.8 series dominates the current trending landscap…",
+      "Trending Models",
+      "Qwen/Qwen3.8-27B：A large-scale image-text-to-text conversat…",
+      "Qwen/Qwen3.8-Flash-Next：An experimental, fast iteration of…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：A high-performance model fr…"
+    ],
+    "ai-community": [
+      "Today's Highlights",
+      "The dominant theme across Dev.to today is the \"Touch Grass\"…",
+      "Dev.to Highlights",
+      "TerraPulse 🌿 — The Screenless Outdoor & Trail Agent：A Hackt…",
+      "Going outside was never my problem. Saying hello was.：This…",
+      "A Reader Showed Me What My Auditer Wasnt Counting.：Focuses…"
+    ]
+  }
+}

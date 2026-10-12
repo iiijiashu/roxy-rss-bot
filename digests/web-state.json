@@ -1,6 +1,6 @@
 {
   "anthropic": {
-    "lastChecked": "2026-10-11T00:20:12.441Z",
+    "lastChecked": "2026-10-12T00:20:09.838Z",
     "urls": {
       "https://www.anthropic.com/engineering/a-postmortem-of-three-recent-issues": {
         "status": "accepted",
@@ -2349,7 +2349,7 @@
     }
   },
   "openai": {
-    "lastChecked": "2026-10-11T00:20:16.178Z",
+    "lastChecked": "2026-10-12T00:20:14.298Z",
     "urls": {
       "https://openai.com/academy/applications-of-ai": {
         "status": "accepted",
@@ -15478,9 +15478,9 @@
       "https://openai.com/index/codex-maxxing-long-running-work/": "2026-10-09T12:29:09.621Z",
       "https://openai.com/index/builders-guide-to-gpt-5-6/": "2026-10-10T18:31:02.983Z",
       "https://openai.com/index/teens-learn-and-plan/": "2026-10-09T14:57:13.928Z",
-      "https://openai.com/index/gpt-6-for-everyone/": "2026-10-10T21:05:51.572Z",
+      "https://openai.com/index/gpt-6-for-everyone/": "2026-10-11T12:33:38.822Z",
       "https://openai.com/index/disrupting-malicious-uses-of-ai-influence-campaign-russia/": "2026-10-09T09:23:49.426Z",
-      "https://openai.com/index/disrupting-ai-enabled-false-front-operations/": "2026-10-10T16:06:15.137Z",
+      "https://openai.com/index/disrupting-ai-enabled-false-front-operations/": "2026-10-11T19:42:07.357Z",
       "https://openai.com/index/ai-native-company-workflows/": "2026-10-09T23:15:23.475Z",
       "https://openai.com/business/learn/download-the-chatgpt-work-guide-for-sales-teams/": "2026-10-09T18:20:55.389Z",
       "https://openai.com/business/learn/agent-security-enterprise/": "2026-10-09T18:17:24.600Z",
