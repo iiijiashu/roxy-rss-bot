@@ -1,0 +1,118 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态正处于高并发稳定性优化与多模态…",
+      "两大工具社区的痛点呈现高度重合，主要集中在认证流一致性与跨…",
+      "多端状态同步与持久化：Claude Code 用户抱怨跨组…",
+      "跨平台底层适配（Windows 重灾区）：Claude C…",
+      "认证与权限体系：双方均存在复杂的 OAuth/认证冲突，如…",
+      "Claude Code：深耕长会话与多代理工作流。其技术路…"
+    ],
+    "ai-agents": [
+      "过去 24 小时内，OpenClaw 项目保持高活跃状态…",
+      "今日发布两个版本，重点解决升级阻塞和恢复逻辑：",
+      "核心更新：改进了 openclaw update 的容错能…",
+      "迁移/注意事项：该版本在更新过程中保留了服务堆限制和 We…",
+      "核心更新：修复了从稳定版 2026.10.1 升级时无法干…",
+      "关联 Issue：解决了 #168849 和 #16903…"
+    ],
+    "ai-trending": [
+      "今日 GitHub AI 领域呈现“逆向工程与轻量推理”双…",
+      "morluto/rea：利用 Agent 从应用行为到原生…",
+      "Alishahryar1/free-claude-code…",
+      "microsoft/BitNet：官方 1-bit LLM…",
+      "lyogavin/airllm：实现 2.8T 参数 LL…",
+      "mksglu/context-mode：针对 AI 编码…"
+    ],
+    "ai-web": [
+      "今日 Anthropic 密集发布了三项关键安全研究成果…",
+      "1. 强化针对蒸馏攻击的防御",
+      "核心观点：Anthropic 宣布在对抗隐蔽、工业级蒸馏攻…",
+      "技术细节与意义：新发布的防御方法已使蒸馏者收集的数据量减少…",
+      "2. AI 模型可能无需数据中心即可自我复制",
+      "核心观点：Anthropic 前沿红队研究指出，小型 AI…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区围绕 AI 的讨论呈现出“高热度争议”与“…",
+      "Sharing AI progress in mathem…",
+      "The gap in shared understandi…",
+      "AI models may be capable of s…",
+      "GLM-Legal · HN：针对法律垂直领域的大型模型发…",
+      "Codex CLI installs a persiste…"
+    ],
+    "ai-hf": [
+      "Qwen 模型家族占据主导地位，Qwen3.8 系列及多个…",
+      "Qwen/Qwen3.8-27B：多模态对话基础模型，拥有…",
+      "Qwen/Qwen3.8-Flash-Next：下一代快速…",
+      "Aleph-Alpha/Kolibri-1：基于 MoE…",
+      "ConwayResearch/Underdog-Saluk…",
+      "LiquidAI/d1-3B：3B 参数的小型多模态模型…"
+    ],
+    "ai-community": [
+      "今日技术社区对 AI 的讨论呈现出强烈的“反思与务实”倾向…",
+      "If You Never Do Anything Else…",
+      "The README looked harmless. T…",
+      "My agent's trace was green en…",
+      "I audited my AI agent stack…",
+      "Human-in-the-loop isn't a saf…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Ecosystem Overview",
+      "The AI CLI tool landscape on October 13, 2026, is defined b…",
+      "Activity Comparison",
+      "Note: Issue counts reflect the top \"Hot Issues\" listed in t…",
+      "Shared Feature Directions",
+      "Windows Platform Reliability: Both communities are battling…"
+    ],
+    "ai-agents": [
+      "OpenClaw maintains high engineering velocity, with 50 updat…",
+      "v2026.10.5-beta.2 and v2026.10.2 were released recently.",
+      "Update Stability: openclaw update now settles stale handoff…",
+      "Cross-Platform Fixes: Specific paths for Windows short-file…",
+      "Service Management: The update process now properly maintai…",
+      "Merged PRs: 2 PRs were merged/closed in the last 24 hours…"
+    ],
+    "ai-trending": [
+      "1. Today's Highlights",
+      "The \"agent harness\" ecosystem is expanding rapidly, with to…",
+      "2. Top Projects by Category",
+      "microsoft/BitNet：Official inference framework for 1-bit LLM…",
+      "mksglu/context-mode：Context window optimization for AI codi…",
+      "thedotmack/claude-mem：A persistent context layer that captu…"
+    ],
+    "ai-web": [
+      "Sources: Anthropic (Claude), OpenAI",
+      "Anthropic’s October 13 update focuses exclusively on advanc…",
+      "Strengthening our defenses against distillation attacks",
+      "Core Insights: This research outlines new methods that have…",
+      "AI models may be capable of self-replicating without access…",
+      "Core Insights: Researchers from the Frontier Red Team demon…"
+    ],
+    "ai-hn": [
+      "Today’s Hacker News feed is dominated by a critical tension…",
+      "Sharing AI progress in mathematics · HN：This thread feature…",
+      "Recursive self-improvement through collective intelligence…",
+      "GLM-Legal · HN：Zhipu AI releases a specialized model for le…",
+      "Codex CLI installs a persistent, self-updating background d…",
+      "AI coding agents generate more code, but not more software…"
+    ],
+    "ai-hf": [
+      "Today's Highlights",
+      "The Hugging Face trending ecosystem this week is heavily do…",
+      "Trending Models",
+      "Note: The following multimodal text-generation models are c…",
+      "Qwen/Qwen3.8-27B：This flagship image-text-to-text model is…",
+      "jialinyyzz/humanizer：A specialized text-generation model de…"
+    ],
+    "ai-community": [
+      "AI agent observability and security are dominating the disc…",
+      "Light don go: when Nigeria's power cuts out, my laptop send…",
+      "One rm -f Silently Disabled My Crash Detection：A critical p…",
+      "OpenTrips: should I go out this weekend, with a number you…",
+      "I was chasing the job market. One comment on DEV.to made me…",
+      "A single console.log was costing us $40,000 a year. I found…"
+    ]
+  }
+}
