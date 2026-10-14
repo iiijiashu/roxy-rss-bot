@@ -1,0 +1,118 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态正处于从“单一对话代理”向“多…",
+      "自动化可靠性与静默失败：",
+      "Claude Code：用户投诉定时任务（Schedule…",
+      "OpenAI Codex：面临模型行为一致性差、任务中途停…",
+      "共同诉求：开发者急需解决自动化流程中的“黑盒”失败问题，要…",
+      "资源管理与成本控制："
+    ],
+    "ai-agents": [
+      "2026-10-14 期间，OpenClaw 项目保持高度…",
+      "今日发布了 2 个新版本，标志着项目从 Beta 向稳定的…",
+      "v2026.10.5-beta.3 (Beta 版)",
+      "核心亮点：更新了安装与更新机制，确保 pnpm 12 安装…",
+      "跨平台支持：Windows 更新流程现在接受经过验证的 S…",
+      "v2026.10.3 (稳定版)"
+    ],
+    "ai-trending": [
+      "今日 AI 开源生态呈现出“工程化落地”与“多模态本地化”…",
+      "morluto/rea：支持从应用行为到二进制层的多层级逆…",
+      "vercel-labs/skills：官方开源的 AI 智…",
+      "DietrichGebert/ponytail：旨在通过“…",
+      "huggingface/transformers：行业标准…",
+      "run-llama/llamaindex：文档处理与 AI…"
+    ],
+    "ai-web": [
+      "数据范围：增量更新（Anthropic 4 篇，OpenA…",
+      "今日 Anthropic 密集发布了四项高价值内容，标志着…",
+      "核心观点：随着 Claude 具备自主迭代研究循环、微优化…",
+      "技术细节：Anthropic 内部构建了名为 Scion…",
+      "业务意义：此举表明 Anthropic 正为“AI 大规模…",
+      "核心观点：针对隐蔽的工业规模蒸馏攻击，Anthropic…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区围绕 AI 的讨论呈现出“模型迭代”与“信…",
+      "Gemini 4 Argon · HN：谷歌最新旗舰模型发…",
+      "Muse Wonder · HN：Meta 发布的新模型研…",
+      "GLM-Legal · HN：智谱 AI 推出法律领域专用…",
+      "AI models can provably hide a…",
+      "Redesigning source control at…"
+    ],
+    "ai-hf": [
+      "2026年10月14日，Hugging Face 热门模型…",
+      "Qwen/Qwen3.8-27B：该模型支持图像文本到文本…",
+      "Cloudflare/clef：基于 Qwen3.5 架构…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "Aleph-Alpha/Kolibri-1：采用 MoE…",
+      "Cloudflare/clef-flash：clef 的高…"
+    ],
+    "ai-community": [
+      "今日技术社区的讨论焦点已从“AI 能力炫耀”转向生产环境下…",
+      "Your Auth Check Passed. The A…",
+      "Your AI agent said it blocked…",
+      "AI Agent Governance in Produc…",
+      "I Signed a Regression and Alm…",
+      "Amnesia and déjà vu: how our…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI tools ecosystem in October 2026 is characterized…",
+      "Note: Data reflects the top 10 hottest issues/PRs highlight…",
+      "Resource & Cost Governance: Both communities are demanding…",
+      "TUI/UX Refinements: Both tools struggle with Terminal User…",
+      "Context Management: Codex is actively developing \"backgroun…",
+      "Technical Maturity & Strategy:"
+    ],
+    "ai-agents": [
+      "OpenClaw experienced high development velocity with 50 pull…",
+      "v2026.10.5-beta.3: This beta release focuses on update inte…",
+      "v2026.10.3: A stable release comprising 90 commits and 79 p…",
+      "Merged/Closed PRs: Six pull requests were updated to a merg…",
+      "Feature Advancements: Development is actively advancing in…",
+      "Fixes: Several fixes were applied to prevent fabricated ans…"
+    ],
+    "ai-trending": [
+      "The open-source AI ecosystem is currently dominated by a ma…",
+      "vercel-labs/skills：An open agent skills tool accessible via…",
+      "lyogavin/airllm：Demonstrates 2.8T LLM inference on a single…",
+      "huggingface/transformers：The foundational framework for sta…",
+      "0xPlaygrounds/rig：A modular and scalable system for buildin…",
+      "morluto/rea：Allows users to reverse-engineer anything with…"
+    ],
+    "ai-web": [
+      "Sources: Anthropic (4 new items), OpenAI (0 new items)",
+      "Anthropic has released a significant package of four new ar…",
+      "Redesigning source control at Anthropic",
+      "Analysis: This release details how Anthropic rebuilt its de…",
+      "Strengthening our defenses against distillation attacks",
+      "Analysis: Anthropic addresses the growing threat of covert…"
+    ],
+    "ai-hn": [
+      "Here is the Hacker News AI Community Digest for October 14…",
+      "The Hacker News community is currently dominated by the rel…",
+      "Gemini 4 Argon · HN：Google's new flagship model release is…",
+      "AI models can provably hide arbitrary capabilities · HN：Thi…",
+      "Muse Wonder · HN：Meta’s research division has published a n…",
+      "GLM-Legal · HN：A specialized legal model release that has g…"
+    ],
+    "ai-hf": [
+      "Qwen continues to dominate the landscape with multiple entr…",
+      "Qwen/Qwen3.8-27B：This is a large language model supporting…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：Designed for fast inference…",
+      "Aleph-Alpha/Kolibri-1：A reasoning-focused MoE model optimiz…",
+      "autotrust/JEV-35B：A system-one text classification model bu…",
+      "convaiinnovations/laya：Specialized in system-one text class…"
+    ],
+    "ai-community": [
+      "AI agent security and governance are the dominant concerns…",
+      "People Are Vibe-Coding Clones of Every Paid App. What Actua…",
+      "Your Auth Check Passed. The Agent Still Did Something Nobod…",
+      "Your AI agent said it blocked the attack. I read the source…",
+      "AI Agent Governance in Production: Permissions, Audits & Hu…",
+      "How I Built a Fully Local AI Coding Agent with Qwen 3.8, LM…"
+    ]
+  }
+}
