@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态正处于“桌面化深化”与“跨端协…",
+      "3. 共同关注的功能方向",
+      "跨端协同与会话连续性：两工具均被用户强烈要求解决多设备会话…",
+      "Windows 平台可靠性：这是双方共同的技术短板。Cla…",
+      "MCP 协议标准化与集成：社区均在推动 MCP 生态鲁棒性…",
+      "Git 工作流深度定制：开发者普遍不满默认的 Git 行为…"
+    ],
+    "ai-agents": [
+      "今日 OpenClaw 项目保持高活跃度，过去24小时内有…",
+      "今日合并/关闭的PR主要围绕网关去重与核心包清理以及用户体…",
+      "架构清理：PR #172587 完成了 Gateway、C…",
+      "体验修复：PR #172637 修复了媒体交付警告问题，解…",
+      "由于提供的PR数据中评论数多为 undefined 或 0…",
+      "PR #166516：Discord 交互状态保持。该PR…"
+    ],
+    "ai-trending": [
+      "今日 GitHub AI 生态呈现明显的“智能体运维化”与…",
+      "涵盖框架、SDK、推理引擎、开发工具及 CLI",
+      "morluto/rea：允许使用 Agent 逆向工程任何…",
+      "mksglu/context-mode：为 AI 编码智能…",
+      "HKUDS/CLI-Anything：旨在让所有软件具备…",
+      "0xPlaygrounds/rig：基于 Rust 构建模…"
+    ],
+    "ai-web": [
+      "覆盖范围: 增量更新（2026-10-14 至 2026…",
+      "今日 Anthropic 发布两项关键更新：一是针对 20…",
+      "分类: News / Policy",
+      "内容提炼: Anthropic 披露了针对 2026 年美…",
+      "战略意义: 此举展示了 Anthropic 利用自有数据（…",
+      "内容提炼: Anthropic 宣布在新加坡开设其亚太区第…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 AI 的讨论重心明显向产业风险与工程基…",
+      "Gemini 4 Argon · HN：Google 发布…",
+      "LFM2.5-24B-A2B: Built for Fas…",
+      "Redesigning source control at…",
+      "Neckbeard – A DevOps/platform…",
+      "Artificial Analysis Decision…"
+    ],
+    "ai-arxiv": [
+      "今日研究热点集中在长程自主智能体（Long-horizon…",
+      "强化学习（RL）领域显著关注可验证奖励（RLVR）下的策略…",
+      "具身智能方面，VLA（视觉-语言-动作）模型的预训练数据质…",
+      "此外，推理效率优化（如免训练解码、投机解码）与模型可解释性…",
+      "DoubtLess: Training-Free Cont…",
+      "SP$^2$ec: Adaptive Self-Specu…"
+    ],
+    "ai-hf": [
+      "本次榜单由 Qwen3.8 系列主导，其原生模型、Flas…",
+      "Qwen/Qwen3.8-27B：Qwen3.8 系列的主…",
+      "Qwen/Qwen3.8-Flash-Next：Qwen4…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "openbmb/MiniCPM-V-4.7-35B-A3B…",
+      "autotrust/JEV-35B：基于 Qwen3.5…"
+    ],
+    "ai-community": [
+      "今日技术社区聚焦于端侧 AI 的实用落地与AI Agent…",
+      "Your Browser Can Do WHAT?! 5…",
+      "I argued with AI until it apo…",
+      "Building Better Agents throug…",
+      "An Agent’s Plan Isn’t Permiss…",
+      "Memory Isn’t Learning: Why AI…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Tools Analyzed: Claude Code (Anthropic), OpenAI Codex (Open…",
+      "The AI CLI development landscape is currently defined by a…",
+      "Note: Counts reflect the top 10 hot issues and key PR progr…",
+      "Several critical requirements are emerging across both tool…",
+      "Cross-Device Session Synchronization: Both communities repo…",
+      "Sandboxing & Environment Control: Both tools are under heav…"
+    ],
+    "ai-agents": [
+      "OpenClaw experienced a high-volume development day with 50…",
+      "No new releases were published on 2026-10-15.",
+      "Major Refactoring & Cleanup: A significant portion of the 5…",
+      "Gateway & Provider Consolidation: PR #172587 (Wave-4 bundle…",
+      "Test & CI Improvements: PR #172320 adjusts CI time limits f…",
+      "While specific comment counts were not fully populated for…"
+    ],
+    "ai-trending": [
+      "Step 1 & 2: Filtering and Categorization",
+      "Note: Non-AI repositories (nvm-sh/nvm, rust-lang/rust, xtoo…",
+      "The open-source AI ecosystem is experiencing a surge in spe…",
+      "morluto/rea：A TypeScript tool that enables agents to revers…",
+      "mksglu/context-mode：An optimization layer for AI coding age…",
+      "headroomlabs-ai/headroom：A compression library that reduces…"
+    ],
+    "ai-web": [
+      "Scope: Incremental Update (Anthropic & OpenAI)",
+      "Anthropic released a dedicated policy update on \"Preparing…",
+      "Concurrently, Anthropic announced the opening of its 5th As…",
+      "The Singapore MOU focuses explicitly on areas of cooperatio…",
+      "OpenAI reported zero new content in the incremental update…",
+      "These two Anthropic releases suggest a dual-track strategy…"
+    ],
+    "ai-hn": [
+      "Today's Highlights",
+      "The community's attention is currently dominated by Gemini…",
+      "Top News & Discussions",
+      "Gemini 4 Argon · HN：This release is the focal point of the…",
+      "LFM2.5-24B-A2B: Built for Fast On-Device Agents · HN：Liquid…",
+      "Why do LLM pelicans look like this? · HN：This post uses a v…"
+    ],
+    "ai-arxiv": [
+      "Today's submissions demonstrate a maturation of agentic fra…",
+      "DoubtLess: Training-Free Contrastive Decoding for Efficient…",
+      "Jeva: System One Models from First Principles：Argues that c…",
+      "Read the Room Before Your Model Generates：Introduces a geom…",
+      "Tev: Scaling Long-Horizon Agentic Environments with Dense P…",
+      "Hybrid Reasoning Agents：Bridges text-based LLM agents with…"
+    ],
+    "ai-hf": [
+      "The Hugging Face ecosystem is dominated by an explosive sur…",
+      "Qwen/Qwen3.8-27B：A 27B parameter multimodal language model…",
+      "Qwen/Qwen3.8-Flash-Next：An optimized \"Flash\" variant of the…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：A state-of-the-art LLM from…",
+      "Cloudflare/clef：A specialized Qwen-based model likely tailo…",
+      "Lightricks/LTX-2.5：A high-quality diffusion model for image…"
+    ],
+    "ai-community": [
+      "The AI developer community is currently deeply focused on a…",
+      "Your Browser Can Do WHAT?! 5 AI Features That Actually Work…",
+      "Building Better Agents through End-to-End Evals：Argues that…",
+      "I argued with AI until it apologized for calling my course…",
+      "Design for Churn：Proposes that the key design shift in the…",
+      "An Agent’s Plan Isn’t Permission：A security-focused piece w…"
+    ]
+  }
+}
