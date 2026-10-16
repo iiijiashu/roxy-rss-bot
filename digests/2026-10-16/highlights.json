@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "以下基于 2026-10-16 Claude Code 与…",
+      "当前 AI CLI 工具生态正从基础代码生成向精细化工作流…",
+      "交互效率与自定义预设：",
+      "Codex 全面投入 TUI 预设系统（/presets）…",
+      "Claude Code 社区也在呼吁更高效的会话管理与长任…",
+      "权限管理与同步稳定性："
+    ],
+    "ai-agents": [
+      "OpenClaw 项目今日保持高度活跃状态，过去24小时内…",
+      "今日共有 3 个 Release 更新，涉及 Beta 通…",
+      "核心更新：Gateway 性能显著提升。针对聊天轮次、会话…",
+      "技术细节：更多数据库操作被移至 Worker 线程，确保在…",
+      "核心更新：更新机制可靠性增强。修复了 macOS 在别名临…",
+      "技术细节：快照失败在更早期被识别，防止状态不一致。"
+    ],
+    "ai-trending": [
+      "今日 GitHub AI 生态呈现金字塔结构，底层推理与数…",
+      "lightseekorg/tokenspeed：号称“光速…",
+      "xerj-org/xerj：为 AI 设计的新型数据搜索工…",
+      "mksglu/context-mode：AI 编码 Age…",
+      "JuliusBrussee/caveman：通过“原始人式…",
+      "NationalSecurityAgency/ghidra…"
+    ],
+    "ai-web": [
+      "说明：本期为增量更新，重点梳理今日（基于 2026-10…",
+      "今日 AI 领域的官方动态由 Anthropic 主导，主…",
+      "治理层：Anthropic 宣布给予第三方独立评估机构 M…",
+      "基建层：Anthropic 揭示了其工程团队的重大转变，内…",
+      "OpenAI 动向：OpenAI 同步上线了面向学术界的新…",
+      "原文：An update on independent e…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 AI 的讨论呈现出“技术乐观”与“落地…",
+      "Gemini 4 Argon · HN：Google De…",
+      "LFM2.5-24B-A2B: Built for fas…",
+      "Muse Spark Open · HN：Meta 研究博…",
+      "Redesigning source control at…",
+      "Anthropic's Scion is heavily…"
+    ],
+    "ai-arxiv": [
+      "今日投稿显示出 AI 研究正从单纯的性能提升向系统性鲁棒性…",
+      "Your Transformer Is Secretly…",
+      "Continuum Attention：引入连续注意力（C…",
+      "ReaDy: Recurrent States as Dy…",
+      "Manacá-1B-Instruct-2: Reprodu…",
+      "ChronoCulture: Evaluating Cul…"
+    ],
+    "ai-hf": [
+      "Qwen 系列持续主导榜单，其 Qwen3.8 系列（包括…",
+      "主要包含纯文本生成、对话及指令遵循模型。",
+      "LiquidAI/LFM2.5-24B-A2B：Liqui…",
+      "ConwayResearch/Underdog-Saluk…",
+      "convaiinnovations/laya：一款基于“系…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…"
+    ],
+    "ai-community": [
+      "今日社区焦点高度集中在 AI 编码代理（Agent）的工程…",
+      "I built a lie detector for AI…",
+      "I Vibe-Coded My Way Out of An…",
+      "Scope-Creep Guard: A Local Ge…",
+      "Your model router is a classi…",
+      "AI-Generated Tests Can Agree…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI tooling landscape has matured beyond basic code…",
+      "Note: Claude Code's digest reported only 1 updated PR in th…",
+      "Session Continuity & State Management: Both communities are…",
+      "Context & Token Efficiency: Developers of both tools are de…",
+      "Cross-Platform OS Integration: Both tools face critical blo…",
+      "OpenAI Codex: Demonstrates higher iteration velocity today…"
+    ],
+    "ai-agents": [
+      "OpenClaw reported a highly active development cycle with 50…",
+      "v2026.10.10-beta.1: openclaw/openclaw releases",
+      "Highlights: Enhanced Gateway stability and responsiveness…",
+      "Implication: Improved performance for busy hosts and large…",
+      "v2026.10.5-beta.4: openclaw/openclaw releases",
+      "Highlights: Improved update reliability. Fixed macOS update…"
+    ],
+    "ai-trending": [
+      "The open-source AI ecosystem is showing a massive pivot tow…",
+      "🔧 AI Infrastructure",
+      "lightseekorg/tokenspeed：A \"speed-of-light\" LLM inference en…",
+      "xerj-org/xerj：An Elasticsearch-compatible engine that auto…",
+      "headroomlabs-ai/headroom：A compression library for tool out…",
+      "🤖 AI Agents / Workflows"
+    ],
+    "ai-web": [
+      "Today's Highlights",
+      "Anthropic has significantly escalated its safety governance…",
+      "Anthropic / Claude Content Highlights",
+      "Published/Updated: 2026-10-15",
+      "Core Insights: Anthropic has initiated deep collaboration w…",
+      "Published/Updated: 2026-10-15 (Note: Article body dated Aug…"
+    ],
+    "ai-hn": [
+      "The community is intensely focused on the implications of G…",
+      "Gemini 4 Argon · HN：The highest-scoring post of the day, th…",
+      "Muse Spark Open · HN：Meta's new open model release is being…",
+      "LFM2.5-24B-A2B: Built for fast on-device agents · HN：This o…",
+      "Redesigning source control at Anthropic · HN：A deep dive in…",
+      "Using AI to reverse engineer hardware · HN：Demonstrates pra…"
+    ],
+    "ai-arxiv": [
+      "Here is the ArXiv AI Research Digest for 2026-10-16.",
+      "Today’s research landscape shows a strong pivot toward agen…",
+      "Your Transformer Is Secretly Elastic：Proposes that transfor…",
+      "Manacá-1B-Instruct-2：Documents the safety alignment of a na…",
+      "The COUNT：Demonstrates that counting n-grams allows for sca…",
+      "Recovering Reliable Supervision via Critique-Guided On-Poli…"
+    ],
+    "ai-hf": [
+      "Qwen dominates the trending list with multiple high-engagem…",
+      "Qwen/Qwen3.8-27B：A powerful multi-modal language model that…",
+      "Qwen/Qwen3.8-Flash-Next：An experimental fast-version of the…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：A highly efficient language…",
+      "LiquidAI/LFM2.5-24B-A2B：A Mixture-of-Experts architecture d…",
+      "convaiinnovations/laya：A specialized text classification mo…"
+    ],
+    "ai-community": [
+      "Today's Highlights",
+      "Developers are grappling with the reliability of AI coding…",
+      "Dev.to Highlights",
+      "I Vibe-Coded My Way Out of Angular Upgrades：The author shar…",
+      "I built a lie detector for AI coding agents. Then I read th…",
+      "Scope-Creep Guard: A Local Gemma AI That Tells Clients \"Tha…"
+    ]
+  }
+}
