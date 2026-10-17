@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态正从单一线程的编码辅助向多 A…",
+      "注：数量基于提供的 2026-10-17 摘要数据，未包含…",
+      "3. 共同关注的功能方向",
+      "Windows 平台深度适配与稳定性：两家工具的社区均将…",
+      "会话与状态管理可靠性：多平台用户面临长任务中断风险。Cla…",
+      "资源效率与 Token 优化：双方社区均对成本与性能极度敏…"
+    ],
+    "ai-agents": [
+      "今日 OpenClaw 保持极高开发活跃度，过去 24 小…",
+      "v2026.10.4 发布，重点解决 Gateway 稳定…",
+      "Gateway 心跳修复：修复了电脑休眠或系统时钟跳转后…",
+      "关闭/重启挂起修复：Gateway 关闭和重启不再出现挂起…",
+      "迁移注意事项：对于长期部署的 Gateway 实例，升级此…",
+      "今日无合并记录，所有显著进展均为待合并状态，主要方向包括："
+    ],
+    "ai-trending": [
+      "今日 AI 开源生态呈现“Agent 基建层”与“垂直领域…",
+      "anthropics/claude-plugins-off…",
+      "affaan-m/ECC：Agent Harness 性能…",
+      "mksglu/context-mode：专为 AI 编码智…",
+      "xerj-org/xerj：新一代 AI 数据搜索工具，通…",
+      "huggingface/transformers：行业标准…"
+    ],
+    "ai-web": [
+      "数据范围: Anthropic (claude.com /…",
+      "Anthropic 于 2026 年 10 月 16 日集…",
+      "核心观点: Anthropic 红队团队解决了困扰密码学社…",
+      "业务/技术意义: 此举旨在终结关于 ECDSA（Anthr…",
+      "核心观点: 报告显示美国公众与 Anthropic 员工对…",
+      "业务/技术意义: 数据指出，员工因直接接触前沿模型，对 A…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区呈现出“前沿模型爆发”与“现实工程落地”并…",
+      "Muse Spark Open · HN：Meta 重磅开…",
+      "Gemini 4 Argon · HN：今日分数最高的帖子…",
+      "Krea 3 – An image model built…",
+      "Designing more efficient quan…",
+      "How the Claude Code team does…"
+    ],
+    "ai-arxiv": [
+      "今日研究重点从单纯的模型规模扩张转向系统化的部署效率与智能…",
+      "Designing Transformers for Co…",
+      "Rethinking Routing Exploratio…",
+      "BitSparse: Compact Activation…",
+      "Knowledge That Is Linear Befo…",
+      "Towards Continual Learning: M…"
+    ],
+    "ai-hf": [
+      "今日榜单由 Qwen3.8-27B 以 17,854 点赞…",
+      "Qwen/Qwen3.8-27B：本次榜单人气与下载量双料…",
+      "Qwen/Qwen3.8-Flash-Next：主打轻量级…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "LiquidAI/LFM2.5-24B-A2B：Liqui…",
+      "jialinyyzz/humanizer：基于 Gemma…"
+    ],
+    "ai-community": [
+      "今日技术社区对 AI 的讨论重心从单纯的能力展示转向了工程…",
+      "What I Look for Before Trusti…",
+      "The Bug Lives at the Seam, No…",
+      "What I Actually Learn When I…",
+      "Help Your Coding Assistant Fi…",
+      "Harnessing the Nondeterminist…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI developer tooling landscape is characterized by a bi…",
+      "Windows Platform Stability: Both communities report high-fr…",
+      "Sandbox & Security Granularity: There is a concurrent push…",
+      "Session & State Persistence: Both tools are grappling with…",
+      "Technical Approach:",
+      "Claude Code: Emphasizes client-side configurability (e.g…"
+    ],
+    "ai-agents": [
+      "The OpenClaw project remains highly active with high-veloci…",
+      "v2026.10.4 was released today.",
+      "Highlights: The Gateway no longer restarts itself when the…",
+      "Contributors: Thanks to @AnvinaLI, @sgh6688, @waynegault, a…",
+      "UI Refactoring (Solid.js Migration): A major portion of tod…",
+      "Performance Optimization: PR #174801 was closed/merged, opt…"
+    ],
+    "ai-trending": [
+      "The open-source AI ecosystem is showing a massive shift tow…",
+      "anthropics/claude-plugins-official：The official, Anthropic…",
+      "mksglu/context-mode：A context window optimization system fo…",
+      "xerj-org/xerj：A new data indexing tool that allows AI to se…",
+      "headroomlabs-ai/headroom：Compresses tool outputs, logs, and…",
+      "affaan-m/ECC：An agent harness performance optimization syst…"
+    ],
+    "ai-web": [
+      "Anthropic released a significant cluster of four research p…",
+      "Research & Economics",
+      "How employment is changing at Anthropic",
+      "Insight: This report serves as a leading indicator for the…",
+      "The AI expectations gap",
+      "Insight: A comparative study between US adults and Anthropi…"
+    ],
+    "ai-hn": [
+      "The Hacker News community is currently captivated by major…",
+      "Gemini 4 Argon · HN：The release of Google's new flagship mo…",
+      "Muse Spark Open · HN：Meta's open-weight release has sparked…",
+      "Anthropic assigned highest junk credit rating in June · HN…",
+      "Claude reveals ECDSA curve origins · HN：Researchers are ana…",
+      "How to make System 1 LLMs show System 2 competencies? · HN…"
+    ],
+    "ai-arxiv": [
+      "Recent submissions indicate a pivot toward agentic robustne…",
+      "Designing Transformers for Continuous Diffusion Language Mo…",
+      "CAT-alyzing Honesty: Continuous Adversarial Training for Tr…",
+      "Evaluation Awareness Beyond English: Do LLMs Act Differentl…",
+      "LEASH: Uncertainty-Aware Weak-to-Strong Escalation and Over…",
+      "A team of Gemini 4 Argon agents beats Minecraft：Demonstrate…"
+    ],
+    "ai-hf": [
+      "Qwen dominates the trend list with multiple top-ranked entr…",
+      "Qwen3.8-27B：A flagship multimodal LLM capable of handling i…",
+      "Qwen3.8-Flash-Next：An experimental, fast inference variant…",
+      "DeepSeek-V4.1-Flash：A high-performance open-weights model f…",
+      "LFM2.5-24B-A2B：A Mixture of Experts (MoE) language model fr…",
+      "d1-3B：A compact 3B parameter multimodal model designed for…"
+    ],
+    "ai-community": [
+      "Today’s discussion across Dev.to and Lobste.rs is heavily c…",
+      "What I Look for Before Trusting an AI App Builder With a Re…",
+      "The Bug Lives at the Seam, Not in the Logic：This post highl…",
+      "What I Actually Learn When I Build With AI：A reflective pie…",
+      "Harnessing the Nondeterministic Machine: Practical Lessons…",
+      "Don't Assume Your Cloud T4 Runs at Spec: Gemma 4 Decode Fal…"
+    ]
+  }
+}
