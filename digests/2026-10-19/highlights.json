@@ -1,0 +1,118 @@
+{
+  "zh": {
+    "ai-cli": [
+      "基于 2026-10-19 的社区数据，以下是关于 Cla…",
+      "当前 AI CLI 工具生态正从单纯的代码生成向全栈自动化…",
+      "尽管技术路线不同，两大社区的诉求在以下三个维度高度重叠：",
+      "会话生命周期管理：",
+      "Claude Code: 关注会话归档不可逆（#67835…",
+      "OpenAI Codex: 关注会话恢复失败（#19397…"
+    ],
+    "ai-agents": [
+      "过去24小时内，OpenClaw 社区活跃度极高，共记录…",
+      "v2026.10.5 发布",
+      "更新重点：openclaw update 命令在跨设备、文…",
+      "自愈机制：针对陈旧的手交租约（stale handoff…",
+      "迁移注意：该版本主要优化更新器的鲁棒性，对于正在使用旧版本…",
+      "今日合并/关闭的重要 PR 推动了以下核心能力的演进："
+    ],
+    "ai-trending": [
+      "以下是基于 2026-10-19 提供的数据生成的《AI…",
+      "Trending 榜单过滤：",
+      "保留：MadsLorentzen/ai-job-searc…",
+      "略去：Kruk2/jasna (虽用于视频修复，但描述仅为…",
+      "主题搜索过滤：",
+      "保留所有带有 llm-model, vector-db…"
+    ],
+    "ai-web": [
+      "数据源: Anthropic (claude.com /…",
+      "Anthropic 发布重磅新闻，宣布成立“公共受益基金”…",
+      "核心观点: Anthropic 宣布设立“公共受益基金”…",
+      "业务意义: 此举明确了公司的公共受益公司（PBC）属性，不…",
+      "核心观点: 这三篇报告共同构成了 Anthropic 对“…",
+      "技术细节: 研究发现，随着 AI 工具采用率提高，员工产出…"
+    ],
+    "ai-hn": [
+      "《Hacker News AI 社区动态日报》 (2026…",
+      "今日 HN 社区对 AI 的讨论呈现出“前沿研究与工程落地…",
+      "DeepSeek-v4.1-Flash-1017 · HN…",
+      "Muse Spark Open · HN：Meta 推出该…",
+      "Neural networks are clean · H…",
+      "Hyper Optimizing Kimi K3 in v…"
+    ],
+    "ai-hf": [
+      "今日 Hugging Face 趋势显著偏向 Qwen3…",
+      "Qwen/Qwen3.8-27B：本周点赞与下载双料冠军…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "Qwen/Qwen3.8-Flash-Next：主打极致低…",
+      "tencent/Hy-Memory-30B-A3B：腾讯发…",
+      "LiquidAI/LFM2.5-24B-A2B：Liqui…"
+    ],
+    "ai-community": [
+      "今日 Dev.to 社区热度集中在 Hacktoberfe…",
+      "Fine-Tuning Qwen3-8B with Tin…",
+      "A Drift Detector That Cries W…",
+      "Bookmark It! STOP Shipping Br…",
+      "Munshi: a WhatsApp front desk…",
+      "I built the world's fastest A…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI development landscape on 2026-10-19 is character…",
+      "Both communities are converging on three specific technical…",
+      "Context Management & Visibility: Both tools face pressure t…",
+      "Observability of Agent Workflows: There is a shared need fo…",
+      "Remote/Device Parity: Both tools are struggling to make the…",
+      "Target User & Environment:"
+    ],
+    "ai-agents": [
+      "OpenClaw released v2026.10.5 today, a maintenance-focused u…",
+      "v2026.10.5 (Release Page)",
+      "Highlight: Resilient update lifecycle. openclaw update now…",
+      "Stability: The release ensures updates finish and recover o…",
+      "Migration Notes: No explicit breaking changes noted in the…",
+      "Merged/Closed PRs today focused on UI performance and bug f…"
+    ],
+    "ai-trending": [
+      "The developer ecosystem is seeing a surge in infrastructure…",
+      "Frameworks, SDKs, inference engines, and development tools.",
+      "MadsLorentzen/ai-job-search：A local job application framewo…",
+      "anomalyco/opencode：An open-source coding agent that serves…",
+      "anthropics/claude-plugins-official：The official directory o…",
+      "Kruk2/jasna：A video restoration tool that utilizes AI to en…"
+    ],
+    "ai-web": [
+      "Anthropic has released a concentrated batch of six new arti…",
+      "Investing in the public benefit (Published: 2026-10-18)",
+      "Anthropic is establishing a Public Benefit Fund as a wholly…",
+      "Working at the frontier shapes expectations for the future…",
+      "This overview article summarizes two accompanying reports o…",
+      "How employment is changing at Anthropic (Published: 2026-10…"
+    ],
+    "ai-hn": [
+      "Today's Highlights",
+      "Hacker News is dominated by a surge in high-engagement disc…",
+      "Top News & Discussions",
+      "🔬 Models & Research",
+      "DeepSeek-v4.1-Flash-1017 · HN：This release marks a signific…",
+      "Muse Spark Open · HN：Meta's open release of a major model v…"
+    ],
+    "ai-hf": [
+      "Today's Highlights",
+      "Qwen3.8-27B leads the weekly likes chart with nearly 18,000…",
+      "Trending Models",
+      "Qwen/Qwen3.8-27B：This is a large-scale conversational model…",
+      "deepseek-ai/DeepSeek-V4.1-Flash：A fast, text-generation cap…",
+      "Qwen/Qwen3.8-Flash-Next：An experimental next-generation var…"
+    ],
+    "ai-community": [
+      "The AI developer community is currently grappling with the…",
+      "Bookmark It! STOP Shipping Broken Vibe Code: 10 Checks That…",
+      "Fine-Tuning Qwen3-8B with Tinker: From 50% to 76% Accuracy…",
+      "My AI Experiment Was Going Great Until My Client Replied 😂…",
+      "GlowUp Local: Using Open-Source AI to Help Local Businesses…",
+      "A Drift Detector That Cries Wolf Is Worse Than No Detector…"
+    ]
+  }
+}
