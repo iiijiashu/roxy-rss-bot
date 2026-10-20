@@ -1,0 +1,118 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态已进入稳定性深水区与企业级合规…",
+      "多端同步与远程协作稳定性：",
+      "Claude Code：用户反馈远程控制会话消息丢失、De…",
+      "OpenAI Codex：iOS 与 Desktop 项目…",
+      "共性诉求：建立“单一事实来源”的跨设备数据一致性机制，消除…",
+      "认证与凭证生命周期管理："
+    ],
+    "ai-agents": [
+      "OpenClaw 过去 24 小时保持高活跃度，新增/活跃…",
+      "v2026.10.10-beta.2 发布。",
+      "更新内容：修复工作区安全问题，拒绝在多文件 applypa…",
+      "迁移注意事项：无明确破坏性变更记录，但涉及工作区文件操作的…",
+      "今日合并/关闭的 PR 为 4 条，主要涉及代码清理与底层…",
+      "[CLOSED] PR #177717 refactor(…"
+    ],
+    "ai-trending": [
+      "AI 编码智能体（Coding Agent）生态爆发，成为…",
+      "Trending 榜单中，7 个 / 12 个 仓库与 A…",
+      "本地推理与扩散模型方面，ComfyUI 再次登顶（+1,0…",
+      "RAG 与记忆层基础设施（headroom、ai-memo…",
+      "垂直场景应用如金融（Kronos、dailystockan…",
+      "tensorflow/tensorflow：通用 ML 框…"
+    ],
+    "ai-web": [
+      "Anthropic 于 10 月 15 日发布了关于“独立…",
+      "核心洞察：该研究揭示了“内部预期”与“公众预期”之间显著的…",
+      "核心洞察：这是 Anthropic 在安全治理上的关键制度…",
+      "状态说明：⚠️ 数据受限",
+      "本次抓取仅获取了元数据，标题由 URL 路径推断，未包含正…",
+      "该标题在 OpenAI 列表中重复出现两次，可能为抓取缓存…"
+    ],
+    "ai-hn": [
+      "《Hacker News AI 社区动态日报》（2026…",
+      "今日 HN 社区对 DeepSeek 新模型保持高度关注…",
+      "DeepSeek-v4.1-Flash-1017 · HN…",
+      "Timestral: Mistral's time-ser…",
+      "Hybrid Reasoning Agents: LLM…",
+      "Claude reveals ECDSA curve or…"
+    ],
+    "ai-hf": [
+      "今日榜单由 Qwen3.8 系列主导，其中 Qwen/Qw…",
+      "Qwen/Qwen3.8-27B：支持图像文本交互的多模态…",
+      "Qwen/Qwen3.8-Flash-Next：Qwen3…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "LiquidAI/LFM2.5-24B-A2B：一个 24…",
+      "tencent/Hy-Memory-30B-A3B：腾讯发…"
+    ],
+    "ai-community": [
+      "今日社区讨论焦点已从单纯的模型能力转向Agent 的可靠性…",
+      "Your agent's retry bug isn't…",
+      "I built an AWS agent that sco…",
+      "The Verification Trap: Why Ge…",
+      "I put a logging proxy in fron…",
+      "Why your MCP servers are secr…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI development landscape in late 2026 is characteri…",
+      "Note: Counts reflect the specific top 10 items highlighted…",
+      "Enterprise VCS Integration: Both communities are demanding…",
+      "Secure Credential Management: Both tools are enhancing how…",
+      "Observability & Tracing: There is a shared need for better…",
+      "Feature Focus: Claude Code is prioritizing security policy…"
+    ],
+    "ai-agents": [
+      "OpenClaw Project Digest — 2026-10-20",
+      "1. Today's Overview",
+      "OpenClaw remains in a highly active development phase, char…",
+      "v2026.10.10-beta.2:",
+      "Focus: Workspace safety and I/O reliability.",
+      "Changes: Introduces a safeguard to reject multi-file applyp…"
+    ],
+    "ai-trending": [
+      "The most significant trend is the explosive growth of \"agen…",
+      "Comfy-Org/ComfyUI：A modular diffusion model GUI and backend…",
+      "anthropics/claude-code：The official agentic coding tool fro…",
+      "ollama/ollama：The standard for running local LLMs like Kimi…",
+      "pytorch/pytorch：The industry-standard framework for dynamic…",
+      "HKUDS/CLI-Anything：A new project aiming to make \"ALL softwa…"
+    ],
+    "ai-web": [
+      "Sources: Anthropic, OpenAI",
+      "Anthropic's Strategic Pivot to Public Accountability: Anthr…",
+      "The Quantification of the \"AI Expectations Gap\": Anthropic…",
+      "OpenAI's Data Curation Limitation: The current crawl of Ope…",
+      "Article: Anthropic update on independent evaluators",
+      "Publication Date: 2026-10-19"
+    ],
+    "ai-hn": [
+      "Today's Highlights",
+      "Hacker News is heavily focused on the latest open-weight mo…",
+      "Top News & Discussions",
+      "DeepSeek-v4.1-Flash-1017 · HN：This open-weight release trig…",
+      "Timestral: Mistral's time-series foundation models · HN：A n…",
+      "Hybrid Reasoning Agents: LLM agents that think in latent sp…"
+    ],
+    "ai-hf": [
+      "Today's Highlights",
+      "The Hugging Face ecosystem is currently dominated by a surg…",
+      "Trending Models",
+      "🧠 Language Models (LLMs, chat models, instruction-tuned)",
+      "Qwen3.8-27B：A flagship multimodal LLM that pairs text gener…",
+      "DeepSeek-V4.1-Flash：A fast, instruction-tuned multimodal mo…"
+    ],
+    "ai-community": [
+      "The developer community is heavily focused on the practical…",
+      "Your agent's retry bug isn't an AI problem. It's a distribu…",
+      "I built an AWS agent that scores any GitHub repo before you…",
+      "The Verification Trap: Why Generative AI Is Making Senior E…",
+      "Persistent Agent Teams: Recreating the Grok Bot Experience…",
+      "Why your MCP servers are secretly eating 30,000 tokens per…"
+    ]
+  }
+}
