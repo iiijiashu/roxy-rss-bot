@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态已进入“企业化与标准化”关键期…",
+      "注：Claude Code 的 PR 数据仅为过去 24…",
+      "3. 共同关注的功能方向",
+      "MCP 鉴权稳定性：Claude Code 与 OpenA…",
+      "跨平台浏览器交互：两者在 Windows 环境下均出现浏览…",
+      "会话生命周期管理：均存在因高频任务或归档需求导致的界面杂乱…"
+    ],
+    "ai-agents": [
+      "OpenClaw 项目当前处于高活跃维护阶段，过去 24…",
+      "今日合并/关闭的 6 个 PR 主要涉及文档澄清与针对性修…",
+      "UI 文档审计：PR #178880 关闭，统一了 Wav…",
+      "客诉通知 Bug 修复：PR #178164 已合并（状态…",
+      "X 渠道安全修复：PR #178861 关闭，涉及在 X…",
+      "测试重构：PR #178691 合并，移除了低价值的测试脚…"
+    ],
+    "ai-trending": [
+      "今日 AI 开源生态呈现出“智能体基础设施化”与“垂直场景…",
+      "编码智能体（Coding Agents）占据绝对主导：Tr…",
+      "金融领域的 AI 基础模型首次登榜：Kronos 作为金融…",
+      "RAG 技术栈持续成熟：向量数据库与 RAG 引擎（如 M…",
+      "多智能体协作（Multi-Agent Swarms）兴起…",
+      "vllm-project/vllm：高性能 LLM 推理引…"
+    ],
+    "ai-web": [
+      "科学探索纵深： Anthropic 密集发布生命科学成果…",
+      "网络安全防御常态化： 启动“Anthropic Cyber…",
+      "经济影响量化： 发布《AI 预期差距》及内部就业结构分析…",
+      "公司治理与透明度： 成立“公共收益基金”（Public B…",
+      "OpenAI 动作： 今日仅捕获 1 条元数据记录：宣布收…",
+      "核心内容： 成立 Anthropic 公共收益基金（Pub…"
+    ],
+    "ai-hn": [
+      "2026-10-21 的 Hacker News AI 社…",
+      "Voxtral 3 · HN：Mistral 发布新一代语…",
+      "Gemini 4 Argon is now availab…",
+      "SlopCodeBench 10/2026 – Opus…",
+      "Hybrid Reasoning Agents: LLM…",
+      "You could have invented trans…"
+    ],
+    "ai-arxiv": [
+      "今日研究焦点集中在多智能体系统的协作与导航、大规模模型推理…",
+      "Competing Learning in Hybrid…",
+      "Kronecker Delta Rule for Long…",
+      "Scaling Parameter-Efficient F…",
+      "Safety Mid-Training: Internal…",
+      "TokenGate: Adapting LLMs for…"
+    ],
+    "ai-hf": [
+      "本周 Hugging Face 榜单由 Qwen 和 Li…",
+      "Qwen/Qwen3.8-27B：本周热度最高模型，通用对…",
+      "Qwen/Qwen3.8-Flash-Next：Qwen…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "jialinyyzz/humanizer：基于 Gemma…",
+      "Qwen/Qwen3.8-Flash-Next-FP4-L…"
+    ],
+    "ai-community": [
+      "技术社区 AI 动态日报 (2026-10-21)",
+      "今日技术社区焦点集中在 AI 代理（Agent）的工程化落…",
+      "Building an Open-Source Suppo…",
+      "Somewhere, Coding Stopped Bei…",
+      "The Hardest Part of Robotics…",
+      "Is Claude taking control of m…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Cross-Tool AI CLI Comparison Report (2026-10-21)",
+      "The AI CLI tooling ecosystem is currently navigating a crit…",
+      "Enterprise Security & OAuth Stability: Both communities are…",
+      "Sandboxing & Environment Configuration: Significant technic…",
+      "Browser Automation & State Management: Both tools face \"bro…",
+      "Technical Approach: Codex is in a high-velocity \"hardening\"…"
+    ],
+    "ai-agents": [
+      "OpenClaw experienced high development activity on October 2…",
+      "Security & Policy Enhancements: Two security-sensitive PRs…",
+      "Test Suite Optimization: A major portion of today's activit…",
+      "Core Stability Fixes: PR #178883 addresses a Linux worker c…",
+      "Activity is concentrated among core maintainers (e.g., stei…",
+      "Security Boundary Audit: The highest priority \"hot\" items a…"
+    ],
+    "ai-trending": [
+      "Step 1 (Filter)",
+      "All trending repositories are filtered as AI-related. Non-A…",
+      "Step 2 (Categorize)",
+      "Trending: All 13 repos are AI-relevant.",
+      "Vector-DB: Assigned to 🔍 RAG / Knowledge (except f/prompts…",
+      "ML: Assigned to 🧠 LLMs / Training (foundational ML framewor…"
+    ],
+    "ai-web": [
+      "AI Official Content Tracking Report — 2026-10-21",
+      "Today’s incremental update reveals a heavy strategic push b…",
+      "Research & Science",
+      "Protein Binder Design & Novel Enzymes: Anthropic shared det…",
+      "Quantum & Mathematics: Research demonstrated that Claude si…",
+      "Cyber Defense & Attack Surface: The Frontier Red Team publi…"
+    ],
+    "ai-hn": [
+      "The community is currently dominated by a mix of high-level…",
+      "DeepInfer: High-performance inference framework for DeepSee…",
+      "Voxtral 3 · HN：Mistral's new release focuses on multimodal…",
+      "Hybrid Reasoning Agents: LLM agents that think in latent sp…",
+      "Gemini 4 Argon is now available for everyone · HN：Google's…",
+      "Launch HN: Respan (YC W24) – Open-source Rust AI gateway bu…"
+    ],
+    "ai-arxiv": [
+      "The recent batch of submissions reveals a strong pivot towa…",
+      "Text-to-Image Generative Modeling Without Language Pretrain…",
+      "MemT-1.0: Towards Memory-Native Evolution：Proposes a founda…",
+      "TokenGate: Adapting LLMs for Fast and Memory-Efficient Pref…",
+      "Safety Mid-Training: Internalizing LLM Safety：Shifts safety…",
+      "Same Simulation, Different Evidence: Where Retrieved Tool O…"
+    ],
+    "ai-hf": [
+      "Today's Highlights",
+      "The Hugging Face ecosystem is currently dominated by high-p…",
+      "Trending Models",
+      "🧠 Language Models (LLMs, chat models, instruction-tuned)",
+      "Qwen3.8-27B：A dense 27B parameter image-text-to-text model…",
+      "Qwen3.8-Flash-Next：An experimental open-weight variant desi…"
+    ],
+    "ai-community": [
+      "Today's Highlights",
+      "The community is actively debating the impact of AI coding…",
+      "Dev.to Highlights",
+      "Somewhere, Coding Stopped Being Allowed to Be Fun：Explores…",
+      "The quietest backdoor runs on your own GPU：Details how a 7B…",
+      "OpenCode lost the keys that lived in its cloud. The ones on…"
+    ]
+  }
+}
