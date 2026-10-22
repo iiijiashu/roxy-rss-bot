@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "2026年10月下旬，主流 AI CLI 工具已从“功能可…",
+      "企业级认证与安全 (OAuth/MCP)：",
+      "Claude Code：遭遇 OAuth 登录死锁（#93…",
+      "Codex：修复 OAuth 状态丢失（#54924），新…",
+      "诉求：稳定、可审计且符合企业合规的认证流程。",
+      "会话状态与数据完整性："
+    ],
+    "ai-agents": [
+      "今日 OpenClaw 项目活跃度较高，主要集中在于工程基…",
+      "发布链接: OpenClaw Release v2026…",
+      "主要更新:",
+      "Windows 可靠性增强: 恢复了新状态初始化（Fres…",
+      "UI 体验优化: 在应用更新期间隐藏 SQLite 辅助窗…",
+      "安装器修复: 强制 Gateway 重装时增加了容错机制…"
+    ],
+    "ai-trending": [
+      "今日 GitHub AI 开源生态呈现出“智能体基础设施精…",
+      "vllm-project/vllm：针对 LLM 的高吞吐…",
+      "Comfy-Org/ComfyUI：模块化扩散模型 GUI…",
+      "headroomlabs-ai/headroom：在数据到…",
+      "akitaonrails/ai-memory：针对智能体编…",
+      "stablyai/orca：智能体集群（Fleet of…"
+    ],
+    "ai-web": [
+      "今日 Anthropic 集中更新了 9 篇深度内容，核心…",
+      "Enterprise Frontier Safeguard…",
+      "核心观点：Anthropic 宣布推出 EFS，结合零数据…",
+      "业务意义：此举旨在解决“前沿安全”与“数据隐私”的困境，支…",
+      "发布信息：发布于 2026-09-01（今日增量收录），原…",
+      "Christopher Stubbs 加入长期利益信托（L…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区热议焦点集中在 OpenAI 的安全合作与…",
+      "Voxtral 3 · HN：Mistral 发布的最新模…",
+      "Claude designed protein binde…",
+      "SlopCodeBench 10/2026 – Opus…",
+      "DeepInfer: High-performance i…",
+      "The bridge to agent-scale Git…"
+    ],
+    "ai-arxiv": [
+      "今日投稿重点关注大语言模型的效率优化与能耗分析，如 Tok…",
+      "The Token-Energy Law of LLM D…",
+      "BitMTP: When Multi-Token Pred…",
+      "Large Flow Language Models：介绍…",
+      "When Do LLMs Help with Featur…",
+      "DecisionPivot: A Diagnostic B…"
+    ],
+    "ai-hf": [
+      "今日榜单由 Qwen 家族强势主导，其中 Qwen3.8…",
+      "Qwen/Qwen3.8-27B：旗舰级多模态对话模型，下…",
+      "Qwen/Qwen3.8-Flash-Next：高速推理版…",
+      "jialinyyzz/humanizer：基于 Gemma…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "LiquidAI/LFM2.5-24B-A2B：采用 Mo…"
+    ],
+    "ai-community": [
+      "AI Agent 的工程化与安全治理是今日社区讨论的核心…",
+      "Idempotency keys for AI agent…",
+      "Who watches the watcher when…",
+      "AI Made Coding Cheaper. So Wh…",
+      "MCP vs function calling: whic…",
+      "OpenAI's 12-hour prompt cache…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Ecosystem Overview",
+      "The AI CLI tool landscape is shifting toward enterprise-gra…",
+      "Activity Comparison",
+      "Note: Counts reflect specific items detailed in the 2026-10…",
+      "Shared Feature Directions",
+      "Remote & Headless Execution: Both communities demand the ab…"
+    ],
+    "ai-agents": [
+      "Today's Overview",
+      "OpenClaw demonstrated high maintenance activity with 50 pul…",
+      "v2026.10.10-beta.3 (Released 2026-10-10, noted in digest wi…",
+      "Key Changes:",
+      "Restored fresh state initialization and Gateway startup for…",
+      "Configured SQLite helper windows to remain hidden during ap…"
+    ],
+    "ai-trending": [
+      "Today’s GitHub trending data reveals a significant shift to…",
+      "vllm-project/vllm：A high-throughput, memory-efficient infer…",
+      "ollama/ollama：The go-to tool for running models like Kimi…",
+      "headroomlabs-ai/headroom：A tool that compresses tool output…",
+      "Comfy-Org/ComfyUI：The most powerful modular diffusion model…",
+      "strelov1/freehire：An open-source search engine for job seek…"
+    ],
+    "ai-web": [
+      "AI Official Content Tracking Report",
+      "Today’s incremental update from Anthropic confirms the comm…",
+      "Category: News & Corporate Strategy",
+      "Developing Enterprise Frontier Safeguards with our customers",
+      "Core Insight: Anthropic is resolving the \"frontier security…",
+      "Significance: This is a major enterprise adoption driver, s…"
+    ],
+    "ai-hn": [
+      "The Hacker News community is currently fixated on the escal…",
+      "Voxtral 3 · HN：Mistral’s new audio-language model has gener…",
+      "Claude designed protein binders against scorpion neurotoxin…",
+      "DeepInfer: High-performance inference framework for DeepSee…",
+      "The bridge to agent-scale Git infrastructure · HN：GitHub is…",
+      "Launch HN: Alter (YC S25) – Access control for multi-user a…"
+    ],
+    "ai-arxiv": [
+      "Today's submissions reveal a strong convergence of efficien…",
+      "When Do LLMs Help with Feature Selection? A Systematic Empi…",
+      "Humans Correct Their Judgments Through Debate, but Weaker A…",
+      "Present but Hard to Read: Probing Latent Reasoning with Min…",
+      "Sage-A1.5: From Long-Horizon Execution to Scientific Explor…",
+      "Evolving Agent Interfaces：This work addresses the bottlenec…"
+    ],
+    "ai-hf": [
+      "As of 2026-10-22",
+      "The Hugging Face hub is currently driven by a significant p…",
+      "Qwen3.8-27B：A 27B parameter multimodal model capable of ima…",
+      "Qwen3.8-Flash-Next：An experimental variant of the Qwen3.8 s…",
+      "DeepSeek-V4.1-Flash-1017：A flash variant of the DeepSeek V4…",
+      "LiquidAI/LFM2.5-24B-A2B：A Mixture-of-Experts model with 24B…"
+    ],
+    "ai-community": [
+      "Today's Highlights",
+      "The dominant theme in today's feed is the shift from \"vibe…",
+      "Dev.to Highlights",
+      "Idempotency keys for AI agents: why hashing the arguments d…",
+      "Who watches the watcher when the watcher is a file in the r…",
+      "Your Agent Should Not Run as You: What Windows Now Offers f…"
+    ]
+  }
+}
