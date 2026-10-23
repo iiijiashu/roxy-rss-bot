@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "2026 年 10 月下旬，AI CLI 工具生态进入“稳…",
+      "注：数据基于提供的当日摘要提取。Claude Code 侧…",
+      "Windows 平台稳定性与性能：两家工具均在 Windo…",
+      "资源生命周期管理（内存/进程）：资源泄漏是共同痛点。Cod…",
+      "细粒度权限与安全策略：Claude Code 聚焦于组织层…",
+      "本地/文件访问策略平衡：Claude Code 用户呼吁禁…"
+    ],
+    "ai-agents": [
+      "今日 OpenClaw 项目维持高活跃度，过去 24 小时…",
+      "v2026.10.6 已发布 (Release)",
+      "核心变更与破坏性警告：",
+      "运行时强制校验：OpenClaw 现在强制要求 Node…",
+      "迁移注意事项：使用旧版本 Node.js 的部署环境将直接…",
+      "关联 PR：多个 PR (#181072, #181073…"
+    ],
+    "ai-trending": [
+      "《AI 开源趋势日报》2026-10-23",
+      "今日 AI 开源社区的关注重心明显从“模型本身”向Agen…",
+      "DietrichGebert/ponytail：专为 AI…",
+      "Graphify-Labs/graphify：将代码库、S…",
+      "cloudflare/security-audit-ski…",
+      "anthropics/knowledge-work-plu…"
+    ],
+    "ai-web": [
+      "Anthropic 于 10 月 22 日密集发布了四篇高…",
+      "核心观点与意义： 这篇文章代表了软件安全领域从“测试驱动”…",
+      "技术细节： 通过与 Theorem 合作，Claude 在…",
+      "核心观点与意义： 该研究探讨模型是否具备类似意识或体验的特…",
+      "战略信号： 引用了 David Chalmers 等专家的…",
+      "核心观点与意义： Anthropic 正式启动生命科学领域…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 DeepInfer（高性能推理框架）和…",
+      "Voxtral 3 · HN：Mistral 最新发布的多…",
+      "LLMs are making formal softwa…",
+      "AI and the Enclosure of the S…",
+      "How to spot AI science slop ·…",
+      "DeepInfer: High-performance i…"
+    ],
+    "ai-arxiv": [
+      "今日 ArXiv 投稿显示，AI 研究正从单纯扩大模型规模…",
+      "🧠 大语言模型（架构、训练、对齐、评估）",
+      "LongZero: Enhancing Long-Cont…",
+      "EPIC: Rethinking Trust Region…",
+      "CORD: Conflict-Aware Optimiza…",
+      "Did the Problem Actually Get…"
+    ],
+    "ai-hf": [
+      "Qwen 家族表现强劲，Qwen3.8 系列以极高的下载量…",
+      "Qwen3.8-27B：本周最热语言模型，支持图文多模态输…",
+      "Qwen3.8-Flash-Next：Qwen3.8 系列…",
+      "DeepSeek-V4.1-Flash-1017：Deep…",
+      "Muse-Spark-Open-816B-A42B：Met…",
+      "flint：RecursiveSI 发布的对话模型，支持文…"
+    ],
+    "ai-community": [
+      "今日技术社区聚焦于 AI Agent 的规模化部署与安全治…",
+      "Don't Be a Proxy Between Me a…",
+      "The Hidden Bugs Behind Duplic…",
+      "\"I'm 93% confident\" is a stri…",
+      "Scaling stateful Gemini 4 Arg…",
+      "Your retry loop is your most…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Tools: Claude Code, OpenAI Codex",
+      "The AI developer tool ecosystem is currently prioritizing s…",
+      "Resource & Process Management: Both communities report crit…",
+      "Windows Distribution Friction: Significant pain points exis…",
+      "Plugin/Ecosystem Lifecycle: Both tools are addressing issue…",
+      "Desktop Session Persistence: Users of both platforms are re…"
+    ],
+    "ai-agents": [
+      "Activity is high and development-focused, with 50 PRs updat…",
+      "Security Critical: This release enforces minimum Node.js ru…",
+      "Breaking Change / Migration Note: Users on older Node 24 or…",
+      "Several key fixes were merged/closed today, advancing stabi…",
+      "Linux Mount Path Fix: PR #181103 closed Issue #181101, fixi…",
+      "Onboarding Logic: PR #149817 closed Issue #149768, ensuring…"
+    ],
+    "ai-trending": [
+      "Step 1 (Filter)",
+      "From Trending List:",
+      "Included: anthropics/knowledge-work-plugins, DietrichGebert…",
+      "Excluded: php/php-src (general web interpreter), Meloong-Gi…",
+      "From Topic Search: All 81 repositories are explicitly AI/ML…",
+      "Step 2 (Categorize)"
+    ],
+    "ai-web": [
+      "The most significant strategic development today is Anthrop…",
+      "Research & Technical Capabilities",
+      "Title: LLMs are making formal software verification feasibl…",
+      "Core Insights: This release marks a pivotal shift from test…",
+      "Significance: This positions Claude not just as a code gene…",
+      "Title: Exploring model welfare"
+    ],
+    "ai-hn": [
+      "Today's Highlights",
+      "The Hacker News community is heavily focused on the operati…",
+      "Top News & Discussions",
+      "🔬 Models & Research",
+      "DeepInfer: High-performance inference framework for DeepSee…",
+      "Voxtral 3 · HN：Mistral's latest release represents a major…"
+    ],
+    "ai-arxiv": [
+      "Today's submissions reveal a strong pivot toward agent reli…",
+      "The End of Consensus Research?：Tackles the open problem of…",
+      "Which Differences Matter?：Develops controlled tests to dete…",
+      "Mitigating Model Collapse through Dreaming Learning：Studies…",
+      "Environment Duels: A Microcosm of LLM Co-Evolution：Introduc…",
+      "HGM-Dual: Lineage-Aware Guided Agent Harness Optimization：A…"
+    ],
+    "ai-hf": [
+      "Here is the structured digest for the Hugging Face Hub base…",
+      "DeepSeek and Qwen Lead: DeepSeek-V4.1-Flash-1017 and Qwen3…",
+      "Visual Generation Surge: The MOSS-Image ecosystem from Open…",
+      "Unfiltered/UNCENSORED Variants: There is a notable trend of…",
+      "Video and Segmentation: Lightricks/LTX-2.5 is a massive per…",
+      "Embedding Focus: google/embeddinggemma-2 stands out as the…"
+    ],
+    "ai-community": [
+      "The AI developer community is deeply focused on the operati…",
+      "Don't Be a Proxy Between Me and Your AI：A candid discussion…",
+      "The Hidden Bugs Behind Duplicate API Requests：Explains how…",
+      "\"I'm 93% confident\" is a string, not a probability：Highligh…",
+      "One Dev, Four Specialists: My Agent Team for OpenCode 🧑‍💻：Dem…",
+      "Anthropic Runs 30,000 Agents at Once. What Keeps Them Under…"
+    ]
+  }
+}
