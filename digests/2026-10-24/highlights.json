@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "2026年10月，AI CLI工具生态进入深度成熟期，竞争…",
+      "跨平台一致性（Windows重灾区）：",
+      "Claude Code：Windows下Cowork上下文…",
+      "Codex：Windows桌面端组织设置加载失败、Comp…",
+      "共性诉求：开发者强烈要求解决Windows客户端的稳定性回…",
+      "自动化与事件驱动："
+    ],
+    "ai-agents": [
+      "OpenClaw 项目今日保持高度活跃，过去 24 小时内…",
+      "今日合并/关闭了多个关键 PR，主要推进了以下方面：",
+      "性能优化与内存管理：",
+      "PR #181962 (Closed/Merged): 减…",
+      "PR #181973 (Closed): 修复了自然 GC…",
+      "PR #182030 (Closed): 修复了在新安装环…"
+    ],
+    "ai-trending": [
+      "今日 GitHub AI 开源社区热度呈现出向“智能体工程…",
+      "NVIDIA/OpenShell：专为自主 AI 智能体构…",
+      "cloudflare/security-audit-ski…",
+      "ollama/ollama：本地大模型运行工具，支持 Ki…",
+      "huggingface/transformers：支持文本…",
+      "SnailSploit/Claude-Red：为 Clau…"
+    ],
+    "ai-web": [
+      "Anthropic 于 10 月 23 日集中更新了其研究…",
+      "本次增量更新共 86 篇内容，主要集中于 网络安全/双用途…",
+      "LLM 自主发现零日漏洞的临界点",
+      "核心观点：Claude Opus 4.6 无需特定工具即可…",
+      "Claude Mythos Preview 的漏洞利用（E…",
+      "核心观点：该模型不仅能发现漏洞，还能自主编写端到端的漏洞利…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 AI 的讨论呈现出“高热度模型发布”与…",
+      "Kimi K3.1 Pro and K3.1 Pro Hi…",
+      "Voxtral 3 · HN：Mistral 的多模态模型…",
+      "New AI Is More Than Twice as…",
+      "AI analysis of CT scans finds…",
+      "DeepInfer: High-performance i…"
+    ],
+    "ai-arxiv": [
+      "今日 50 篇论文显示 LLM 基础设施与安全性成为核心焦…",
+      "A Fix for Softmax and Cross-E…",
+      "BeNice! Closing Looping's Inf…",
+      "Questioning Instrumental Conv…",
+      "Who Is Sycophantic to Whom? C…",
+      "The Geometry of Metaphor: Pro…"
+    ],
+    "ai-hf": [
+      "Meta 推出的 Qwen3.8-27B 以近 1.8 万…",
+      "Qwen3.8-27B：支持图像文本的多模态大模型，本周下…",
+      "DeepSeek-V4.1-Flash-1017：Deep…",
+      "Flint：面向递归应用的文本生成模型，标签显示其具备对话…",
+      "Spark-X2.6-4B：4B 参数的小型 LLM，主打…",
+      "Humanizer：基于 Gemma4 架构的多模态模型…"
+    ],
+    "ai-community": [
+      "今日技术社区的关注点正从单纯的模型能力转向AI 基础设施与…",
+      "Agents should never hold your…",
+      "How to Make RAG Show Its Evid…",
+      "Why an 80-Year-Old Math Book…",
+      "I Built a Pixel Hero That Nag…",
+      "Hush: I Hid 10 Emergencies in…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI development landscape is currently characterized…",
+      "Note: Exact total issue/PR counts were not provided in the…",
+      "Several requirements are driving community engagement acros…",
+      "Background & Automation Efficiency: Both communities are de…",
+      "Permission & Safety Granularity: There is a common push for…",
+      "Cross-Platform & Mobile Stability: Both tools face signific…"
+    ],
+    "ai-agents": [
+      "1. Today's Overview",
+      "OpenClaw demonstrated high engineering velocity on October…",
+      "No new releases were identified for 2026-10-24.",
+      "3. Project Progress",
+      "Merged and closed activities from the last 24 hours show a…",
+      "UI Polish: Several UI fixes were merged, including improvem…"
+    ],
+    "ai-trending": [
+      "Step 1: AI Relevance Filtering",
+      "Based on the provided data, the following general-purpose o…",
+      "cloudflare/security-audit-skill: While it mentions \"coding…",
+      "php/php-src: General interpreter.",
+      "nodejs/node: General runtime.",
+      "Renhuai123/ziwei-doushu: Traditional Chinese astrology/meta…"
+    ],
+    "ai-web": [
+      "The primary strategic signal from this incremental update i…",
+      "LLMs are making formal software verification feasible at a…",
+      "Insight: Anthropic has demonstrated that LLMs can now produ…",
+      "Using Claude to reduce the attack surface of code",
+      "Insight: This research focuses on automated attack surface…",
+      "Claude reveals ECDSA curve origins"
+    ],
+    "ai-hn": [
+      "The Hacker News community is currently dominated by intense…",
+      "Kimi K3.1 Pro and K3.1 Pro Highspeed · HN：The release of Ki…",
+      "Voxtral 3 · HN：Mistral’s latest audio-language model signal…",
+      "LLMs are making formal software verification feasible at a…",
+      "Using LLM for confidence scoring is a bad idea · HN：The aut…",
+      "New AI Is More Than Twice as Good at Diagnosing Diseases as…"
+    ],
+    "ai-arxiv": [
+      "Today's Highlights",
+      "Today's research landscape is heavily focused on operationa…",
+      "Key Papers",
+      "A Fix for Softmax and Cross-Entropy：Identifies and resolves…",
+      "Questioning Instrumental Convergence in RLVR: Checkpoint Ev…",
+      "The Geometry of Metaphor: Probing and Steering Metaphor Rep…"
+    ],
+    "ai-hf": [
+      "Today's Highlights",
+      "The Qwen3.8-27B model dominates the leaderboard with over 7…",
+      "Trending Models",
+      "Qwen/Qwen3.8-27B：This flagship 27B parameter multimodal LLM…",
+      "deepseek-ai/DeepSeek-V4.1-Flash-1017：A new iteration of the…",
+      "meta-models/Muse-Spark-Open-816B-A42B：Meta’s massive open-w…"
+    ],
+    "ai-community": [
+      "Today's Highlights",
+      "AI security and agent governance dominate today's discussio…",
+      "Dev.to Highlights",
+      "AI Is Winning Literary Awards. The Data Says That's Not Wha…",
+      "Agents should never hold your API keys. NVIDIA just open-so…",
+      "How to Make RAG Show Its Evidence: Claim Verification at 15…"
+    ]
+  }
+}
