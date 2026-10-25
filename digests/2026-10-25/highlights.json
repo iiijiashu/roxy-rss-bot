@@ -1,0 +1,102 @@
+{
+  "zh": {
+    "ai-cli": [
+      "以下是对 2026-10-25 Claude Code 与…",
+      "当前 AI CLI 工具生态已从单纯的语言模型接入转向全端…",
+      "注：基于提供的摘要数据，Claude Code 社区在订阅…",
+      "3. 共同关注的功能方向",
+      "多设备/远程协同解耦：",
+      "Codex：强烈要求移动端（iOS/iPad）能独立连接常…"
+    ],
+    "ai-agents": [
+      "OpenClaw 项目今日（2026-10-25）保持高度…",
+      "核心亮点：引入了重放安全的会话恢复机制。中断的会话现在保留…",
+      "稳定性：旨在解决大上下文处理及会话状态一致性问题。",
+      "定位：网关专用的扩展稳定版（相当于 LTS）。",
+      "内容：包含2026年9月底的 OpenClaw 基础，加上…",
+      "注意：这是针对需要长期稳定运行网关环境用户的维护分支版本。"
+    ],
+    "ai-trending": [
+      "今日 GitHub 开源生态的核心焦点全面转向 Agent…",
+      "NVIDIA/OpenShell：NVIDIA 推出的自主…",
+      "google-gemini/gemini-cli：谷歌官方…",
+      "morluto/rea：利用 Agent 逆向工程任何应用…",
+      "CherryHQ/cherry-studio：集智能聊天、…",
+      "ollama/ollama：本地化 LLM 推理引擎，支持…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 AI 的关注显著从单纯的模型参数竞赛转…",
+      "Kimi K3.1 Pro and K3.1 Pro Hi…",
+      "Why is AI generated language…",
+      "Using thousands of AI agents…",
+      "OpenShell – A safe, private r…",
+      "A practical guide to AI image…"
+    ],
+    "ai-hf": [
+      "本日 Hugging Face 生态呈现“多模态视频爆发”…",
+      "Qwen3.8-27B：基于 Qwen3.5 架构的多模态…",
+      "Qwen3.8-Flash-Next：Qwen4 实验性系…",
+      "DeepSeek-V4.1-Flash-1017：Deep…",
+      "jialinyyzz/humanizer：基于 Gemma…",
+      "DavidAU/Qwen3.8-27B-TURBO…"
+    ],
+    "ai-community": [
+      "今日技术社区 AI 讨论聚焦于落地工程的深化与基础设施的反…",
+      "Hours, Not Weeks: How AI Rewr…",
+      "Humanizer has about 60,000 st…",
+      "Your AI Agent Says “Done.” Wh…",
+      "I built a pip tool to test ho…",
+      "A 1.5B model is a triage sign…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "Ecosystem Overview",
+      "The AI CLI development landscape on October 25, 2026, is ch…",
+      "Activity Comparison",
+      "Note: \"High-Traction Issues\" refers to the specific hot iss…",
+      "Shared Feature Directions",
+      "Remote & Headless Independence: Both communities are demand…"
+    ],
+    "ai-agents": [
+      "Here is the OpenClaw project digest for 2026-10-25, based o…",
+      "OpenClaw demonstrates high-velocity maintenance with 50 pul…",
+      "v2026.10.7 (Latest):",
+      "Key Change: Introduces replay-safe session recovery. Interr…",
+      "Stability: Stopped conversations now retire terminal recove…",
+      "Integration: Ensures rejected Claude CLI drafts are exclude…"
+    ],
+    "ai-trending": [
+      "The open-source AI ecosystem is currently dominated by \"age…",
+      "NVIDIA/OpenShell：A secure and private runtime environment s…",
+      "google-gemini/gemini-cli：An open-source CLI that integrates…",
+      "NirDiamant/RAGTechniques：A comprehensive resource detailing…",
+      "RiccardoBiosas/awesome-MLSecOps：A curated list focused on t…",
+      "morluto/rea：A powerful tool for reverse engineering applica…"
+    ],
+    "ai-hn": [
+      "The Hacker News community is currently focused on the high…",
+      "Kimi K3.1 Pro and K3.1 Pro Highspeed · HN：This release repr…",
+      "Why is AI generated language so hard to understand? · HN：Th…",
+      "LLMs are making formal software verification feasible at a…",
+      "Using thousands of AI agents to uncover new leads in biolog…",
+      "OpenShell – A safe, private runtime for fleets of autonomou…"
+    ],
+    "ai-hf": [
+      "Today's Highlights",
+      "The Hugging Face ecosystem is currently dominated by video…",
+      "Trending Models",
+      "🧠 Language Models",
+      "Qwen/Qwen3.8-27B：This 27B multimodal model is the most like…",
+      "Qwen/Qwen3.8-Flash-Next：A next-generation experimental vers…"
+    ],
+    "ai-community": [
+      "Today's Highlights",
+      "Security and supply chain risks are dominating discussions…",
+      "Dev.to Highlights",
+      "Humanizer has about 60,000 stars. On 12 public tasks my lin…",
+      "Your AI Agent Says “Done.” What Did It Actually Verify?：Thi…",
+      "A 1.5B model is a triage signal, not a verdict：A highly deb…"
+    ]
+  }
+}
