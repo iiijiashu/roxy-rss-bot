@@ -1,0 +1,134 @@
+{
+  "zh": {
+    "ai-cli": [
+      "当前 AI CLI 工具生态正处于功能爆发与稳定性阵痛并存…",
+      "会话状态持久化与上下文管理：",
+      "Claude Code：用户呼吁支持不可逆归档的“取消归档…",
+      "OpenAI Codex：报告更新后历史线程无法恢复、上下…",
+      "透明度与成本/资源控制：",
+      "Claude Code：关注 PII（个人敏感信息）在系统…"
+    ],
+    "ai-agents": [
+      "OpenClaw 项目动态日报 (2026-10-28)",
+      "OpenClaw 社区活跃度处于高位，过去 24 小时内新…",
+      "今日共发布 3 个版本，涵盖 Beta 测试与稳定版修复：",
+      "核心变更：优化 Automations 功能，保留已认证操…",
+      "注意事项：此版本旨在强化会话边界安全，确保在角色、会话、取…",
+      "核心变更："
+    ],
+    "ai-trending": [
+      "今日 AI 开源社区焦点极度集中，\"Agent Harne…",
+      "morluto/rea：利用 Agent 逆向工程任意系统…",
+      "ollama/ollama：本地运行 Kimi、GLM、D…",
+      "huggingface/transformers：涵盖文本…",
+      "JetBrains/thinkrail：JetBrains…",
+      "makecindy/cindy：开源、开箱即用的 AI A…"
+    ],
+    "ai-web": [
+      "2026年10月27日至28日，AI 领域的战略焦点发生了…",
+      "核心观点：Anthropic 通过美国通用服务管理局（GS…",
+      "核心观点：Anthropic 向 SEC 提交了 S-1…",
+      "核心观点：Anthropic 公布其生命科学团队与 Bri…",
+      "核心观点：一项针对 50 名因果推断专家的研究揭示了“智能…",
+      "核心观点：Frontier Red Team 报告称其内部…"
+    ],
+    "ai-hn": [
+      "今日 HN 社区对 Anthropic 的关注度极高，其提…",
+      "GPT-6.1 Terra · HN：OpenAI 发布的…",
+      "Three new discoveries in math…",
+      "[The Exponential Time Hypothe…",
+      "Introducing LFM3: Every Modal…",
+      "Survival LLM: AI assistant an…"
+    ],
+    "ai-arxiv": [
+      "今日研究焦点显著转向智能体可靠性与评估，包括针对长时程任务…",
+      "Retriever-Free Retrieval: Nav…",
+      "Learning When to Commit: Sche…",
+      "Quantitative Generalization B…",
+      "Understanding Jev-Style Syste…",
+      "FOCUS: Active Critic Learning…"
+    ],
+    "ai-hf": [
+      "今日 Hugging Face 榜单呈现出明显的视频生成与…",
+      "deepseek-ai/DeepSeek-V4.1-Fla…",
+      "Qwen/Qwen3.8-27B：阿里通义千问 3.8 系…",
+      "Nanbeige/Nanbeige4.3-33B：纳米比亚…",
+      "XHToken/Spark-X2.6-4B：专为端侧或轻量…",
+      "KRAFTON/Raon-1-mini-preview：韩…"
+    ],
+    "ai-community": [
+      "今日技术社区对 AI 的讨论已从单纯的效果展示转向工程落地…",
+      "Your AI said \"fixed\" but neve…",
+      "The Most Embarrassing Private…",
+      "AI wrote the first 90% of my…",
+      "MCP Is the WSDL Moment for Ag…",
+      "A 3x Faster Local LLM That Ca…"
+    ]
+  },
+  "en": {
+    "ai-cli": [
+      "The AI CLI development tool landscape in late 2026 is defin…",
+      "Note: Data reflects the specific items provided in the 2026…",
+      "Requirements appearing across multiple tool communities ind…",
+      "Stateful Session Management & Recovery:",
+      "Claude Code: High demand for \"unarchiving\" sessions and res…",
+      "Codex: Struggles with thread resumption failures (missing e…"
+    ],
+    "ai-agents": [
+      "1. Today's Overview",
+      "OpenClaw maintains a high-velocity development cycle, with…",
+      "v2026.10.8: This release focuses on update reliability. It…",
+      "v2026.9.35: A gateway-only extended-stable (LTS) release. I…",
+      "v2026.10.10-beta.4: An in-development beta emphasizing auto…",
+      "3. Project Progress"
+    ],
+    "ai-trending": [
+      "The open-source AI ecosystem has shifted decisively toward…",
+      "affaan-m/ECC：An agent harness performance optimization syst…",
+      "Nutlope/hallmark：An \"anti-AI-slop\" design skill repository…",
+      "JetBrains/thinkrail：A lightweight, real IDE that \"vibe code…",
+      "pbakaus/impeccable：A design language framework specifically…",
+      "obra/superpowers：An agentic skills framework and software d…"
+    ],
+    "ai-web": [
+      "Today's Highlights",
+      "Anthropic announced its S-1 filing with the SEC for an Init…",
+      "Anthropic / Claude Content Highlights",
+      "News: Expanding our partnership with GSA to bring Claude to…",
+      "Core Insights: Anthropic is standardizing a 40% discount fo…",
+      "News: Anthropic files S-1 with the SEC for proposed initial…"
+    ],
+    "ai-hn": [
+      "Today's Highlights",
+      "The Hacker News community is dominated by the explosive rel…",
+      "Top News & Discussions",
+      "🔬 Models & Research",
+      "Three new discoveries in mathematics, computer science, and…",
+      "[The Exponential Time Hypothesis Is False [pdf] · HN](https…"
+    ],
+    "ai-arxiv": [
+      "Today's Highlights",
+      "Today’s research landscape is heavily focused on the operat…",
+      "Key Papers",
+      "Retriever-Free Retrieval: Navigating Documents with Decisio…",
+      "Learning When to Commit: Schedule Distillation for Fast Dif…",
+      "Selective Tie Learning: Mitigating Spurious Correlations in…"
+    ],
+    "ai-hf": [
+      "Today's Highlights",
+      "The Hugging Face ecosystem on 2026-10-28 is defined by the…",
+      "Trending Models",
+      "Qwen3.8-27B：This large multimodal LLM handles image-text in…",
+      "DeepSeek-V4.1-Flash-1017：A fast, image-text-capable model d…",
+      "RecursiveSI/flint：A conversational text-generation model ta…"
+    ],
+    "ai-community": [
+      "The most discussed AI topics today center on the practical…",
+      "Stratagems #32: The AI Logged a Withdrawal. P Took It as Pr…",
+      "Your AI said \"fixed\" but never ran the tests? I made a plug…",
+      "The Most Embarrassing Private Key in Web PKI History：A secu…",
+      "AI wrote the first 90% of my app in an afternoon. The last…",
+      "Your Data Never Leaves the Building: How to Self-Host a Min…"
+    ]
+  }
+}
